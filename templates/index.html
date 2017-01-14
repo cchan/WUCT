@@ -1,0 +1,13 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+<input id="message"><input type="submit" id="submit">
+
+<script>
+  var socket = io('http://localhost:{{ port }}{{ ns }}');
+  socket.on('connect', function(){console.log('connected');});
+  socket.on('disconnect', function(){console.log('disconnected');});
+  socket.on('reply', function(data){console.log('reply:', data);});
+  $('#submit').click(function(){
+    socket.emit('chat message', $('#message').val());
+  });
+</script>
