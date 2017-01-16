@@ -10,9 +10,12 @@ port = int(os.environ['PORT']) # will, correctly, raise a KeyError if does not e
 sio = socketio.Server()
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-  return render_template("index.html", ns=ns, port=port)
+@app.route("/entry")
+def entryPage():
+  return render_template("entry.html", ns=ns, port=port)
+@app.route("/display")
+def displayPage():
+  return render_template("display.html", ns=ns, port=port)
 
 @sio.on('connect', namespace=ns)
 def connect(sid, environ):
