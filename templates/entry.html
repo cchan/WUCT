@@ -1,21 +1,25 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+<head>
+  <link rel="stylesheet" href="https://npmcdn.com/bootstrap@4.0.0-alpha.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
 
-{% for n in range(8) %}
-//make a bootstrap card instead of rolling my own
-//there's probably some library to add and manipulate bootstrap cards
-//use angular or react
-  <form>
-    <input id="team-name" class="team{{n}}">
-  </form>
-{% endfor %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js" integrity="sha256-WKvqiY0jZHWQZIohYEmr9KUC5rEaYEOFTq+ByllJK8w=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
 
-<script>
-  var socket = io('http://localhost:{{ port }}{{ ns }}');
-  socket.on('connect', function(){console.log('connected');});
-  socket.on('disconnect', function(){console.log('disconnected');});
-  socket.on('reply', function(data){console.log('reply:', data);});
-  $('#submit').click(function(){
-    socket.emit('chat message', $('#message').val());
-  });
-</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+  <script src="https://npmcdn.com/reactstrap@2/dist/reactstrap.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    var socket = io('http://localhost:{{ port }}{{ ns }}');
+    socket.on('connect', function(){console.log('connected');});
+    socket.on('disconnect', function(){console.log('disconnected');});
+    socket.on('reply', function(data){console.log('reply:', data);});
+    $('#submit').click(function(){
+      socket.emit('chat message', $('#message').val());
+    });
+  </script>
+  <script type="text/jsx" src="scripts/app.jsx"></script>
+</body>
