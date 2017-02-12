@@ -1,4 +1,4 @@
-var requires = ["Card", "CardImg", "CardText", "CardBlock",
+var requires = ["CardGroup", "Card", "CardImg", "CardText", "CardBlock",
                 "CardTitle", "CardSubtitle", "Button"];
 for(var i = 0; i < requires.length; i++)
   window[requires[i]] = Reactstrap[requires[i]];
@@ -36,13 +36,14 @@ var TeamCard = React.createClass({
 });
 var TeamCardSet = React.createClass({
   render: function() {
-    var cards = [<TeamCard />];
+    console.log('hi');
+    var cards = [<TeamCard />, <TeamCard />];
     return (
       <CardGroup>{cards}</CardGroup>
     );
   }
 });
 ReactDOM.render(
-  <TeamCard />,
+  <TeamCardSet />,
   document.getElementById('app')
 );
