@@ -1,9 +1,5 @@
 <html>
 <head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-with-addons.min.js" integrity="sha256-NtwBF+7tVJHQJP21n/7wq6vbvRoVyzs+Pk0YZganCN8=" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.min.js" integrity="sha256-uzKwYuH50DHzDYr3h/Bnpv7C5QJNUjHEpVmT3Xuq3ww=" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.38/browser.min.js" integrity="sha256-0qXTMQRluMHQsawOwSYblgYSXkmuvZ2ygOkj7y6TtGU=" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/reactstrap@4.1.1/dist/reactstrap.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
@@ -25,7 +21,7 @@
       messagingSenderId: "833633709327"
     };
     firebase.initializeApp(config);
-    firebase.database().ref('wuct2017');
+    var fb = firebase.database().ref('wuct2017');
   </script>
   <script src="bundle.js"></script>
 </body>
