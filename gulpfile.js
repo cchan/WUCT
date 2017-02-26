@@ -36,7 +36,8 @@ gulp.task('build', ['build-html', 'build-sass', 'build-jsx']);
 
 gulp.task('watch', ['build'], function () {
   browserSync.init({
-    server: "./dist"
+    server: "./dist",
+    port: process.env.PORT || 8849
   });
   gulp.watch('app/scripts/*.jsx', ['watch-jsx']);
   gulp.watch('app/views/*.html', ['build-html']).on('change', browserSync.reload);
