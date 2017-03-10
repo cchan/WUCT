@@ -47,11 +47,22 @@ class DifficultySection extends React.Component {
       currentQuestion: 0,
       scores: [0, 0, 0]
     };
+    this.ref = fb.child('scores')
+      .child('team'+this.props.teamId)
+      .child(["easy", "medium", "hard"][this.props.difficulty]);
+    //initial value???
+    this.ref.on('value', function(snapshot){
+      if(!snapshot.val())
+        this.ref.set(this.state.scores);
+      else
+        this.setState({scores: snapshot.val()});
+    }.bind(this));
   }
   scoreHandler(selected){
     var newScores = this.state.scores;
     newScores[this.state.currentQuestion] = selected;
     this.setState({scores: newScores});
+    this.ref.set(newScores);
   }
   back(){
     this.setState({currentQuestion: this.state.currentQuestion - 1});
@@ -60,16 +71,9 @@ class DifficultySection extends React.Component {
     this.setState({currentQuestion: this.state.currentQuestion + 1});
   }
   render() {
-    //fb.child(this.state.id + '/' + this.props.difficulty);
     const dClass = ["easy", "medium", "hard"];
     const dTitle = ["Easy", "Med", "Hard"];
-    const numQuestions = [3, 3, 3]; //if currentQuestion hits this then display end screen
-    
-    var buttons = [];
-    if(this.state.currentQuestion > 0)
-      buttons.push();
-    if(this.state.currentQuestion < 2)
-      buttons.push();
+    //const numQuestions = [3, 3, 3]; //if currentQuestion hits this then display end screen
     
     return (
       <span className={"difficulty "+dClass[this.props.difficulty]}>
@@ -90,19 +94,41 @@ class TeamCard extends React.Component {
       color: 'hsl(' + Math.floor(Math.random()*360) + ', 100%, 35%)'
     };
   }
+  setTeamId(event){
+    if(event.target.value){
+      var teamId = event.target.value;
+      fb.child('teams').child(teamId).once('value').then(function(snapshot){
+        if(snapshot.val() != null)
+          this.setState({teamName: snapshot.val().name, teamId: teamId});
+        else
+          this.setState({teamName: "Unknown Team", teamId: undefined});
+      }.bind(this));
+    }
+    else
+      this.setState({teamName: "Unknown Team", teamId: undefined});
+  }
   render() {
+    var setTeamId = this.setTeamId.bind(this);
+    var difficultySections;
+    if(this.state.teamId != undefined)
+      difficultySections = 
+        <div>
+          <DifficultySection difficulty="0" teamId={this.state.teamId}/>
+          <DifficultySection difficulty="1" teamId={this.state.teamId}/>
+          <DifficultySection difficulty="2" teamId={this.state.teamId}/>
+        </div>;
+    else
+      difficultySections = <p>Enter a team ID first.</p>;
     return (
-      <div>
-        <Card inverse style={{ backgroundColor: this.state.color, borderColor: this.state.color }}>
-          <CardBlock>
-            <CardTitle>{this.state.teamName}</CardTitle>
-            <CardSubtitle>ID: <input type="text" placeholder="12345"/></CardSubtitle>
-            <DifficultySection difficulty="0"/>
-            <DifficultySection difficulty="1"/>
-            <DifficultySection difficulty="2"/>
-          </CardBlock>
-        </Card>
-      </div>
+      <Card inverse style={{ backgroundColor: this.state.color, borderColor: this.state.color }}>
+        <CardBlock>
+          <CardTitle>{this.state.teamName}</CardTitle>
+          <a href="#" onClick={this.props.remove}>x</a>
+          <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.state.teamId} onChange={setTeamId}/></CardSubtitle>
+          
+          {difficultySections}
+        </CardBlock>
+      </Card>
     );
   }
 }
@@ -110,13 +136,38 @@ class TeamCard extends React.Component {
 class TeamCardSet extends React.Component {
   constructor(props) {
     super(props);
+    
+    this.state = {cards: []};
+  }
+  addCard(){
+    var index;
+    do{index = 'card' + Math.floor(Math.random() * 100000000);}
+    while(this.state.cards[index] !== undefined);
+    
+    this.state.cards[index] = <TeamCard token={window.token} remove={this.removeCard.bind(this, index)} />;
+    this.setState({cards: this.state.cards});
+  }
+  removeCard(i){
+    this.state.cards[i] = undefined;
+    this.setState({cards: this.state.cards});
   }
   render() {
     console.log('hi');
-    var cards = [<TeamCard />, <TeamCard />,<TeamCard />, <TeamCard />,<TeamCard />, <TeamCard />];
-    return (
-      <CardDeck>{cards}</CardDeck>
-    );
+    if(true||window.token){
+      var cards = [];
+      for(var prop in this.state.cards){
+        if(this.state.cards.hasOwnProperty(prop))
+          cards.push(this.state.cards[prop]);
+      }
+      return (
+        <div>
+          <div>{cards}</div>
+          <Button onClick={this.addCard.bind(this)}>Add Team</Button>
+        </div>
+      );
+    }else{
+      return <p>Not authenticated</p>;
+    }
   }
 }
 
