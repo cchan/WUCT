@@ -97,6 +97,7 @@ class TeamCard extends React.Component {
   setTeamId(event){
     if(event.target.value){
       var teamId = event.target.value;
+      console.log('changing to', teamId);
       fb.child('teams').child(teamId).once('value').then(function(snapshot){
         if(snapshot.val() != null)
           this.setState({teamName: snapshot.val().name, teamId: teamId});
@@ -163,6 +164,7 @@ class TeamCardSet extends React.Component {
         <div>
           <div>{cards}</div>
           <Button onClick={this.addCard.bind(this)}>Add Team</Button>
+          <Button onClick={function(){firebase.auth().signOut();window.location.reload();}}>Sign Out</Button>
         </div>
       );
     }else{
@@ -171,7 +173,9 @@ class TeamCardSet extends React.Component {
   }
 }
 
-ReactDOM.render(
-  <TeamCardSet />,
-  document.getElementById('app')
-);
+window.render = function(){
+  ReactDOM.render(
+    <TeamCardSet />,
+    document.getElementById('app')
+  );
+};
