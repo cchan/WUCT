@@ -9,8 +9,8 @@
   <link rel="stylesheet" href="main.css" />
 </head>
 <body>
-  
-  
+  <div id="app"></div>
+
   <script>
     // Initialize Firebase
     var config = {
@@ -22,19 +22,7 @@
     };
     firebase.initializeApp(config);
     var fb = firebase.database().ref('wuct2017');
-    
-    fb.child('scores').on('value', function(snapshot){
-      var teams = snapshot.val();
-      for(teamId in teams){
-        if(teams.hasOwnProperty(teamId)){
-          console.log(teamId, teams[teamId]);
-          score = teams[teamId]['easy'].map(function(a){if(a==3)a++;return a*1;}).reduce(function(a,b){return a+b;})
-                + teams[teamId]['medium'].map(function(a){if(a==3)a++;return a*3;}).reduce(function(a,b){return a+b;})
-                + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*8;}).reduce(function(a,b){return a+b;});
-          console.log(teamId, score);
-        }
-      }
-    });
   </script>
+  <script src="bundle.js"></script>
 </body>
 </html>

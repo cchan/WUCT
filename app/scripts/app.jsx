@@ -179,3 +179,21 @@ window.render = function(){
     document.getElementById('app')
   );
 };
+
+setTimeout(function(){
+  var user = firebase.auth().currentUser;
+  console.log('attempt');
+  if (user) {
+    if(user.email != 'wuct@clive.io'){
+      firebase.auth().signOut();
+      window.location.reload();
+    }
+    else
+      window.render();
+  } else {
+    var password = prompt('Enter password');
+    firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).then(window.render).catch(function(error){
+      document.getElementById('app').innerHTML = 'failed to sign in';
+    });
+  }
+}, 300);
