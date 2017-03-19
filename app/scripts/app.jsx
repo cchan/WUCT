@@ -43,6 +43,7 @@ class RadioBtnGroup extends React.Component {
 class DifficultySection extends React.Component {
   constructor(props) {
     super(props);
+    console.log('asdf');
     this.state = {
       currentQuestion: 0,
       scores: [0, 0, 0]
@@ -50,13 +51,17 @@ class DifficultySection extends React.Component {
     this.ref = fb.child('scores')
       .child('team'+this.props.teamId)
       .child(["easy", "medium", "hard"][this.props.difficulty]);
-    //initial value???
     this.ref.on('value', function(snapshot){
+      console.log('mooooo');
       if(!snapshot.val())
         this.ref.set(this.state.scores);
       else
         this.setState({scores: snapshot.val()});
     }.bind(this));
+    console.log('x');
+  }
+  componentWillUnmount(){
+    this.ref.off('value')
   }
   scoreHandler(selected){
     var newScores = this.state.scores;
@@ -90,28 +95,24 @@ class TeamCard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      teamName: "Unknown Team", // id doesn't matter
+      teamName: null,
+      teamId: "",
       color: 'hsl(' + Math.floor(Math.random()*360) + ', 100%, 35%)'
     };
   }
   setTeamId(event){
-    if(event.target.value){
-      var teamId = event.target.value;
-      console.log('changing to', teamId);
+    var teamId = event.target.value;
+    this.setState({teamName: undefined, teamId: teamId});
+    if(teamId)
       fb.child('teams').child(teamId).once('value').then(function(snapshot){
-        if(snapshot.val() != null)
-          this.setState({teamName: snapshot.val().name, teamId: teamId});
-        else
-          this.setState({teamName: "Unknown Team", teamId: undefined});
+        console.log("<");
+        this.setState({teamName: snapshot.val() ? snapshot.val().name : null});
+        console.log(">");
       }.bind(this));
-    }
-    else
-      this.setState({teamName: "Unknown Team", teamId: undefined});
   }
   render() {
-    var setTeamId = this.setTeamId.bind(this);
     var difficultySections;
-    if(this.state.teamId != undefined)
+    if(this.state.teamName != null)
       difficultySections = 
         <div>
           <DifficultySection difficulty="0" teamId={this.state.teamId}/>
@@ -120,12 +121,13 @@ class TeamCard extends React.Component {
         </div>;
     else
       difficultySections = <p>Enter a team ID first.</p>;
+    var teamName = this.state.teamName || "Unknown Team";
     return (
       <Card inverse style={{ backgroundColor: this.state.color, borderColor: this.state.color }}>
         <CardBlock>
-          <CardTitle>{this.state.teamName}</CardTitle>
+          <CardTitle>{teamName}</CardTitle>
           <a href="#" onClick={this.props.remove}>x</a>
-          <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.state.teamId} onChange={setTeamId}/></CardSubtitle>
+          <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.state.teamId} onChange={this.setTeamId.bind(this)}/></CardSubtitle>
           
           {difficultySections}
         </CardBlock>
