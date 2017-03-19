@@ -101,15 +101,38 @@ class TeamCard extends React.Component {
     };
   }
   setTeamId(event){
+    if(this.state.teamId)
+      fb.child('teams').child(this.state.teamId).off('value');
+    
     var teamId = event.target.value;
-    this.setState({teamName: null, teamId: teamId});
+    this.setState({teamName: null, teamId: teamId, color: 'grey'});
     if(teamId)
-      fb.child('teams').child(teamId).once('value').then(function(snapshot){
+      fb.child('teams').child(teamId).on('value', function(snapshot){
+        console.log('got something');
         if(snapshot.val())
           this.setState({teamName: snapshot.val().name, color: snapshot.val().color});
       }.bind(this));
   }
+  changeColor(event){
+    console.log(event.target.value);
+    if(this.state.teamName)
+      fb.child('teams').child(this.state.teamId).child('color').set(event.target.value);
+    this.setState({color: event.target.value});
+  }
+  componentWillUnmount(){
+    fb.child('teams').child(teamId).off('value');
+  }
   render() {
+    const spectrum = {
+      pink: "MediumVioletRed",
+      red: "DarkRed",
+      orange: "OrangeRed",
+      yellow: "Goldenrod",
+      green: "Green",
+      blue: "DarkBlue",
+      violet: "DarkViolet"
+    };
+    
     var difficultySections;
     if(this.state.teamName != null)
       difficultySections = 
@@ -125,6 +148,13 @@ class TeamCard extends React.Component {
       <Card inverse style={{ backgroundColor: this.state.color, borderColor: this.state.color }}>
         <CardBlock>
           <a href="#" onClick={this.props.remove} className="xBtn">&#x2715;</a>
+          <select value={this.state.color} onChange={this.changeColor.bind(this)}>
+            <option selected="selected">grey</option>
+            {Object.keys(spectrum).reduce(function(previous, current) {
+                previous.push(<option key={spectrum[current]} value={spectrum[current]}>{current}</option>);
+                return previous;
+            }, [])}
+          </select>
           <CardTitle>{teamName}</CardTitle>
           <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.state.teamId} onChange={this.setTeamId.bind(this)}/></CardSubtitle>
           
@@ -199,7 +229,10 @@ firebase.auth().onAuthStateChanged(function(user){
       window.render();
   }
 });
-
+document.getElementById('password').onkeypress = function(e){
+  if(e.keyCode == 13)
+    document.getElementById('passsubmit').click();
+}
 document.getElementById('passsubmit').onclick = function(e){
   var password = document.getElementById('password').value;
   if(!password)
