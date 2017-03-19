@@ -4,6 +4,20 @@ body
   display: inline-block
   width: 450px
   margin: 10px
+  color: white
+  .xBtn
+    float: right
+    display: inline-block
+    width: 1.5em
+    height: 1.5em
+    background-color: #666
+    text-align: center
+    border-radius: 3px
+    color: white
+    &:hover
+      text-decoration: none
+      color: #000
+      background-color: white
 input[type=text]
   border: none
 .difficulty
@@ -15,11 +29,11 @@ input[type=text]
   
   border-radius: 3px
   &.easy
-    background-color: #6f6
+    background-color: #3d3
   &.medium
-    background-color: #6ee
+    background-color: #3dd
   &.hard
-    background-color: #f88
+    background-color: #f77
   input[type=text]
     background-color: transparent
     width: 100%
@@ -27,6 +41,9 @@ input[type=text]
   .btn-group
     button
       padding: 0 0.6em 0.2em 0.6em
+    .active
+      background-color: black
+      color: white
   button
     padding: 0 0.35em 0.2em 0.35em
     &.next

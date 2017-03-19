@@ -97,17 +97,16 @@ class TeamCard extends React.Component {
     this.state = {
       teamName: null,
       teamId: "",
-      color: 'hsl(' + Math.floor(Math.random()*360) + ', 100%, 35%)'
+      color: 'grey'
     };
   }
   setTeamId(event){
     var teamId = event.target.value;
-    this.setState({teamName: undefined, teamId: teamId});
+    this.setState({teamName: null, teamId: teamId});
     if(teamId)
       fb.child('teams').child(teamId).once('value').then(function(snapshot){
-        console.log("<");
-        this.setState({teamName: snapshot.val() ? snapshot.val().name : null});
-        console.log(">");
+        if(snapshot.val())
+          this.setState({teamName: snapshot.val().name, color: snapshot.val().color});
       }.bind(this));
   }
   render() {
@@ -120,13 +119,13 @@ class TeamCard extends React.Component {
           <DifficultySection difficulty="2" teamId={this.state.teamId}/>
         </div>;
     else
-      difficultySections = <p>Enter a team ID first.</p>;
+      difficultySections = <p>Invalid team ID.</p>;
     var teamName = this.state.teamName || "Unknown Team";
     return (
       <Card inverse style={{ backgroundColor: this.state.color, borderColor: this.state.color }}>
         <CardBlock>
+          <a href="#" onClick={this.props.remove} className="xBtn">&#x2715;</a>
           <CardTitle>{teamName}</CardTitle>
-          <a href="#" onClick={this.props.remove}>x</a>
           <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.state.teamId} onChange={this.setTeamId.bind(this)}/></CardSubtitle>
           
           {difficultySections}
