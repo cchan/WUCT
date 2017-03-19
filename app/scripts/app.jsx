@@ -61,7 +61,7 @@ class DifficultySection extends React.Component {
     console.log('x');
   }
   componentWillUnmount(){
-    this.ref.off('value')
+    this.ref.off('value');
   }
   scoreHandler(selected){
     var newScores = this.state.scores;
@@ -166,7 +166,7 @@ class TeamCardSet extends React.Component {
         <div>
           <div>{cards}</div>
           <Button onClick={this.addCard.bind(this)}>Add Team</Button>
-          <Button onClick={function(){firebase.auth().signOut();window.location.reload();}}>Sign Out</Button>
+          <Button onClick={function(){window.signOut()}}>Sign Out</Button>
         </div>
       );
     }else{
@@ -182,20 +182,33 @@ window.render = function(){
   );
 };
 
-setTimeout(function(){
-  var user = firebase.auth().currentUser;
+window.cancelAuthStateChanged = false;
+window.signOut = function(){
+  window.cancelAuthStateChanged = true;
+  firebase.auth().signOut();
+  window.location.reload();
+}
+firebase.auth().onAuthStateChanged(function(user){
+  if(window.cancelAuthStateChanged)
+    return;
+  
   console.log('attempt');
   if (user) {
-    if(user.email != 'wuct@clive.io'){
-      firebase.auth().signOut();
-      window.location.reload();
-    }
+    if(user.email != 'wuct@clive.io')
+      window.signOut();
     else
       window.render();
-  } else {
-    var password = prompt('Enter password');
+  }
+});
+
+document.getElementById('passsubmit').onclick = function(e){
+  var password = document.getElementById('password').value;
+  if(!password)
+    document.getElementById('app').innerHTML = 'failed to sign in';
+  else
     firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).then(window.render).catch(function(error){
       document.getElementById('app').innerHTML = 'failed to sign in';
     });
-  }
-}, 300);
+  e.preventDefault();
+  return false;
+};
