@@ -1,0 +1,81 @@
+<html>
+<head>
+  <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
+</head>
+<body>
+  <div id="app"></div>
+  
+  <style>
+    #app{
+      padding: 2em;
+    }
+    #app div{
+      border: solid 1px #000;
+      border-radius: 10px;
+      display: inline-block;
+      padding: 1em;
+      margin: 1em;
+    }
+    #app div h2{
+      display: inline-block;
+      font-size: 1.3em;
+    }
+    #app div span{
+      font-size: 1.3em;
+      margin-left: 1em;
+    }
+  </style>
+  
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyC4siYV0A1Nq4POMUfvdRKyP0-xzUUvMVo",
+      authDomain: "wuct-1f4ca.firebaseapp.com",
+      databaseURL: "https://wuct-1f4ca.firebaseio.com",
+      storageBucket: "wuct-1f4ca.appspot.com",
+      messagingSenderId: "833633709327"
+    };
+    firebase.initializeApp(config);
+    var fb = firebase.database().ref('wuct2017');
+    
+    window.teamNames = {};
+    window.scores = [];
+    
+    fb.child('teams').on('value', function(snapshot){
+      window.teamNames = {};
+      var teams = snapshot.val();
+      for(var teamId in teams)
+        if(teams.hasOwnProperty(teamId))
+          window.teamNames['team'+teamId] = teams[teamId].name;
+      render();
+    });
+    
+    fb.child('scores').on('value', function(snapshot){
+      window.scores = [];
+      var teams = snapshot.val();
+      for(var teamId in teams){
+        if(teams.hasOwnProperty(teamId)){
+          score = teams[teamId]['easy'].map(function(a){if(a==3)a++;return a*1;}).reduce(function(a,b){return a+b;})
+                + teams[teamId]['medium'].map(function(a){if(a==3)a++;return a*3;}).reduce(function(a,b){return a+b;})
+                + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*8;}).reduce(function(a,b){return a+b;});
+          window.scores.push([teamId, score]);
+        }
+      }
+      window.scores.sort(function(a,b){return b[1] - a[1];});
+      render();
+    });
+    
+    function render(){
+      var s = "";
+      for(let i = 0; i < window.scores.length; i++)
+        s += "<div><h2>" + window.teamNames[scores[i][0]] + "</h2><span>" + scores[i][1] + "</span></div>";
+      document.getElementById('app').innerHTML = s;
+    }
+  </script>
+</body>
+</html>

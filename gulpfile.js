@@ -1,6 +1,7 @@
 //based on http://egorsmirnov.me/2015/05/22/react-and-es6-part1.html
 
 var gulp =        require('gulp');
+var serve =       require('gulp-serve');
 var browserify =  require('browserify');
 var babelify =    require('babelify');
 var source =      require('vinyl-source-stream');
@@ -33,6 +34,11 @@ gulp.task('watch-jsx', ['build-jsx'], function(done) {
 });
 
 gulp.task('build', ['build-html', 'build-sass', 'build-jsx']);
+
+gulp.task('serve', ['build'], serve({
+  root: 'dist',
+  port: process.env.PORT || 8849
+}));
 
 gulp.task('watch', ['build'], function () {
   browserSync.init({
