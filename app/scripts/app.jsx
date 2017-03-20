@@ -193,9 +193,12 @@ class TeamCardSet extends React.Component {
       }
       return (
         <div>
+          <header>
+            <h1><img src="http://wuct.wustl.edu/images/wuct.jpg" alt="WUCT" />Broken Bonds Round</h1>
+            <a href="#" onClick={function(){window.signOut()}}><i className="fa fa-sign-out" aria-hidden="true"></i></a>
+            <a href="#" onClick={this.addCard.bind(this)}><i className="fa fa-plus" aria-hidden="true"></i></a>
+          </header>
           <div>{cards}</div>
-          <Button onClick={this.addCard.bind(this)}>Add Team</Button>
-          <Button onClick={function(){window.signOut()}}>Sign Out</Button>
         </div>
       );
     }else{

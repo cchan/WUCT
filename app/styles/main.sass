@@ -1,5 +1,40 @@
+$green: #255D38
+
 body
   padding: 3em
+header
+  position: fixed
+  left: 0
+  right: 0
+  top: 0
+  height: 3em
+  background-color: $green
+  color: white
+  h1
+    font-size: 1.5em
+    line-height: 2em
+    display: inline-block
+    img
+      height: 1.9em
+      vertical-align: top
+      margin-right: 1em
+  a
+    i.fa
+      height: 3em
+      line-height: 3em
+    text-decoration: none
+    color: white
+    float: right
+    display: inline-block
+    width: 3em
+    height: 3em
+    text-align: center
+    transition: background-color 0.4s
+    &:visited
+      color: white
+    &:hover
+      background-color: darken($green, 10%)
+      color: white
 .card
   display: inline-block
   width: 450px
