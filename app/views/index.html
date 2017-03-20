@@ -8,26 +8,29 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
 </head>
 <body>
+  <h1>WUCT Broken Bonds Round</h1>
   <div id="app"></div>
   
   <style>
+    body{
+      text-align: center;
+      padding-top: 3em;
+    }
     #app{
       padding: 2em;
     }
-    #app div{
-      border: solid 1px #000;
-      border-radius: 10px;
+    #app ol{
+      text-align: left;
       display: inline-block;
-      padding: 1em;
-      margin: 1em;
+      padding: 0;
+      list-style-type: none;
     }
-    #app div h2{
-      display: inline-block;
-      font-size: 1.3em;
+    #app ol li span{
+      float: right;
+      margin-left: 2em
     }
-    #app div span{
-      font-size: 1.3em;
-      margin-left: 1em;
+    #app ol li:nth-child(odd){
+      background-color: #ccc
     }
   </style>
   
@@ -63,18 +66,22 @@
           score = teams[teamId]['easy'].map(function(a){if(a==3)a++;return a*1;}).reduce(function(a,b){return a+b;})
                 + teams[teamId]['medium'].map(function(a){if(a==3)a++;return a*3;}).reduce(function(a,b){return a+b;})
                 + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*8;}).reduce(function(a,b){return a+b;});
-          window.scores.push([teamId, score]);
+          window.scores.push({id: teamId, score: score});
         }
       }
-      window.scores.sort(function(a,b){return b[1] - a[1];});
+      window.scores.sort(function(a,b){return b.score - a.score;});
       render();
     });
     
     function render(){
       var s = "";
-      for(let i = 0; i < window.scores.length; i++)
-        s += "<div><h2>" + window.teamNames[scores[i][0]] + "</h2><span>" + scores[i][1] + "</span></div>";
-      document.getElementById('app').innerHTML = s;
+      var prevRank = 0;
+      for(let i = 0; i < window.scores.length; i++){
+        if(i > 0 && scores[i].score != scores[i-1].score)
+          prevRank = i;
+        s += "<li>" + (prevRank + 1) + ". " + window.teamNames[scores[i].id] + "<span>" + scores[i].score + "</span></li>";
+      }
+      document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
     }
   </script>
 </body>
