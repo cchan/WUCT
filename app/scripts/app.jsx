@@ -209,37 +209,3 @@ window.render = function(){
     document.getElementById('app')
   );
 };
-
-window.cancelAuthStateChanged = false;
-window.signOut = function(){
-  window.cancelAuthStateChanged = true;
-  firebase.auth().signOut();
-  window.location.reload();
-}
-firebase.auth().onAuthStateChanged(function(user){
-  if(window.cancelAuthStateChanged)
-    return;
-  
-  console.log('attempt');
-  if (user) {
-    if(user.email != 'wuct@clive.io')
-      window.signOut();
-    else
-      window.render();
-  }
-});
-document.getElementById('password').onkeypress = function(e){
-  if(e.keyCode == 13)
-    document.getElementById('passsubmit').click();
-}
-document.getElementById('passsubmit').onclick = function(e){
-  var password = document.getElementById('password').value;
-  if(!password)
-    document.getElementById('app').innerHTML = 'failed to sign in';
-  else
-    firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).then(window.render).catch(function(error){
-      document.getElementById('app').innerHTML = 'failed to sign in';
-    });
-  e.preventDefault();
-  return false;
-};

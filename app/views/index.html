@@ -9,6 +9,7 @@
 </head>
 <body>
   <h1>WUCT Broken Bonds Round</h1>
+  <span id="login-status"></span>
   <div id="app"></div>
   
   <style>
@@ -45,6 +46,11 @@
     };
     firebase.initializeApp(config);
     var fb = firebase.database().ref('wuct2017');
+    firebase.auth().onAuthStateChanged(function(user){
+      if (user && user.email == "wuct@clive.io"){
+        document.getElementById('login-status').innerHTML = 'logged in';
+      }
+    });
     
     window.teamNames = {};
     window.scores = [];
@@ -77,6 +83,8 @@
       var s = "";
       var prevRank = 0;
       for(let i = 0; i < window.scores.length; i++){
+        if(window.teamNames[scores[i].id] === undefined)
+          continue;
         if(i > 0 && scores[i].score != scores[i-1].score)
           prevRank = i;
         s += "<li>" + (prevRank + 1) + ". " + window.teamNames[scores[i].id] + "<span>" + scores[i].score + "</span></li>";
