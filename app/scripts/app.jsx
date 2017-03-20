@@ -105,18 +105,14 @@ class TeamCard extends React.Component {
       fb.child('teams').child(this.state.teamId).off('value');
     
     var teamId = event.target.value;
-    this.setState({teamName: null, teamId: teamId, color: 'grey'});
+    this.setState({teamName: null, teamId: teamId});
     if(teamId)
       fb.child('teams').child(teamId).on('value', function(snapshot){
-        console.log('got something');
         if(snapshot.val())
-          this.setState({teamName: snapshot.val().name, color: snapshot.val().color});
+          this.setState({teamName: snapshot.val().name});
       }.bind(this));
   }
   changeColor(event){
-    console.log(event.target.value);
-    if(this.state.teamName)
-      fb.child('teams').child(this.state.teamId).child('color').set(event.target.value);
     this.setState({color: event.target.value});
   }
   componentWillUnmount(){
@@ -148,10 +144,10 @@ class TeamCard extends React.Component {
       <Card inverse style={{ backgroundColor: this.state.color, borderColor: this.state.color }}>
         <CardBlock>
           <a href="#" onClick={this.props.remove} className="xBtn">&#x2715;</a>
-          <select value={this.state.color} onChange={this.changeColor.bind(this)}>
-            <option selected="selected">grey</option>
+          <select value={this.state.color} style={{color: "white", backgroundColor: this.state.color}} onChange={this.changeColor.bind(this)}>
+            <option style={{backgroundColor: "grey"}}>grey</option>
             {Object.keys(spectrum).reduce(function(previous, current) {
-                previous.push(<option key={spectrum[current]} value={spectrum[current]}>{current}</option>);
+                previous.push(<option key={spectrum[current]} value={spectrum[current]} style={{backgroundColor: spectrum[current]}}>{current}</option>);
                 return previous;
             }, [])}
           </select>
@@ -194,9 +190,9 @@ class TeamCardSet extends React.Component {
       return (
         <div>
           <header>
-            <h1><img src="http://wuct.wustl.edu/images/wuct.jpg" alt="WUCT" />Broken Bonds Round</h1>
-            <a href="#" onClick={function(){window.signOut()}}><i className="fa fa-sign-out" aria-hidden="true"></i></a>
-            <a href="#" onClick={this.addCard.bind(this)}><i className="fa fa-plus" aria-hidden="true"></i></a>
+            <h1><img src="http://wuct.wustl.edu/images/wuct.jpg" alt="WUCT" />Broken Bonds Round: Scoring</h1>
+            <a href="#" className="add" onClick={this.addCard.bind(this)}><i className="fa fa-plus" aria-hidden="true"></i></a>
+            <a href="#" className="signout" onClick={function(){window.signOut()}}><i className="fa fa-sign-out" aria-hidden="true"></i></a>
           </header>
           <div>{cards}</div>
         </div>
