@@ -13,6 +13,11 @@
     <h1><img src="http://wuct.wustl.edu/images/wuct.jpg" alt="WUCT" />Broken Bonds Round: Control Panel</h1>
   </header>
   
+  <input type="text" placeholder="id" id="newid" />
+  <input type="text" placeholder="new name" id="newname" />
+  <input type="submit" value="Set team name" onclick="addTeam();" />
+  <input type="submit" value="Remove team with this ID" onclick="deleteTeam();" />
+  
   <div id="app"></div>
   
   <script>
@@ -30,34 +35,32 @@
     window.teamNames = {};
     window.scores = [];
     
+    function addTeam(){
+        fb.child('teams').child(document.getElementById('newid').value).set({name:document.getElementById('newname').value});
+        document.getElementById('newid').value = '';
+        document.getElementById('newname').value = '';
+        return false;
+    }
+    function deleteTeam(){
+      fb.child('teams').child(document.getElementById('newid').value).remove();
+      fb.child('scores').child('team'+document.getElementById('newid').value).remove();
+      console.log('team'+document.getElementById('newid').value);
+      document.getElementById('newid').value = '';
+        document.getElementById('newname').value = '';
+        return false;
+    }
+    
     fb.child('teams').on('value', function(snapshot){
       window.teamNames = {};
-      var teams = snapshot.val();
-      for(var teamId in teams)
-        if(teams.hasOwnProperty(teamId))
-          window.teamNames['team'+teamId] = teams[teamId].name;
-      render();
-    });
-    
-    fb.child('scores').on('value', function(snapshot){
-      window.scores = [];
-      var teams = snapshot.val();
-      for(var teamId in teams){
-        if(teams.hasOwnProperty(teamId)){
-          score = teams[teamId]['easy'].map(function(a){if(a==3)a++;return a*1;}).reduce(function(a,b){return a+b;})
-                + teams[teamId]['medium'].map(function(a){if(a==3)a++;return a*3;}).reduce(function(a,b){return a+b;})
-                + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*8;}).reduce(function(a,b){return a+b;});
-          window.scores.push([teamId, score]);
-        }
-      }
-      window.scores.sort(function(a,b){return b[1] - a[1];});
+      teamNames = snapshot.val();
       render();
     });
     
     function render(){
       var s = "";
-      for(let i = 0; i < window.scores.length; i++)
-        s += "<div><h2>" + window.teamNames[scores[i][0]] + "</h2><span>" + scores[i][1] + "</span></div>";
+      for(var id in teamNames)
+        if(teamNames.hasOwnProperty(id) && window.teamNames[id].name)
+          s +="<div>"+ id + ": "+ window.teamNames[id].name +"</div>";
       document.getElementById('app').innerHTML = s;
     }
   </script>
