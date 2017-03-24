@@ -71,7 +71,7 @@
         if(teams.hasOwnProperty(teamId)){
           score = teams[teamId]['easy'].map(function(a){if(a==3)a++;return a*1;}).reduce(function(a,b){return a+b;})
                 + teams[teamId]['medium'].map(function(a){if(a==3)a++;return a*3;}).reduce(function(a,b){return a+b;})
-                + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*8;}).reduce(function(a,b){return a+b;});
+                + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*7;}).reduce(function(a,b){return a+b;});
           window.scores.push({id: teamId, score: score});
         }
       }
