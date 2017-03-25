@@ -2,11 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {CardDeck, Card, CardImg, CardText, CardBlock, CardTitle, CardSubtitle, Button, ButtonGroup} from 'reactstrap'
 
-const scoreValues = {
-  easy: 1,
-  medium: 3,
-  hard: 8
-}; //plus 33% bonus on the set if you get all three (basically a bonus fourth score)
+const dClass = ["easy", "medium", "hard"];
+const dTitle = ["Easy", "Med", "Hard"];
+const numPackets = [20, 13, 9]; //if currentQuestion hits this then display end screen - actually very awkward to change (firebase persistence), so don't.
+//const scoreValues = [1, 3, 7];
 
 //start/stop clock functionality
 
@@ -44,9 +43,13 @@ class DifficultySection extends React.Component {
   constructor(props) {
     super(props);
     console.log('asdf');
+    
+    var initialScores = [];
+    for(var i = 0; i < numPackets[props.difficulty]; i++)
+      initialScores.push(0);
     this.state = {
       currentQuestion: 0,
-      scores: [0, 0, 0]
+      scores: initialScores
     };
     this.ref = fb.child('scores')
       .child('team'+this.props.teamId)
@@ -76,14 +79,10 @@ class DifficultySection extends React.Component {
     this.setState({currentQuestion: this.state.currentQuestion + 1});
   }
   render() {
-    const dClass = ["easy", "medium", "hard"];
-    const dTitle = ["Easy", "Med", "Hard"];
-    //const numQuestions = [3, 3, 3]; //if currentQuestion hits this then display end screen
-    
     return (
       <span className={"difficulty "+dClass[this.props.difficulty]}>
         <Button className="back" onClick={this.back.bind(this)} disabled={this.state.currentQuestion <= 0}>&lt;</Button>
-        <Button className="next" onClick={this.next.bind(this)} disabled={this.state.currentQuestion >= 2}>&gt;</Button>
+        <Button className="next" onClick={this.next.bind(this)} disabled={this.state.currentQuestion >= numPackets[this.props.difficulty] - 1}>&gt;</Button>
         <h3>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</h3>
         <RadioBtnGroup selected={this.state.scores[this.state.currentQuestion]} scoreHandler={this.scoreHandler.bind(this)} />
       </span>
