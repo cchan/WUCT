@@ -180,15 +180,22 @@ class TeamCardSet extends React.Component {
     this.setState({cards: this.state.cards});
   }
   render() {
-    console.log('hi');
     if(true||window.token){
       var cards = [];
       for(var prop in this.state.cards){
-        if(this.state.cards.hasOwnProperty(prop))
+        if(this.state.cards.hasOwnProperty(prop) && this.state.cards[prop] !== undefined)
           cards.push(this.state.cards[prop]);
       }
       if(cards.length == 0)
-        cards = <div>Press the + button above to start tracking a team!</div>
+        cards = <div style={{width: "50%"}}>
+                  Press the + button above to start tracking a team! You can:
+                  <ul>
+                    <li>Enter a team ID to begin tracking a team's score live</li>
+                    <li>Set colors to help quickly visually identify teams</li>
+                    <li>Enter scores by clicking the score (0, 1, 2, or 3).</li>
+                    <li>Advance to the next question (&gt;) or go back to a previous question (&lt;). The packet difficulty and number shown should always be the one that the team has or can take next.</li>
+                  </ul>
+                </div>;
       return (
         <div>
           <header>
