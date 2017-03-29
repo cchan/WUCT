@@ -186,6 +186,8 @@ class TeamCardSet extends React.Component {
         if(this.state.cards.hasOwnProperty(prop))
           cards.push(this.state.cards[prop]);
       }
+      if(cards.length == 0)
+        cards = <div>Press the + button above to start tracking a team!</div>
       return (
         <div>
           <header>
