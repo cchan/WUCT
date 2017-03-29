@@ -9,10 +9,16 @@
   <link rel="stylesheet" href="main.css" />
 </head>
 <body>
+  <style>input[type=text]{border: solid 1px #ccc;}</style>
   <header>
     <h1><img src="http://wuct.wustl.edu/images/wuct.jpg" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
   </header>
+  <h2>Timer</h2>
+  <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
+  <p>Set timer to <input type="text" id="timerplus" /> minutes (higher than limit will be capped until it decreases): <input type="submit" id="timerset" /></p>
+  <p>CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
   
+  <h2>Teams</h2>
   <input type="text" placeholder="id" id="newid" />
   <input type="text" placeholder="new name" id="newname" />
   <input type="submit" value="Set team name" onclick="addTeam();" />
@@ -63,6 +69,51 @@
           s +="<div>"+ id + ": "+ window.teamNames[id].name +"</div>";
       document.getElementById('app').innerHTML = s;
     }
+    
+    
+    //Don't use this during leap seconds btw.
+    (function(){
+      function bindinputfb(input, ref, cb){
+        ref.on('value', function(snapshot){
+          input.value = parseInt(snapshot.val());
+          cb(parseInt(snapshot.val()));
+        });
+        input.onchange = function(e){
+          ref.set(parseInt(e.target.value));
+          cb(parseInt(e.target.value));
+        };
+      }
+      
+      var timerlength, hidetime;
+      bindinputfb(document.getElementById('timerlength'), fb.child('timer').child('timerlength'), function(x){timerlength = x;});
+      bindinputfb(document.getElementById('hidetime'), fb.child('timer').child('hidetime'), function(x){hidetime = x;});
+      
+      document.getElementById('timerset').onclick = function(){
+        fb.child('timer').child('target').set(parseFloat(document.getElementById('timerplus').value) * 60 * 1000 + (new Date()).getTime());
+      };
+      
+      var currentTarget = 0;
+      fb.child('timer').on('value', function(snapshot){
+        if(snapshot.val()){
+          currentTarget = snapshot.val().target;
+        }
+      });
+      setInterval(function(){
+        var total = Math.floor((currentTarget - (new Date()).getTime())/1000);
+        if(total < 0){
+          total = 0;
+          document.getElementById('timer').style.color = "red";
+        }else{
+          document.getElementById('timer').style.color = "black";
+        }
+        if(total > timerlength * 60)
+          total = timerlength * 60;
+        var hours = "" + Math.floor(total/3600);
+        var minutes = "" + Math.floor(total/60) % 60;
+        var seconds = "" + total % 60;
+        document.getElementById('timer').innerHTML = ((hours<10)?"0":"") + hours + ":" + ((minutes<10)?"0":"") + minutes + ":" + ((seconds<10)?"0":"") + seconds + ((total < hidetime * 60)?" [scores hidden]":" [scores not hidden]");
+      }, 100);
+    }());
   </script>
 </body>
 </html>

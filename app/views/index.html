@@ -9,9 +9,14 @@
 </head>
 <body>
   <h1>WUCT Breaking Bonds Round</h1>
-  <!--span id="login-status"></span-->
-  <div id="app"></div>
   
+  <div id="timer"></div>
+  
+  <!--span id="login-status"></span-->
+  <div style="position:relative;">
+    <div id="app" style="position: absolute;"></div>
+    <div id="hidden" style="position: absolute;">Scores hidden for awards ceremony suspense :)</div>
+  </div>
   <style>
     body{
       text-align: center;
@@ -19,6 +24,11 @@
     }
     #app{
       padding: 2em;
+      opacity: 0;
+      transition: opacity 1s;
+      width: 1000px;
+      left: 50%;
+      margin-left: -500px;
     }
     #app ol{
       text-align: left;
@@ -33,6 +43,16 @@
     #app ol li:nth-child(odd){
       background-color: #ccc
     }
+    #hidden{
+      opacity: 0;
+      transition: opacity 1s;
+      width: 1000px;
+      left: 50%;
+      margin-left: -500px;
+    }
+    #timer{
+      font-size: 2em
+    }
   </style>
   
   <script>
@@ -46,51 +66,86 @@
     };
     firebase.initializeApp(config);
     var fb = firebase.database().ref('wuct2017');
-    firebase.auth().onAuthStateChanged(function(user){
-      if (user && user.email == "wuct@clive.io"){
-        document.getElementById('login-status').innerHTML = 'logged in';
-      }
-    });
     
     window.teamNames = {};
     window.scores = [];
     
-    fb.child('teams').on('value', function(snapshot){
-      window.teamNames = {};
-      var teams = snapshot.val();
-      for(var teamId in teams)
-        if(teams.hasOwnProperty(teamId))
-          window.teamNames['team'+teamId] = teams[teamId].name;
-      render();
-    });
-    
-    fb.child('scores').on('value', function(snapshot){
-      window.scores = [];
-      var teams = snapshot.val();
-      for(var teamId in teams){
-        if(teams.hasOwnProperty(teamId)){
-          score = teams[teamId]['easy'].map(function(a){if(a==3)a++;return a*1;}).reduce(function(a,b){return a+b;})
-                + teams[teamId]['medium'].map(function(a){if(a==3)a++;return a*3;}).reduce(function(a,b){return a+b;})
-                + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*7;}).reduce(function(a,b){return a+b;});
-          window.scores.push({id: teamId, score: score});
+    fb.child('timer').once('value', function(snapshot){
+      if(Math.floor((snapshot.val().target - (new Date()).getTime())/1000) < snapshot.val().hidetime * 60)
+        return;
+      
+      fb.child('teams').on('value', function(snapshot){
+        window.teamNames = {};
+        var teams = snapshot.val();
+        for(var teamId in teams)
+          if(teams.hasOwnProperty(teamId))
+            window.teamNames['team'+teamId] = teams[teamId].name;
+        render();
+      });
+      
+      fb.child('scores').on('value', function(snapshot){
+        window.scores = [];
+        var teams = snapshot.val();
+        for(var teamId in teams){
+          if(teams.hasOwnProperty(teamId)){
+            score = teams[teamId]['easy'].map(function(a){if(a==3)a++;return a*1;}).reduce(function(a,b){return a+b;})
+                  + teams[teamId]['medium'].map(function(a){if(a==3)a++;return a*3;}).reduce(function(a,b){return a+b;})
+                  + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*7;}).reduce(function(a,b){return a+b;});
+            window.scores.push({id: teamId, score: score});
+          }
         }
+        window.scores.sort(function(a,b){return b.score - a.score;});
+        render();
+      });
+      
+      function render(){
+        var s = "";
+        var prevRank = 0;
+        for(let i = 0; i < window.scores.length; i++){
+          if(window.teamNames[scores[i].id] === undefined)
+            continue;
+          if(i > 0 && scores[i].score != scores[i-1].score)
+            prevRank = i;
+          s += "<li>" + (prevRank + 1) + ". " + window.teamNames[scores[i].id] + "<span>" + scores[i].score + "</span></li>";
+        }
+        document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
       }
-      window.scores.sort(function(a,b){return b.score - a.score;});
-      render();
     });
-    
-    function render(){
-      var s = "";
-      var prevRank = 0;
-      for(let i = 0; i < window.scores.length; i++){
-        if(window.teamNames[scores[i].id] === undefined)
-          continue;
-        if(i > 0 && scores[i].score != scores[i-1].score)
-          prevRank = i;
-        s += "<li>" + (prevRank + 1) + ". " + window.teamNames[scores[i].id] + "<span>" + scores[i].score + "</span></li>";
-      }
-      document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
-    }
+        //Don't use this during leap seconds btw.
+    (function(){
+      var timerlength, hidetime;
+      fb.child('timer').child('timerlength').on('value', function(snapshot){timerlength = snapshot.val();});
+      fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
+      
+      var currentTarget = 0;
+      fb.child('timer').on('value', function(snapshot){
+        if(snapshot.val()){
+          currentTarget = snapshot.val().target;
+        }
+      });
+      setInterval(function(){
+        var total = Math.floor((currentTarget - (new Date()).getTime())/1000);
+        if(total < 0){
+          total = 0;
+          document.getElementById('timer').style.color = "red";
+        }else{
+          document.getElementById('timer').style.color = "black";
+        }
+        if(total > timerlength * 60)
+          total = timerlength * 60;
+        if(total < hidetime * 60){
+          document.getElementById('app').style.opacity = 0;
+          document.getElementById('hidden').style.opacity = 1;
+        }else{
+          document.getElementById('app').style.opacity = 1;
+          document.getElementById('hidden').style.opacity = 0;
+        }
+        var hours = "" + Math.floor(total/3600);
+        var minutes = "" + Math.floor(total/60) % 60;
+        var seconds = "" + total % 60;
+        document.getElementById('timer').innerHTML = ((hours<10)?"0":"") + hours + ":" + ((minutes<10)?"0":"") + minutes + ":" + ((seconds<10)?"0":"") + seconds;
+      }, 100);
+    }());
   </script>
 </body>
 </html>
