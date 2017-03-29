@@ -33,7 +33,13 @@ gulp.task('watch-jsx', ['build-jsx'], function(done) {
   done();
 });
 
-gulp.task('build', ['build-html', 'build-sass', 'build-jsx']);
+gulp.task('build-static', function(){
+  gulp.src('app/static/*')
+    .pipe(gulp.dest('dist'))
+    .pipe(browserSync.stream());
+});
+
+gulp.task('build', ['build-html', 'build-sass', 'build-jsx', 'build-static']);
 
 gulp.task('serve', ['build'], serve({
   root: 'dist',
@@ -47,8 +53,9 @@ gulp.task('watch', ['build'], function () {
     ghostMode: false
   });
   gulp.watch('app/scripts/*.jsx', ['watch-jsx']);
-  gulp.watch('app/views/*.html', ['build-html']).on('change', browserSync.reload);
+  gulp.watch('app/views/*.html', ['build-html']).on('change', function(){setTimeout(browserSync.reload,500);});
   gulp.watch('app/styles/*.sass', ['build-sass']);
+  gulp.watch('app/static/*', ['build-static']);
 });
 
 gulp.task('default', ['watch']);
