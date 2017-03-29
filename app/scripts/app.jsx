@@ -115,7 +115,8 @@ class TeamCard extends React.Component {
     this.setState({color: event.target.value});
   }
   componentWillUnmount(){
-    fb.child('teams').child(teamId).off('value');
+    if(this.state.teamId)
+      fb.child('teams').child(this.state.teamId).off('value');
   }
   render() {
     const spectrum = {
