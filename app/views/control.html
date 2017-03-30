@@ -51,7 +51,7 @@
     function deleteTeam(){
       fb.child('teams').child(document.getElementById('newid').value).remove();
       fb.child('scores').child('team'+document.getElementById('newid').value).remove();
-      console.log('team'+document.getElementById('newid').value);
+      //console.log('team'+document.getElementById('newid').value);
       document.getElementById('newid').value = '';
         document.getElementById('newname').value = '';
         return false;

@@ -42,7 +42,6 @@ class RadioBtnGroup extends React.Component {
 class DifficultySection extends React.Component {
   constructor(props) {
     super(props);
-    console.log('asdf');
     
     var initialScores = [];
     for(var i = 0; i < numPackets[props.difficulty]; i++)
@@ -55,13 +54,11 @@ class DifficultySection extends React.Component {
       .child('team'+this.props.teamId)
       .child(["easy", "medium", "hard"][this.props.difficulty]);
     this.ref.on('value', function(snapshot){
-      console.log('mooooo');
       if(!snapshot.val())
         this.ref.set(this.state.scores);
       else
         this.setState({scores: snapshot.val()});
     }.bind(this));
-    console.log('x');
   }
   componentWillUnmount(){
     this.ref.off('value');
@@ -172,7 +169,7 @@ class TeamCardSet extends React.Component {
     do{index = 'card' + Math.floor(Math.random() * 100000000);}
     while(this.state.cards[index] !== undefined);
     
-    this.state.cards[index] = <TeamCard token={window.token} remove={this.removeCard.bind(this, index)} />;
+    this.state.cards[index] = <TeamCard token={window.token} remove={this.removeCard.bind(this, index)} key={index} />;
     this.setState({cards: this.state.cards});
   }
   removeCard(i){
@@ -199,7 +196,7 @@ class TeamCardSet extends React.Component {
       return (
         <div>
           <header>
-            <h1><img src="http://wuct.wustl.edu/images/wuct.jpg" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
+            <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
             <a href="#" className="add" onClick={this.addCard.bind(this)}><i className="fa fa-plus" aria-hidden="true"></i></a>
             <a href="#" className="signout" onClick={function(){window.signOut()}}><i className="fa fa-sign-out" aria-hidden="true"></i></a>
           </header>
