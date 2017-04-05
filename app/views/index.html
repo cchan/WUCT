@@ -21,6 +21,10 @@
     body{
       text-align: center;
       padding-top: 3em;
+      position: absolute;
+      top:0;
+      left:0;
+      right:0;
     }
     h1 img{
       height: 1.4em;
@@ -40,10 +44,19 @@
       display: inline-block;
       padding: 0;
       list-style-type: none;
-      -webkit-column-count: 3; /* Chrome, Safari, Opera */
-      -moz-column-count: 3; /* Firefox */
-      column-count: 3;
-      width: 60em;
+    }
+    @media(min-width: 800px){
+      #app ol{
+        -webkit-column-count: 3; /* Chrome, Safari, Opera */
+        -moz-column-count: 3; /* Firefox */
+        column-count: 3;
+        width: 60em;
+      }
+    }
+    @media(max-width: 800px){
+      #app ol{
+        width: 100%;
+      }
     }
     #app ol li span{
       float: right;
