@@ -31,19 +31,25 @@
       padding: 2em;
       opacity: 0;
       transition: opacity 1s;
-      width: 1000px;
+      width: 90%;
       left: 50%;
-      margin-left: -500px;
+      margin-left: -45%;
     }
     #app ol{
       text-align: left;
       display: inline-block;
       padding: 0;
       list-style-type: none;
+      -webkit-column-count: 3; /* Chrome, Safari, Opera */
+      -moz-column-count: 3; /* Firefox */
+      column-count: 3;
+      width: 60em;
     }
     #app ol li span{
       float: right;
-      margin-left: 2em
+    }
+    #app ol li div{
+      clear: both;
     }
     #app ol li:nth-child(odd){
       background-color: #ccc
@@ -112,7 +118,7 @@
             continue;
           if(i > 0 && scores[i].score != scores[i-1].score)
             prevRank = i;
-          s += "<li>" + (prevRank + 1) + ". " + window.teamNames[scores[i].id] + "<span>" + scores[i].score + "</span></li>";
+          s += "<li>" + (prevRank + 1) + ". " + window.teamNames[scores[i].id] + "<span>" + scores[i].score + "</span><div></div></li>";
         }
         document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
       }
