@@ -8,7 +8,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
 </head>
 <body>
-  <h1><img src="wuct_bw.png" alt="WUCT" />Breaking Bonds Round</h1>
+  <header>
+    <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round</h1>
+  </header>
+  
+  <h1><img src="wuct_bw.png" alt="WUCT" /></h1>
   
   <div id="timer"></div>
   
@@ -26,18 +30,40 @@
       left:0;
       right:0;
     }
-    h1 img{
-      height: 1.4em;
+    header{
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3em;
+      background-color: #255D38;
+      color: white;
+      text-align: left;
+    }
+    header h1{
+      font-size: 1.5em;
+      line-height: 2em;
+      display: inline-block;
+    }
+    header h1 img{
+      height: 1.9em;
+      vertical-align: top;
+      margin-right: 1em;
+    }
+    body>h1 img{
+      height: 1.6em;
       vertical-align: -0.143em;
-      margin-right: 0.25em;
+    }
+    body>h1{
+      margin:0;
     }
     #app{
       padding: 2em;
       opacity: 0;
       transition: opacity 1s;
-      width: 90%;
+      width: 100%;
       left: 50%;
-      margin-left: -45%;
+      margin-left: -50%;
     }
     #app ol{
       text-align: left;
@@ -51,6 +77,7 @@
         -moz-column-count: 3; /* Firefox */
         column-count: 3;
         width: 60em;
+        font-size: 1.2em;
       }
     }
     @media(max-width: 1000px){
@@ -77,7 +104,8 @@
       font-size: 2em
     }
     #timer{
-      font-size: 4em
+      font-size: 4em;
+      height: 1em;
     }
   </style>
   
