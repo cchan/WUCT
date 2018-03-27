@@ -193,14 +193,14 @@ class TeamCardSet extends React.Component {
                     <li>Set colors to help quickly visually identify teams</li>
                     <li>Enter scores by clicking the score (0, 1, 2, or 3).</li>
                     <li>Advance to the next question (&gt;) or go back to a previous question (&lt;). The packet difficulty and number shown should always be the one that the team has or can take next.</li>
-                    <li>Mouse over the + button to display these instructions.</li>
+                    <li><i>Mouse over the + button to display these instructions again.</i></li>
                   </ul>
                 </div>;
       return (
         <div>
           <header>
             <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
-            <a href="#" className="add" onClick={this.addCard.bind(this)}><i className="fa fa-plus" aria-hidden="true" title="Press the + button above to start tracking a team! You can:\nEnter a team ID to begin tracking a team's score live\nSet colors to help quickly visually identify teams\nEnter scores by clicking the score (0, 1, 2, or 3).\nAdvance to the next question (>) or go back to a previous question (<). The packet difficulty and number shown should always be the one that the team has or can take next."></i></a>
+            <a href="#" className="add" onClick={this.addCard.bind(this)} title="Press the + button above to start tracking a team! You can:&#013;&bull; Enter a team ID to begin tracking a team's score live&#013;&bull; Set colors to help quickly visually identify teams&#013;&bull; Enter scores by clicking the score (0, 1, 2, or 3).&#013;&bull; Advance to the next question (>) or go back to a previous question (<). The packet difficulty and number shown should always be the one that the team has or can take next."><i className="fa fa-plus" aria-hidden="true"></i></a>
             <a href="#" className="signout" onClick={function(){window.signOut()}}><i className="fa fa-sign-out" aria-hidden="true"></i></a>
           </header>
           <div>{cards}</div>
