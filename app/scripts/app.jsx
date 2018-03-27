@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {CardDeck, Card, CardImg, CardText, CardBlock, CardTitle, CardSubtitle, Button, ButtonGroup} from 'reactstrap'
+import {CardDeck, Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button, ButtonGroup} from 'reactstrap'
 
 const dClass = ["easy", "medium", "hard"];
 const dTitle = ["Easy", "Med", "Hard"];
@@ -141,7 +141,7 @@ class TeamCard extends React.Component {
     var teamName = this.state.teamName || "Unknown Team";
     return (
       <Card inverse style={{ backgroundColor: this.state.color, borderColor: this.state.color }}>
-        <CardBlock>
+        <CardBody>
           <a href="#" onClick={this.props.remove} className="xBtn">&#x2715;</a>
           <select value={this.state.color} style={{color: "white", backgroundColor: this.state.color}} onChange={this.changeColor.bind(this)}>
             <option style={{backgroundColor: "grey"}}>grey</option>
@@ -154,7 +154,7 @@ class TeamCard extends React.Component {
           <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.state.teamId} onChange={this.setTeamId.bind(this)}/></CardSubtitle>
           
           {difficultySections}
-        </CardBlock>
+        </CardBody>
       </Card>
     );
   }
