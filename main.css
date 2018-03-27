@@ -1,0 +1,102 @@
+body {
+  padding: 3em;
+  padding-top: 5em; }
+
+header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3em;
+  background-color: #255D38;
+  color: white; }
+  header h1 {
+    font-size: 1.5em;
+    line-height: 2em;
+    display: inline-block; }
+    header h1 img {
+      height: 1.9em;
+      vertical-align: top;
+      margin-right: 1em; }
+  header a {
+    display: inline-block;
+    vertical-align: top;
+    text-decoration: none;
+    color: white;
+    width: 3em;
+    height: 3em;
+    text-align: center;
+    transition: background-color 0.4s; }
+    header a.signout {
+      float: right; }
+    header a.add {
+      margin-left: 1em; }
+    header a i.fa {
+      height: 2em;
+      line-height: 2em;
+      font-size: 1.5em; }
+    header a:active, header a:visited, header a:hover {
+      color: white; }
+    header a:hover {
+      background-color: #163922;
+      color: white; }
+
+.card {
+  display: inline-block;
+  width: 450px;
+  margin: 10px;
+  color: white; }
+  .card select {
+    float: right; }
+  .card .xBtn {
+    float: right;
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    background-color: #666;
+    text-align: center;
+    border-radius: 3px;
+    color: white;
+    text-decoration: none; }
+    .card .xBtn:visited {
+      text-decoration: none; }
+    .card .xBtn:hover {
+      text-decoration: none;
+      color: #000;
+      background-color: white; }
+
+input[type=text] {
+  border: none; }
+
+.difficulty {
+  display: inline-block;
+  width: 32%;
+  margin: 0.5%;
+  padding: 2%;
+  box-sizing: border-box;
+  border-radius: 3px; }
+  .difficulty.easy {
+    background-color: #3d3; }
+  .difficulty.medium {
+    background-color: #3dd; }
+  .difficulty.hard {
+    background-color: #f77; }
+  .difficulty input[type=text] {
+    background-color: transparent;
+    width: 100%;
+    text-align: center; }
+  .difficulty .btn-group button {
+    padding: 0 0.6em 0.2em 0.6em; }
+  .difficulty .btn-group .active {
+    background-color: black;
+    color: white; }
+  .difficulty button {
+    padding: 0 0.35em 0.2em 0.35em; }
+    .difficulty button.next {
+      float: right; }
+    .difficulty button.back {
+      float: left; }
+
+h3 {
+  font-size: 1.2em;
+  text-align: center; }
