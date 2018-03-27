@@ -53,6 +53,8 @@ class DifficultySection extends React.Component {
     this.ref = fb.child('scores')
       .child('team'+this.props.teamId)
       .child(["easy", "medium", "hard"][this.props.difficulty]);
+  }
+  componentWillMount(){
     this.ref.on('value', function(snapshot){
       if(!snapshot.val())
         this.ref.set(this.state.scores);
