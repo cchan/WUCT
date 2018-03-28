@@ -1,6 +1,6 @@
 window.dClass = ["easy", "medium", "hard"];
 window.dTitle = ["Easy", "Med", "Hard"];
-window.numPackets = [20, 13, 9];
+window.numPackets = [20, 15, 9];
 window.scoreValues = [1, 3, 7];
 window.dbName = 'wuct2018';
 
