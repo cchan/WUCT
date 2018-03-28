@@ -5,6 +5,7 @@
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
+  <script src="common.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
   <link rel="stylesheet" href="main.css" />
@@ -20,18 +21,6 @@
     <input type="submit" id="passsubmit" value="Log In" />
   </div>
 
-  <script>
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyC4siYV0A1Nq4POMUfvdRKyP0-xzUUvMVo",
-      authDomain: "wuct-1f4ca.firebaseapp.com",
-      databaseURL: "https://wuct-1f4ca.firebaseio.com",
-      storageBucket: "wuct-1f4ca.appspot.com",
-      messagingSenderId: "833633709327"
-    };
-    firebase.initializeApp(config);
-    var fb = firebase.database().ref('wuct2018');
-  </script>
   <script src="bundle.js"></script>
   <script>
     window.cancelAuthStateChanged = false;
