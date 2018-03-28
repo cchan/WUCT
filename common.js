@@ -1,3 +1,4 @@
+// note the the number of difficulty classes is fixed at 3, for now
 window.dClass = ["easy", "medium", "hard"];
 window.dTitle = ["Easy", "Med", "Hard"];
 window.numPackets = [20, 15, 9];
@@ -7,7 +8,13 @@ window.dbName = 'wuct2018';
 window.getScore = function(scores){
   var totalScore = 0;
   for(var i = 0; i < window.dClass.length; i++)
-    totalScore += scores[window.dClass[i]].map(function(a){if(a==3)a++;return a*window.scoreValues[i];}).reduce(function(a,b){return a+b;});
+    totalScore += scores[window.dClass[i]].map(function(a){
+      if(a == -1)
+        return 0;
+      if(a == 3)
+        a++;
+      return a*window.scoreValues[i];
+    }).reduce(function(a,b){return a+b;});
   return totalScore;
 }
 
