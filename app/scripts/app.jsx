@@ -2,10 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {CardDeck, Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button, ButtonGroup} from 'reactstrap'
 
-const dClass = ["easy", "medium", "hard"];
-const dTitle = ["Easy", "Med", "Hard"];
-const numPackets = [20, 13, 9]; //if currentQuestion hits this then display end screen - actually very awkward to change (firebase persistence), so don't.
-//const scoreValues = [1, 3, 7];
+const dClass = window.dClass;
+const dTitle = window.dTitle;
+const numPackets = window.numPackets; //if currentQuestion hits this then display end screen - actually very awkward to change (firebase persistence), so don't.
 
 //start/stop clock functionality
 

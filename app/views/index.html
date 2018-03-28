@@ -1,10 +1,12 @@
 <html>
 <head>
+  <title>WUCT Breaking Bonds Round</title>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
+  <script src="common.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
 </head>
 <body>
@@ -111,17 +113,6 @@
   </style>
   
   <script>
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyC4siYV0A1Nq4POMUfvdRKyP0-xzUUvMVo",
-      authDomain: "wuct-1f4ca.firebaseapp.com",
-      databaseURL: "https://wuct-1f4ca.firebaseio.com",
-      storageBucket: "wuct-1f4ca.appspot.com",
-      messagingSenderId: "833633709327"
-    };
-    firebase.initializeApp(config);
-    var fb = firebase.database().ref('wuct2018');
-    
     window.teamNames = {};
     window.scores = [];
     
@@ -143,9 +134,7 @@
         var teams = snapshot.val();
         for(var teamId in teams){
           if(teams.hasOwnProperty(teamId)){
-            score = teams[teamId]['easy'].map(function(a){if(a==3)a++;return a*1;}).reduce(function(a,b){return a+b;})
-                  + teams[teamId]['medium'].map(function(a){if(a==3)a++;return a*3;}).reduce(function(a,b){return a+b;})
-                  + teams[teamId]['hard'].map(function(a){if(a==3)a++;return a*7;}).reduce(function(a,b){return a+b;});
+            score = window.getScore(teams[teamId]);
             window.scores.push({id: teamId, score: score});
           }
         }
