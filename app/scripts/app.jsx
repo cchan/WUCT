@@ -28,6 +28,7 @@ class RadioBtnGroup extends React.Component {
     return (
       <div>
         <ButtonGroup>
+          <Button onClick={() => this.onRadioBtnClick(-1)} active={this.props.selected === -1}>x</Button>
           <Button onClick={() => this.onRadioBtnClick(0)} active={this.props.selected === 0}>0</Button>
           <Button onClick={() => this.onRadioBtnClick(1)} active={this.props.selected === 1}>1</Button>
           <Button onClick={() => this.onRadioBtnClick(2)} active={this.props.selected === 2}>2</Button>
@@ -44,7 +45,7 @@ class DifficultySection extends React.Component {
     
     var initialScores = [];
     for(var i = 0; i < numPackets[props.difficulty]; i++)
-      initialScores.push(0);
+      initialScores.push(-1);
     this.state = {
       currentQuestion: 0,
       scores: initialScores
