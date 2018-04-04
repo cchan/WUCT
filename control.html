@@ -11,6 +11,7 @@
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
+  <div id="not-logged-in" style="color: red">You are not logged in. You can see these settings but cannot change them. Go to the <a href="scoring.html">scoring page</a> to log in.</div>
   <header>
     <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
   </header>
@@ -29,6 +30,11 @@
   <div id="app"></div>
   
   <script>
+    firebase.auth().onAuthStateChanged(function(user){
+      if (user && user.email != 'wuct@clive.io')
+          document.getElementById("not-logged-in").style.display = "none";
+    });
+    
     window.teamNames = {};
     window.scores = [];
     
