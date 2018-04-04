@@ -31,7 +31,7 @@
   
   <script>
     firebase.auth().onAuthStateChanged(function(user){
-      if (user && user.email != 'wuct@clive.io')
+      if (user && user.email == 'wuct@clive.io')
           document.getElementById("not-logged-in").style.display = "none";
     });
     
