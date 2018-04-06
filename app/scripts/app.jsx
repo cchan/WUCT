@@ -94,16 +94,20 @@ class TeamCard extends React.Component {
     super(props);
     this.state = {
       teamName: null,
-      teamId: "",
       color: 'grey'
     };
   }
+  componentWillMount(){
+    if(this.props.teamId)
+      this.setTeamId({target:{value:this.props.teamId}});
+  }
   setTeamId(event){
-    if(this.state.teamId)
-      fb.child('teams').child(this.state.teamId).off('value');
+    if(this.props.teamId)
+      fb.child('teams').child(this.props.teamId).off('value');
     
     var teamId = event.target.value;
-    this.setState({teamName: null, teamId: teamId});
+    this.setState({teamName: null});
+    this.props.updateId(teamId);
     if(teamId)
       fb.child('teams').child(teamId).on('value', function(snapshot){
         if(snapshot.val())
@@ -114,8 +118,8 @@ class TeamCard extends React.Component {
     this.setState({color: event.target.value});
   }
   componentWillUnmount(){
-    if(this.state.teamId)
-      fb.child('teams').child(this.state.teamId).off('value');
+    if(this.props.teamId)
+      fb.child('teams').child(this.props.teamId).off('value');
   }
   render() {
     const spectrum = {
@@ -132,9 +136,9 @@ class TeamCard extends React.Component {
     if(this.state.teamName != null)
       difficultySections = 
         <div>
-          <DifficultySection difficulty="0" teamId={this.state.teamId}/>
-          <DifficultySection difficulty="1" teamId={this.state.teamId}/>
-          <DifficultySection difficulty="2" teamId={this.state.teamId}/>
+          <DifficultySection difficulty="0" teamId={this.props.teamId}/>
+          <DifficultySection difficulty="1" teamId={this.props.teamId}/>
+          <DifficultySection difficulty="2" teamId={this.props.teamId}/>
         </div>;
     else
       difficultySections = <p>Invalid team ID.</p>;
@@ -151,7 +155,7 @@ class TeamCard extends React.Component {
             }, [])}
           </select>
           <CardTitle>{teamName}</CardTitle>
-          <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.state.teamId} onChange={this.setTeamId.bind(this)}/></CardSubtitle>
+          <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.props.teamId} onChange={this.setTeamId.bind(this)}/></CardSubtitle>
           
           {difficultySections}
         </CardBody>
@@ -164,26 +168,37 @@ class TeamCardSet extends React.Component {
   constructor(props) {
     super(props);
     
-    this.state = {cards: []};
+    if(!Cookies.get('state'))
+      Cookies.set('state', JSON.stringify({cards: {}}));
+    this.state = JSON.parse(Cookies.get('state'));
   }
-  addCard(){
+  setStateSave(newstate){
+    this.setState(newstate);
+    Cookies.set('state', JSON.stringify(newstate));
+  }
+  addCard(id){
     var index;
     do{index = 'card' + Math.floor(Math.random() * 100000000);}
     while(this.state.cards[index] !== undefined);
     
-    this.state.cards[index] = <TeamCard token={window.token} remove={this.removeCard.bind(this, index)} key={index} />;
-    this.setState({cards: this.state.cards});
+    this.state.cards[index] = typeof id == "string" ? id : "";
+    this.setStateSave({cards: this.state.cards});
   }
   removeCard(i){
     this.state.cards[i] = undefined;
-    this.setState({cards: this.state.cards});
+    this.setStateSave({cards: this.state.cards});
+  }
+  updateId(i, newid){
+    this.state.cards[i] = newid || "";
+    this.setStateSave({cards: this.state.cards});
   }
   render() {
     if(true||window.token){
       var cards = [];
       for(var prop in this.state.cards){
+        console.log(this.state.cards);
         if(this.state.cards.hasOwnProperty(prop) && this.state.cards[prop] !== undefined)
-          cards.push(this.state.cards[prop]);
+          cards.push(<TeamCard token={window.token} remove={this.removeCard.bind(this, prop)} updateId={this.updateId.bind(this, prop)} teamId={this.state.cards[prop]} key={prop} />);
       }
       if(cards.length == 0)
         cards = <div style={{width: "50%"}}>
