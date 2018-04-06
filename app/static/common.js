@@ -17,6 +17,16 @@ window.getScore = function(scores){
     }).reduce(function(a,b){return a+b;});
   return totalScore;
 }
+window.getProgress = function(scores){
+  var progress = [];
+  for(var i = 0; i < window.dClass.length; i++){
+    progress[i] = scores[window.dClass[i]].findIndex(a => a == -1); // Number they finished
+    if(progress[i] == -1)
+      progress[i] = scores[window.dClass[i]].length;
+    progress[i] /= numPackets[i];
+  }
+  return progress;
+}
 
 // Initialize Firebase
 var fbconfig = {

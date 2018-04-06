@@ -89,6 +89,27 @@
         font-size: 2em;
       }
     }
+    #app ol li{
+      position: relative;
+      width: 100%;
+    }
+    #app ol li span.progress{
+      height: 0.1em;
+      position: absolute;
+      bottom: -0.5em;
+    }
+    #app ol li span.progress.easy{
+      background: #0f0;
+      left: 0%;
+    }
+    #app ol li span.progress.medium{
+      background: #09f;
+      left: 33%;
+    }
+    #app ol li span.progress.hard{
+      background: #f00;
+      left: 67%;
+    }
     #app ol li span{
       float: right;
     }
@@ -134,8 +155,9 @@
         var teams = snapshot.val();
         for(var teamId in teams){
           if(teams.hasOwnProperty(teamId)){
-            score = window.getScore(teams[teamId]);
-            window.scores.push({id: teamId, score: score});
+            var score = window.getScore(teams[teamId]);
+            var progress = window.getProgress(teams[teamId]);
+            window.scores.push({id: teamId, score: score, progress: progress});
           }
         }
         window.scores.sort(function(a,b){return b.score - a.score;});
@@ -150,7 +172,12 @@
             continue;
           if(i > 0 && scores[i].score != scores[i-1].score)
             prevRank = i;
-          s += "<li>" + (prevRank + 1) + ". " + window.teamNames[scores[i].id] + "<span>" + scores[i].score + "</span><div></div></li>";
+          
+          s += "<li>" + (prevRank + 1) + ". " + window.teamNames[scores[i].id] + "<span>" + scores[i].score + "</span><div></div>"
+          s += "<span class='progress easy' style='width:"+scores[i].progress[0]*33+"%'></span>"
+          s += "<span class='progress medium' style='width:"+scores[i].progress[1]*34+"%'></span>"
+          s += "<span class='progress hard' style='width:"+scores[i].progress[2]*33+"%'></span>"
+          s += "</li>";
         }
         document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
       }
