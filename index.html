@@ -154,52 +154,20 @@
         }
         document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
       }
-    });
-        //Don't use this during leap seconds btw.
-    (function(){
-      var timerlength, hidetime;
-      fb.child('timer').child('timerlength').on('value', function(snapshot){timerlength = snapshot.val();});
-      fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
       
-      var currentTarget = 0;
-      fb.child('timer').on('value', function(snapshot){
-        if(snapshot.val()){
-          currentTarget = snapshot.val().target;
-        }
-      });
-      setInterval(function(){
-        var total = Math.floor((currentTarget - (new Date()).getTime())/1000);
-        if(total < 0){
-          total = 0;
-          document.getElementById('timer').style.color = "red";
-        }else{
-          document.getElementById('timer').style.color = "black";
-        }
-        if(total > timerlength * 60)
-          total = timerlength * 60;
-        if(total < hidetime * 60){
+      var hidetime;
+      fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
+      setTimer(document.getElementById("timer"), function(seconds){
+        // Both cases, so that we stay up to date if hidetime changes.
+        if(seconds < hidetime * 60){
           document.getElementById('app').style.opacity = 0;
           document.getElementById('hidden').style.opacity = 1;
         }else{
           document.getElementById('app').style.opacity = 1;
           document.getElementById('hidden').style.opacity = 0;
         }
-        var hours = "" + Math.floor(total/3600);
-        var minutes = "" + Math.floor(total/60) % 60;
-        var seconds = "" + total % 60;
-        document.getElementById('timer').innerHTML = ((hours<10)?"0":"") + hours + ":" + ((minutes<10)?"0":"") + minutes + ":" + ((seconds<10)?"0":"") + seconds;
-      }, 100);
-    }());
-  </script>
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-62605323-4', 'auto');
-    ga('send', 'pageview');
-
+      });
+    });
   </script>
 </body>
 </html>

@@ -28,3 +28,41 @@ var fbconfig = {
 };
 firebase.initializeApp(fbconfig);
 window.fb = firebase.database().ref(window.dbName);
+
+//Don't use this during leap seconds btw.
+function setTimer(el, cb){
+  var timerlength, currentTarget = 0;
+  fb.child('timer').on('value', function(snapshot){
+    if(snapshot.val()){
+      currentTarget = snapshot.val().target;
+      timerlength = snapshot.val().timerlength;
+    }
+  });
+  setInterval(function(){
+    var total = Math.floor((currentTarget - (new Date()).getTime())/1000);
+    if(cb)
+      cb(total);
+    if(total <= 0)
+      document.getElementById("timer").style.color = "red";
+    else
+      document.getElementById("timer").style.color = "black";
+    if(total > timerlength * 60)
+      total = timerlength * 60;
+    if(total < 0)
+      total = 0;
+    var hours = "" + Math.floor(total/3600);
+    var minutes = "" + Math.floor(total/60) % 60;
+    var seconds = "" + total % 60;
+    el.innerHTML = ((hours<10)?"0":"") + hours + ":" + ((minutes<10)?"0":"") + minutes + ":" + ((seconds<10)?"0":"") + seconds;
+  }, 200);
+}
+
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-62605323-4', 'auto');
+ga('send', 'pageview');
+
