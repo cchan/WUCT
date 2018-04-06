@@ -5,7 +5,7 @@ window.numPackets = [20, 15, 9];
 window.scoreValues = [1, 3, 7];
 window.dbName = 'wuct2018';
 
-if(window.location.hostname != 'wuct.clive.io' && (window.location.hostname != 'localhost' || window.location.port != 8849)) return;
+if(window.location.hostname != 'wuct.clive.io' && (window.location.hostname != 'localhost' || window.location.port != 8849)) throw new Error();
 
 window.getScore = function(scores){
   var totalScore = 0;
