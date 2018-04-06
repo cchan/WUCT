@@ -15,11 +15,15 @@
   <header>
     <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
   </header>
+  <h2>Tips</h2>
+  <p>The recommended way of using the timer is to set it to 999999999999 until you're ready to start (the timer will only display up to the limit, so it'll just sit there), then setting it to 60 (or whatever the limit may be) once the round starts.</p>
+  <p>To disable scoreboard-hiding, set the hidden score time to a large negative value.</p>
+  <p>As with the rest of this webapp, everything updates instantly as long as you're connected!</p>
+  
   <h2>Timer</h2>
   <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
   <p>Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></p>
   <p>CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
-  <p><i>Recommended way of using the timer is to set it to 999999999999 until you're ready to start (the timer will only display up to the limit, so it'll just sit there), then setting it to 60 (or whatever the limit may be) once the round starts.</i></p>
   
   <h2>Teams</h2>
   <input type="text" placeholder="id" id="newid" />
@@ -27,7 +31,7 @@
   <input type="submit" value="Set team name" onclick="addTeam();" />
   <input type="submit" value="Remove team with this ID" onclick="deleteTeam();" />
   
-  <div id="app"></div>
+  <div id="teamlist"></div>
   
   <script>
     firebase.auth().onAuthStateChanged(function(user){
@@ -64,7 +68,7 @@
       for(var id in teamNames)
         if(teamNames.hasOwnProperty(id) && window.teamNames[id].name)
           s +="<div>"+ id + ": "+ window.teamNames[id].name +"</div>";
-      document.getElementById('app').innerHTML = s;
+      document.getElementById('teamlist').innerHTML = s;
     }
     
     
