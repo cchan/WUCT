@@ -7,6 +7,7 @@ var babelify =    require('babelify');
 var source =      require('vinyl-source-stream');
 var browserSync = require('browser-sync').create();
 var sass =        require('gulp-sass');
+var template =    require('gulp-template');
 
 gulp.task('build-jsx', function () {
   return browserify({entries: 'app/scripts/app.jsx', extensions: ['.jsx'], debug: true})
@@ -18,6 +19,7 @@ gulp.task('build-jsx', function () {
 
 gulp.task('build-html', function () {
   return gulp.src('app/views/*.html')
+    .pipe(template({timestamp: new Date().getTime()}))
     .pipe(gulp.dest('dist'));
 });
 
