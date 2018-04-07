@@ -93,7 +93,12 @@
         fb.child('timer').child('target').set(parseFloat(document.getElementById('timerplus').value) * 60 * 1000 + (new Date()).getTime());
       };
       
-      setTimer(document.getElementById('timer'));
+      setTimer(document.getElementById('timer'), function(total){
+        if(total <= 0)
+          document.getElementById("timer").style.color = "red";
+        else
+          document.getElementById("timer").style.color = "black";
+      });
     }());
   </script>
 </body>

@@ -228,7 +228,12 @@ class TeamCardSet extends React.Component {
     }
   }
   componentDidMount() {
-    window.setTimer(document.getElementById("timer"));
+    window.setTimer(document.getElementById("timer"), function(total){
+      if(total <= 0)
+        document.getElementById("timer").style.color = "red";
+      else
+        document.getElementById("timer").style.color = "white";
+    });
   }
 }
 

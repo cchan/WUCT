@@ -54,10 +54,6 @@ function setTimer(el, cb){
     var total = Math.floor((currentTarget - (new Date()).getTime())/1000);
     if(cb)
       cb(total);
-    if(total <= 0)
-      document.getElementById("timer").style.color = "red";
-    else
-      document.getElementById("timer").style.color = "black";
     if(total > timerlength * 60)
       total = timerlength * 60;
     if(total < 0)
