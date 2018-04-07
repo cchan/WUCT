@@ -6,7 +6,7 @@
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-  <script src="common.js?1523038804261"></script>
+  <script src="common.js?1523074055181"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
 </head>
 <body>
@@ -187,6 +187,10 @@
       fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
       setTimer(document.getElementById("timer"), function(seconds){
         // Both cases, so that we stay up to date if hidetime changes.
+        if(seconds <= 0)
+          document.getElementById("timer").style.color = "red";
+        else
+          document.getElementById("timer").style.color = "black";
         if(seconds < hidetime * 60){
           document.getElementById('app').style.opacity = 0;
           document.getElementById('hidden').style.opacity = 1;

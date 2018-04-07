@@ -5,9 +5,9 @@
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-  <script src="common.js?1523038804261"></script>
+  <script src="common.js?1523074055181"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1523038804261" />
+  <link rel="stylesheet" href="main.css?1523074055181" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -93,7 +93,12 @@
         fb.child('timer').child('target').set(parseFloat(document.getElementById('timerplus').value) * 60 * 1000 + (new Date()).getTime());
       };
       
-      setTimer(document.getElementById('timer'));
+      setTimer(document.getElementById('timer'), function(total){
+        if(total <= 0)
+          document.getElementById("timer").style.color = "red";
+        else
+          document.getElementById("timer").style.color = "black";
+      });
     }());
   </script>
 </body>
