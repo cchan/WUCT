@@ -6,7 +6,7 @@
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-  <script src="common.js?1523074055181"></script>
+  <script src="common.js?1523318640658"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
 </head>
 <body>
@@ -139,8 +139,10 @@
     window.scores = [];
     
     fb.child('timer').once('value', function(snapshot){
-      if(Math.floor((snapshot.val().target - (new Date()).getTime())/1000) < snapshot.val().hidetime * 60)
+      if(Math.floor((snapshot.val().target - (new Date()).getTime())/1000) < snapshot.val().hidetime * 60){
+        document.getElementById("hidden").style.opacity = "1";
         return;
+      }
       
       fb.child('teams').on('value', function(snapshot){
         window.teamNames = {};
