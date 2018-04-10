@@ -32,6 +32,9 @@
   <input type="submit" value="Remove team with this ID" onclick="deleteTeam();" />
   
   <div id="teamlist"></div>
+
+  <h2>Copyable Scoreboard Table</h2>
+  <div id="scoreboard"></div>
   
   <script>
     firebase.auth().onAuthStateChanged(function(user){
@@ -100,6 +103,71 @@
           document.getElementById("timer").style.color = "black";
       });
     }());
+    
+    (function(){
+      teamNames = {};
+      scores = [];
+      fb.child('teams').on('value', function(snapshot){
+        teamNames = {};
+        var teams = snapshot.val();
+        for(var teamId in teams)
+          if(teams.hasOwnProperty(teamId))
+            teamNames['team'+teamId] = teams[teamId].name;
+        render();
+      });
+      
+      fb.child('scores').on('value', function(snapshot){
+        scores = [];
+        var teams = snapshot.val();
+        for(var teamId in teams){
+          if(teams.hasOwnProperty(teamId)){
+            var score = window.getScore(teams[teamId]);
+            var progress = window.getProgress(teams[teamId]);
+            scores.push({id: teamId, score: score, progress: progress});
+          }
+        }
+        scores.sort(function(a,b){return b.score - a.score;});
+        render();
+      });
+      
+      function render(){
+        var s = "<tr><th>Rank</th><th>Team ID</th><th>Team Name</th><th>Total Score</th>"
+               +"<th>Submitted "+window.dTitle[0]+" packets (of "+window.numPackets[0]+" total)</th>"
+               +"<th>Submitted "+window.dTitle[1]+" packets (of "+window.numPackets[1]+" total)</th>"
+               +"<th>Submitted "+window.dTitle[2]+" packets (of "+window.numPackets[2]+" total)</th>"
+               +"</tr>";
+        var prevRank = 0;
+        for(let i = 0; i < scores.length; i++){
+          if(teamNames[scores[i].id] === undefined)
+            continue;
+          if(i > 0 && scores[i].score != scores[i-1].score)
+            prevRank = i;
+          
+          s += "<tr><td>" + (prevRank + 1) + "</td><td>"+scores[i].id+"</td><td>" + teamNames[scores[i].id] + "</td><td>" + scores[i].score + "</td>";
+          s += "<td>"+(scores[i].progress[0]*window.numPackets[0])+"</td>";
+          s += "<td>"+(scores[i].progress[1]*window.numPackets[1])+"</td>";
+          s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
+          s += "</tr>";
+        }
+        document.getElementById('scoreboard').innerHTML = "<table onclick='this.focus();this.select()' readonly='readonly' contenteditable>" + s + "</table>";
+        document.getElementById("scoreboard").onkeydown = function (event) {
+            if (event.ctrlKey) {
+                // allow Ctrl-A, Ctrl-(any arrow key) combinations
+                return true;
+            }
+            // keycode: http://www.programming-magic.com/file/20080205232140/keycode_table.html
+            if (33 <= event.keyCode && event.keyCode <= 40) {
+                return true;
+            }
+            return false;
+        };
+      }
+    })();
   </script>
+  <style>
+    td{
+      padding: 0.3em;
+    }
+  </style>
 </body>
 </html>

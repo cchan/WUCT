@@ -139,8 +139,10 @@
     window.scores = [];
     
     fb.child('timer').once('value', function(snapshot){
-      if(Math.floor((snapshot.val().target - (new Date()).getTime())/1000) < snapshot.val().hidetime * 60)
+      if(Math.floor((snapshot.val().target - (new Date()).getTime())/1000) < snapshot.val().hidetime * 60){
+        document.getElementById("hidden").style.opacity = "1";
         return;
+      }
       
       fb.child('teams').on('value', function(snapshot){
         window.teamNames = {};
