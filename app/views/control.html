@@ -34,7 +34,7 @@
   <div id="teamlist"></div>
 
   <h2>Copyable Scoreboard Table</h2>
-  <div id="scoreboard"></div>
+  <div id="scoreboard" class="clickselectall"></div>
   
   <script>
     firebase.auth().onAuthStateChanged(function(user){
@@ -163,6 +163,22 @@
         };
       }
     })();
+
+    document.querySelector('.clickselectall').onfocus = function(e) {
+        var el = this;
+        requestAnimationFrame(function() {
+            selectElementContents(el);
+        });
+    };
+
+    function selectElementContents(el) {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
   </script>
   <style>
     td{
