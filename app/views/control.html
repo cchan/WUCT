@@ -149,7 +149,15 @@
           s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
           s += "</tr>";
         }
-        document.getElementById('scoreboard').innerHTML = "<table class='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
+        document.getElementById('scoreboard').innerHTML = "<table id='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
+
+        document.querySelector('#clickselectall').onfocus = function(e) {
+            var el = this;
+            requestAnimationFrame(function() {
+                selectElementContents(el);
+            });
+        };
+
         document.getElementById("scoreboard").onkeydown = function (event) {
             if (event.ctrlKey) {
                 // allow Ctrl-A, Ctrl-(any arrow key) combinations
@@ -163,13 +171,6 @@
         };
       }
     })();
-
-    document.querySelector('.clickselectall').onfocus = function(e) {
-        var el = this;
-        requestAnimationFrame(function() {
-            selectElementContents(el);
-        });
-    };
 
     function selectElementContents(el) {
         var range = document.createRange();
