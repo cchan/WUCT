@@ -5,9 +5,9 @@
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-  <script src="common.js?1523684462775"></script>
+  <script src="common.js?1523684741159"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1523684462775" />
+  <link rel="stylesheet" href="main.css?1523684741159" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -149,7 +149,15 @@
           s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
           s += "</tr>";
         }
-        document.getElementById('scoreboard').innerHTML = "<table class='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
+        document.getElementById('scoreboard').innerHTML = "<table id='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
+
+        document.querySelector('#clickselectall').onfocus = function(e) {
+            var el = this;
+            requestAnimationFrame(function() {
+                selectElementContents(el);
+            });
+        };
+
         document.getElementById("scoreboard").onkeydown = function (event) {
             if (event.ctrlKey) {
                 // allow Ctrl-A, Ctrl-(any arrow key) combinations
@@ -163,13 +171,6 @@
         };
       }
     })();
-
-    document.querySelector('.clickselectall').onfocus = function(e) {
-        var el = this;
-        requestAnimationFrame(function() {
-            selectElementContents(el);
-        });
-    };
 
     function selectElementContents(el) {
         var range = document.createRange();
