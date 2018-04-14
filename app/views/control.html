@@ -34,7 +34,7 @@
   <div id="teamlist"></div>
 
   <h2>Copyable Scoreboard Table</h2>
-  <div id="scoreboard" class="clickselectall"></div>
+  <div id="scoreboard"></div>
   
   <script>
     firebase.auth().onAuthStateChanged(function(user){
@@ -149,7 +149,7 @@
           s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
           s += "</tr>";
         }
-        document.getElementById('scoreboard').innerHTML = "<table onclick='this.focus();this.select()' readonly='readonly' contenteditable>" + s + "</table>";
+        document.getElementById('scoreboard').innerHTML = "<table class='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
         document.getElementById("scoreboard").onkeydown = function (event) {
             if (event.ctrlKey) {
                 // allow Ctrl-A, Ctrl-(any arrow key) combinations
