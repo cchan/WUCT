@@ -5,9 +5,9 @@
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-  <script src="common.js?1552674009782"></script>
+  <script src="common.js?1553464952422"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1552674009782" />
+  <link rel="stylesheet" href="main.css?1553464952422" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -46,18 +46,30 @@
     window.scores = [];
     
     function addTeam(){
-        fb.child('teams').child(document.getElementById('newid').value).set({name:document.getElementById('newname').value});
-        document.getElementById('newid').value = '';
-        document.getElementById('newname').value = '';
+        var newid = parseInt(document.getElementById('newid').value);
+        if(!isNaN(newid)) {
+          fb.child('teams').child(newid).set({name:document.getElementById('newname').value});
+          document.getElementById('newid').value = '';
+          document.getElementById('newname').value = '';
+        } else {
+          alert("Invalid team ID");
+        }
         return false;
     }
     function deleteTeam(){
-      fb.child('teams').child(document.getElementById('newid').value).remove();
-      fb.child('scores').child('team'+document.getElementById('newid').value).remove();
-      //console.log('team'+document.getElementById('newid').value);
-      document.getElementById('newid').value = '';
-        document.getElementById('newname').value = '';
-        return false;
+      var newid = parseInt(document.getElementById('newid').value);
+      if(!isNaN(newid)){
+        if (confirm("This will remove the team and all of its scores. Are you sure?")){
+          fb.child('teams').child(newid).remove();
+          fb.child('scores').child('team'+newid).remove();
+          //console.log('team'+document.getElementById('newid').value);
+          document.getElementById('newid').value = '';
+          document.getElementById('newname').value = '';
+        }
+      } else {
+        alert("Invalid team ID");
+      }
+      return false;
     }
     
     fb.child('teams').on('value', function(snapshot){
