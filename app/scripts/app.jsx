@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {CardDeck, Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button, ButtonGroup} from 'reactstrap'
+import Autocomplete from "react-autocomplete";
 
 const dClass = window.dClass;
 const dTitle = window.dTitle;
@@ -94,18 +95,25 @@ class TeamCard extends React.Component {
     super(props);
     this.state = {
       teamName: null,
-      color: 'grey'
+      color: 'grey',
+      autocompleteTeams: []
     };
   }
   componentWillMount(){
     if(this.props.teamId)
       this.setTeamId({target:{value:this.props.teamId}});
+    fb.child('teams').on('value', function(snapshot){
+      if(snapshot.val())
+        this.setState({'autocompleteTeams': Object.keys(snapshot.val()).map(k=>{return{id:k,name:snapshot.val()[k].name}})});
+    }.bind(this));
   }
   setTeamId(event){
     if(this.props.teamId)
       fb.child('teams').child(this.props.teamId).off('value');
     
-    var teamId = event.target.value;
+    var teamId;
+    if(event.target) teamId = event.target.value;
+    else teamId = event;
     this.setState({teamName: null});
     this.props.updateId(teamId);
     if(teamId)
@@ -155,7 +163,21 @@ class TeamCard extends React.Component {
             }, [])}
           </select>
           <CardTitle>{teamName}</CardTitle>
-          <CardSubtitle>ID: <input type="text" placeholder="12345" value={this.props.teamId} onChange={this.setTeamId.bind(this)}/></CardSubtitle>
+          <CardSubtitle>ID: 
+            <Autocomplete
+              getItemValue={(item) => item.id}
+              items={this.state.autocompleteTeams}
+              renderItem={(item, isHighlighted) =>
+                <div style={{ background: isHighlighted ? 'lightgray' : 'white', color : 'black' }}>
+                  {item.id} {item.name}
+                </div>
+              }
+              value={this.props.teamId}
+              onChange={this.setTeamId.bind(this)}
+              onSelect={this.setTeamId.bind(this)}
+              shouldItemRender={(item, value) => (item.id + ' ' + item.name).toLowerCase().includes(value.toLowerCase())}
+            />
+          </CardSubtitle>
           
           {difficultySections}
         </CardBody>

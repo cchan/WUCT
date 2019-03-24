@@ -1,14 +1,11 @@
 language: node_js
 node_js:
-- '8'
+- '11'
 install:
 - yarn global add node-gyp
-- yarn global add gulp-cli
+- yarn global add gulp
 - yarn
-cache:
-  directories:
-  - node_modules
-  - $(npm config get prefix)/bin/gulp-cli
+cache: yarn
 script: gulp build
 deploy:
   provider: pages

@@ -11,7 +11,7 @@ var template =    require('gulp-template');
 
 gulp.task('build-jsx', function () {
   return browserify({entries: 'app/scripts/app.jsx', extensions: ['.jsx'], debug: true})
-    .transform('babelify', {presets: ['env', 'react']})
+    .transform('babelify', {presets: ["@babel/preset-env","@babel/preset-react"]})
     .bundle()
     .pipe(source('bundle.js'))
     .pipe(gulp.dest('dist'));
@@ -30,34 +30,35 @@ gulp.task('build-sass', function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task('watch-jsx', ['build-jsx'], function(done) {
+gulp.task('watch-jsx', gulp.series('build-jsx', function(done) {
   browserSync.reload();
   done();
-});
+}));
 
 gulp.task('build-static', function(){
-  gulp.src('app/static/*')
+  return gulp.src('app/static/*')
     .pipe(gulp.dest('dist'))
     .pipe(browserSync.stream());
 });
 
-gulp.task('build', ['build-html', 'build-sass', 'build-jsx', 'build-static']);
+gulp.task('build', gulp.parallel('build-html', 'build-sass', 'build-jsx', 'build-static'));
 
-gulp.task('serve', ['build'], serve({
+gulp.task('serve', gulp.series('build', serve({
   root: 'dist',
   port: process.env.PORT || 8849
-}));
+})));
 
-gulp.task('watch', ['build'], function () {
+gulp.task('watch', gulp.series('build', function (done) {
   browserSync.init({
     server: "./dist",
     port: process.env.PORT || 8849,
     ghostMode: false
   });
-  gulp.watch('app/scripts/*.jsx', ['watch-jsx']);
-  gulp.watch('app/views/*.html', ['build-html']).on('change', function(){setTimeout(browserSync.reload,500);});
-  gulp.watch('app/styles/*.sass', ['build-sass']);
-  gulp.watch('app/static/*', ['build-static']);
-});
+  gulp.watch('app/scripts/*.jsx', gulp.series('watch-jsx'));
+  gulp.watch('app/views/*.html', gulp.series('build-html')).on('change', function(){setTimeout(browserSync.reload,500);});
+  gulp.watch('app/styles/*.sass', gulp.series('build-sass'));
+  gulp.watch('app/static/*', gulp.series('build-static'));
+  done();
+}));
 
-gulp.task('default', ['watch']);
+gulp.task('default', gulp.series('watch'));
