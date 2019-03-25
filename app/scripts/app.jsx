@@ -95,6 +95,7 @@ class TeamCard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      totalScore: 0,
       teamName: null,
       autocompleteTeams: []
     };
@@ -108,19 +109,26 @@ class TeamCard extends React.Component {
     }.bind(this));
   }
   setTeamId(event){
-    if(this.props.teamId)
+    if(this.props.teamId){
       fb.child('teams').child(this.props.teamId).off('value');
+      fb.child('scores').child('team'+this.props.teamId).off('value');
+    }
     
     var teamId;
     if(event.target) teamId = event.target.value;
     else teamId = event;
     this.setState({teamName: null});
     this.props.updateId(teamId);
-    if(teamId)
+    if(teamId){
       fb.child('teams').child(teamId).on('value', function(snapshot){
         if(snapshot.val())
           this.setState({teamName: snapshot.val().name});
       }.bind(this));
+      fb.child('scores').child('team'+this.props.teamId).on('value', function(snapshot){
+        if(snapshot.val())
+          this.setState({totalScore: getScore(snapshot.val())});
+      }.bind(this));
+    }
   }
   componentWillUnmount(){
     if(this.props.teamId)
@@ -174,6 +182,7 @@ class TeamCard extends React.Component {
               onSelect={this.setTeamId.bind(this)}
               shouldItemRender={(item, value) => (item.id + ' ' + item.name).toLowerCase().includes(value.toLowerCase())}
             />
+            <span style={{'float': 'right'}}>Score: <b>{this.state.totalScore}</b></span>
           </CardSubtitle>
           
           {difficultySections}
