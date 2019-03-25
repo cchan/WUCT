@@ -120,9 +120,9 @@ class TeamCard extends React.Component {
     this.setState({teamName: null});
     this.props.updateId(teamId);
     if(teamId){
-      fb.child('teams').child(teamId).on('value', function(snapshot){
+      fb.child('teams').child(teamId).child('name').on('value', function(snapshot){
         if(snapshot.val())
-          this.setState({teamName: snapshot.val().name});
+          this.setState({teamName: snapshot.val()});
       }.bind(this));
       fb.child('scores').child('team'+this.props.teamId).on('value', function(snapshot){
         if(snapshot.val())
@@ -132,7 +132,7 @@ class TeamCard extends React.Component {
   }
   componentWillUnmount(){
     if(this.props.teamId)
-      fb.child('teams').child(this.props.teamId).off('value');
+      fb.child('teams').child(this.props.teamId).child('name').off('value');
   }
   render() {
     const spectrum = {
@@ -201,12 +201,12 @@ class TeamCardSet extends React.Component {
     this.state = JSON.parse(Cookies.get('state'));
     if(!this.state.cards) this.state.cards = {};
     if(!this.state.colors) this.state.colors = {};
-    window.updateUserStatus({tracking:Object.values(this.state.cards)})
+    window.updateUserStatus({tracking:Object.values(this.state.cards)});
   }
   setStateSave(newstate){
     this.setState(newstate, function(){
       Cookies.set('state', JSON.stringify(this.state));
-      window.updateUserStatus({tracking:Object.values(this.state.cards)})
+      window.updateUserStatus({tracking:Object.values(this.state.cards)});
     });
   }
   addCard(id){
