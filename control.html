@@ -9,9 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.js?1553500049704"></script>
+  <script src="common.js?1553530803062"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1553500049704" />
+  <link rel="stylesheet" href="main.css?1553530803062" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -211,9 +211,15 @@
       if(snapshot.val()){
         var allTracked = new Set();
         for(var u in snapshot.val())
-          if(snapshot.val().hasOwnProperty(u) && snapshot.val()[u].tracking && snapshot.val()[u].tracking.length){
-            $("#stations").append($('<div>').text((snapshot.val()[u].identifier || 'Unidentified Station') + ' is tracking: ' + snapshot.val()[u].tracking.join(', ')));
-            snapshot.val()[u].tracking.forEach(x => allTracked.add(parseInt(x)));
+          if(snapshot.val().hasOwnProperty(u) && snapshot.val()[u]){
+            var userState = snapshot.val()[u];
+            try{
+              var tracking = JSON.parse(userState.tracking);
+            }catch(e){
+              continue;
+            }
+            $("#stations").append($('<div>').text((userState.identifier || 'Unidentified Station') + ' is tracking: ' + (tracking.join(', ') || 'no one')));
+            tracking.forEach(x => allTracked.add(parseInt(x)));
           }
         $('#stations').append("<div><b>Unassigned:</b> " + Object.keys(window.teamNames).map(x=>parseInt(x.slice(4))).filter(x => !allTracked.has(x)).join(', ') + "</div>");
       }
