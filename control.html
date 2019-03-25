@@ -9,9 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.js?1553484887144"></script>
+  <script src="common.js?1553494518934"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1553484887144" />
+  <link rel="stylesheet" href="main.css?1553494518934" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -28,6 +28,9 @@
   <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
   <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
   <p>CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
+  
+  <h2>Active Scoring Stations</h2>
+  <div id="stations"></div>
   
   <h2>Teams</h2>
   <input type="text" placeholder="id" id="newid" />
@@ -202,6 +205,19 @@
         sel.removeAllRanges();
         sel.addRange(range);
     }
+    
+    fb.child("users").on('value', function(snapshot){
+      $("#stations").text('');
+      if(snapshot.val()){
+        var allTracked = new Set();
+        for(var u in snapshot.val())
+          if(snapshot.val().hasOwnProperty(u) && snapshot.val()[u].tracking && snapshot.val()[u].tracking.length){
+            $("#stations").append($('<div>').text((snapshot.val()[u].identifier || 'Unidentified Station') + ' is tracking: ' + snapshot.val()[u].tracking.join(', ')));
+            snapshot.val()[u].tracking.forEach(x => allTracked.add(parseInt(x)));
+          }
+        $('#stations').append("<div><b>Unassigned:</b> " + Object.keys(window.teamNames).map(x=>parseInt(x.slice(4))).filter(x => !allTracked.has(x)).join(', ') + "</div>");
+      }
+    });
 
   </script>
   <style>
