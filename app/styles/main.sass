@@ -26,7 +26,7 @@ header
       float: right
     &.add
       margin-left: 1em
-    i.fa
+    i.fa, i.fas, i.fab
       height: 2em
       line-height: 2em
       font-size: 1.5em
@@ -45,6 +45,8 @@ header
   display: inline-block
   width: 450px
   margin: 10px
+  .card-body
+    padding: 0.5em
   color: white
   select
     float: right
@@ -87,8 +89,14 @@ input[type=text]
     width: 100%
     text-align: center
   .btn-group
+    background-color: black
+    border-radius: 0.25em
     button
       padding: 0 0.48em 0.2em 0.48em
+      border: 0
+      margin-right: 0.1em
+    button:last-of-type
+      margin-right: 0
     .active
       background-color: black
       color: white
