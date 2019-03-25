@@ -31,7 +31,7 @@ header {
       float: right; }
     header a.add {
       margin-left: 1em; }
-    header a i.fa {
+    header a i.fa, header a i.fas, header a i.fab {
       height: 2em;
       line-height: 2em;
       font-size: 1.5em; }
@@ -46,6 +46,8 @@ header {
   width: 450px;
   margin: 10px;
   color: white; }
+  .card .card-body {
+    padding: 0.5em; }
   .card select {
     float: right; }
   .card .xBtn {
@@ -87,11 +89,18 @@ input[type=text] {
     background-color: transparent;
     width: 100%;
     text-align: center; }
-  .difficulty .btn-group button {
-    padding: 0 0.48em 0.2em 0.48em; }
-  .difficulty .btn-group .active {
+  .difficulty .btn-group {
     background-color: black;
-    color: white; }
+    border-radius: 0.25em; }
+    .difficulty .btn-group button {
+      padding: 0 0.48em 0.2em 0.48em;
+      border: 0;
+      margin-right: 0.1em; }
+    .difficulty .btn-group button:last-of-type {
+      margin-right: 0; }
+    .difficulty .btn-group .active {
+      background-color: black;
+      color: white; }
   .difficulty button {
     padding: 0 0.35em 0.2em 0.35em; }
     .difficulty button.next {
