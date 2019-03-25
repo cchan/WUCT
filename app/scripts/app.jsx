@@ -283,11 +283,11 @@ class TeamCardSet extends React.Component {
 
 window.updateUserStatus = function(){
   var state = Cookies.getJSON('state');
-  console.log(state);
-  console.log({
-    tracking: JSON.stringify(Object.values(state.cards).filter(x=>!!x)),
-    identifier: state.identifier
-  });
+  //console.log(state);
+  //console.log({
+  //  tracking: JSON.stringify(Object.values(state.cards).filter(x=>!!x)),
+  //  identifier: state.identifier
+  //});
   fb.child("users/" + Cookies.get('userID')).update({
     tracking: JSON.stringify(Object.values(state.cards).filter(x=>!!x)),
     identifier: state.identifier
@@ -307,6 +307,10 @@ window.render = function(){
   connectedRef.on("value", function(snap) {
     if (snap.val() === true) {
       fb.child("users/" + Cookies.get('userID')).onDisconnect().set(null);
+      fb.child("users/" + Cookies.get('userID')).on('value', function(snapshot){
+        if(!snapshot.val())
+          window.signOut();
+      });
       window.updateUserStatus();
     }
   });

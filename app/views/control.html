@@ -19,24 +19,26 @@
   <header>
     <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
   </header>
-  <h2>Tips</h2>
-  <p>The recommended way of using the timer is to set it to 999999999999 until you're ready to start (the timer will only display up to the limit, so it'll just sit there), then setting it to 60 (or whatever the limit may be) once the round starts.</p>
-  <p>To disable scoreboard-hiding, set the hidden score time to a large negative value.</p>
-  <p>As with the rest of this webapp, everything updates instantly as long as you're connected!</p>
-  
+
   <h2>Timer</h2>
+  <p>The recommended way of using the timer is:</p>
+  <ul>
+    <li>Set it to 999999999999 until you're ready to start (the timer will only display up to the limit, so it'll just sit there)</li>
+    <li>Set it to 60 (or whatever the limit may be) once the round starts</li>
+    <li>Use a scoreboard-hiding time of around 5 minutes to create a bit of suspense during the awards ceremony (optional; to avoid this just set the score-hiding time to a large negative value)</li>
+  </ul>
   <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
   <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
   <p>CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
   
   <h2>Active Scoring Stations <sup><small><a href="https://github.com/cchan/WUCT/issues">beta</a></small></sup></h2>
+  <p>This tracks all currently active scoring stations and all teams that they are tracking. Scoring stations may identify themselves using the Identifier textbox in the scoring page header. Use the 'x' to remove stray scoring stations (which forces them to log out).</p>
   <div id="stations"></div>
   
   <h2>Teams</h2>
   <input type="text" placeholder="id" id="newid" />
   <input type="text" placeholder="new name" id="newname" />
-  <input type="submit" value="Set team name" onclick="addTeam();" />
-  <input type="submit" value="Remove team with this ID" onclick="deleteTeam();" />
+  <input type="submit" value="Add/Set team name" onclick="addTeam();" />
   
   <div id="teamlist"></div>
 
@@ -44,6 +46,19 @@
   <div id="scoreboard"></div>
   
   <script>
+    $.fn.outerHTML = function(){
+      // https://css-tricks.com/snippets/jquery/outerhtml-jquery-plugin/
+      // IE, Chrome & Safari will comply with the non-standard outerHTML, all others (FF) will have a fall-back for cloning
+      return (!this.length) ? this : (this[0].outerHTML || (
+        function(el){
+            var div = document.createElement('div');
+            div.appendChild(el.cloneNode(true));
+            var contents = div.innerHTML;
+            div = null;
+            return contents;
+      })(this[0]));
+    };
+
     firebase.auth().onAuthStateChanged(function(user){
       if (user && user.email == 'wuct@clive.io')
           document.getElementById("not-logged-in").style.display = "none";
@@ -63,10 +78,10 @@
         }
         return false;
     }
-    function deleteTeam(){
-      var newid = parseInt(document.getElementById('newid').value);
+    function deleteTeam(newid){
+      newid = parseInt(newid);
       if(!isNaN(newid)){
-        if (confirm("This will remove the team and all of its scores. Are you sure?")){
+        if (confirm("This will remove team "+newid+" and all of its scores. Are you sure?")){
           fb.child('teams').child(newid).remove();
           fb.child('scores').child('team'+newid).remove();
           //console.log('team'+document.getElementById('newid').value);
@@ -86,11 +101,21 @@
     });
     
     function render(){
-      var s = "";
+      $('#teamlist').html('');
       for(var id in teamNames)
         if(teamNames.hasOwnProperty(id) && window.teamNames[id].name)
-          s +="<div>"+ id + ": "+ window.teamNames[id].name +"</div>";
-      document.getElementById('teamlist').innerHTML = s;
+          (function(id){
+            $('#teamlist').append(
+              $('<div>').append(
+                $('<button class="removeBtn">&#x2715;</button>')
+                .click(function(e){
+                  deleteTeam(id);
+                })
+              ).append(' ').append(
+                $("<span>"+ id + ": "+ window.teamNames[id].name +"</span>")
+              )
+            );
+          })(id);
     }
     
     
@@ -208,21 +233,47 @@
     
     fb.child("users").on('value', function(snapshot){
       $("#stations").text('');
+      var allTracked = new Set();
       if(snapshot.val()){
-        var allTracked = new Set();
         for(var u in snapshot.val())
-          if(snapshot.val().hasOwnProperty(u) && snapshot.val()[u]){
-            var userState = snapshot.val()[u];
-            try{
-              var tracking = JSON.parse(userState.tracking);
-            }catch(e){
-              continue;
-            }
-            $("#stations").append($('<div>').text((userState.identifier || 'Unidentified Station') + ' is tracking: ' + (tracking.join(', ') || 'no one')));
-            tracking.forEach(x => allTracked.add(parseInt(x)));
-          }
-        $('#stations').append("<div><b>Unassigned:</b> " + Object.keys(window.teamNames).map(x=>parseInt(x.slice(4))).filter(x => !allTracked.has(x)).join(', ') + "</div>");
+          if(snapshot.val().hasOwnProperty(u) && snapshot.val()[u])
+            (function(u){
+              var userState = snapshot.val()[u];
+              try{
+                var tracking = JSON.parse(userState.tracking);
+              }catch(e){
+                return;
+              }
+              $("#stations").append(
+                $('<div>').append(
+                  $('<button class="removeBtn">&#x2715;</button>')
+                  .click(function(e){
+                    fb.child("users").child(u).set(null);
+                  })
+                ).append(' ').append(
+                  $('<span>')
+                  .append($('<i>').text(userState.identifier || 'Unidentified Station'))
+                  .append(' is tracking: ')
+                  .append(
+                    $('<span>').append(
+                      tracking ? tracking.map(t=>
+                        $('<span class="teamid">').text(t)
+                        .append($("<span>").text(window.teamNames['team'+t]))
+                        .outerHTML()
+                      ).join(', ') : 'no one'
+                    )
+                  )
+                )
+              )
+              tracking.forEach(x => allTracked.add(parseInt(x)));
+            })(u);
       }
+      $('#stations').append($("<div>").append("<b>Untracked teams:</b> ")
+      .append(Object.keys(window.teamNames).map(x=>parseInt(x.slice(4))).filter(x => !allTracked.has(x)).map(t=>
+                        $('<span class="teamid">').text(t)
+                        .append($("<span>").text(window.teamNames['team'+t]))
+                        .outerHTML()
+                      ).join(', ') || 'no one'));
     });
 
   </script>
