@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {CardDeck, Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button, ButtonGroup} from 'reactstrap'
+import { Card, CardBody, CardTitle, CardSubtitle, Button, ButtonGroup } from 'reactstrap'
 import Autocomplete from "react-autocomplete";
 
 const dClass = window.dClass;
