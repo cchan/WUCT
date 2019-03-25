@@ -248,6 +248,7 @@
                 $('<div>').append(
                   $('<button class="removeBtn">&#x2715;</button>')
                   .click(function(e){
+                    if(confirm('Are you sure you want to remove scoring station "' + (userState.identifier || 'Unidentified Station') + '"? This will log them out.'))
                     fb.child("users").child(u).set(null);
                   })
                 ).append(' ').append(
