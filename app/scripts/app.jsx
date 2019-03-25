@@ -295,13 +295,15 @@ window.updateUserStatus = function(){
 };
 
 window.render = function(){
+  if(!Cookies.get('userID'))
+    Cookies.set('userID', uuid.v4());
+  console.log(Cookies.get('userID'));
+  console.trace();
+
   ReactDOM.render(
     <TeamCardSet />,
     document.getElementById('app')
   );
-  if(!Cookies.get('userID'))
-    Cookies.set('userID', uuid.v4());
-  console.log(Cookies.get('userID'));
 
   var connectedRef = firebase.database().ref(".info/connected");
   connectedRef.on("value", function(snap) {
