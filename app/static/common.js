@@ -10,7 +10,7 @@ if(window.location.hostname != 'wuct.clive.io' && (window.location.hostname != '
 window.getScore = function(scores){
   var totalScore = 0;
   for(var i = 0; i < window.dClass.length; i++)
-    totalScore += scores[window.dClass[i]].map(function(a){
+    totalScore += (scores[window.dClass[i]] || scores[i]).map(function(a){
       if(a == -1)
         return 0;
       if(a == 3)

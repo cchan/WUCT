@@ -198,15 +198,17 @@ class TeamCardSet extends React.Component {
     
     if(!Cookies.get('state'))
       Cookies.set('state', JSON.stringify({cards: {}, colors: {}}));
-    this.state = JSON.parse(Cookies.get('state'));
+    this.state = Cookies.getJSON('state');
     if(!this.state.cards) this.state.cards = {};
     if(!this.state.colors) this.state.colors = {};
-    window.updateUserStatus({tracking:Object.values(this.state.cards)});
+    if(!this.state.identifier) this.state.identifier = "";
+    Cookies.set('state', JSON.stringify(this.state));
+    window.updateUserStatus();
   }
   setStateSave(newstate){
     this.setState(newstate, function(){
       Cookies.set('state', JSON.stringify(this.state));
-      window.updateUserStatus({tracking:Object.values(this.state.cards)});
+      window.updateUserStatus();
     });
   }
   addCard(id){
@@ -225,6 +227,10 @@ class TeamCardSet extends React.Component {
   updateId(i, newid){
     this.state.cards[i] = newid || "";
     this.setStateSave({cards: this.state.cards});
+  }
+  updateIdentifier(e){
+    this.setStateSave({identifier: e.target.value});
+    window.updateUserStatus();
   }
   changeCardColor(i, event){
     this.state.colors[i] = event.target.value;
@@ -255,7 +261,7 @@ class TeamCardSet extends React.Component {
           <header>
             <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
             <a href="#" className="add" onClick={this.addCard.bind(this)} title="Press the + button above to start tracking a team! You can:&#013;&bull; Enter a team ID to begin tracking a team's score live&#013;&bull; Set colors to help quickly visually identify teams&#013;&bull; Enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.&#013;&bull; Advance to the next question (>) or go back to a previous question (<). The packet difficulty and number shown should always be the one that the team has or can take next.&#013;&bull; Everything updates instantly on the scoreboard."><i className="fas fa-plus" aria-hidden="true"></i></a>
-            <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{fontSize: "1.5em"}}>Identifier: <input type="text" id="identifier" placeholder="Scoring Station 3" onChange={function(e){window.updateUserStatus({identifier:e.target.value})}} /></label>
+            <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{verticalAlign: "0.2em"}}>Identifier: <input type="text" id="identifier" placeholder="Scoring Station 3" onChange={this.updateIdentifier.bind(this)} /></label>
             <a href="#" className="signout" onClick={function(){window.signOut()}}><i className="fas fa-sign-out-alt" aria-hidden="true" title="Log out"></i></a>
           </header>
           <div>{cards}</div>
@@ -275,11 +281,17 @@ class TeamCardSet extends React.Component {
   }
 }
 
-window.updateUserStatus = function(obj){
-  // obj.tracking is a list
-  // obj.identifier is a string
-  if(obj.tracking) fb.child("users/" + Cookies.get('userID')).update({tracking: obj.tracking});
-  if(obj.identifier) fb.child("users/" + Cookies.get('userID')).update({identifier: obj.identifier});
+window.updateUserStatus = function(){
+  var state = Cookies.getJSON('state');
+  console.log(state);
+  console.log({
+    tracking: JSON.stringify(Object.values(state.cards).filter(x=>!!x)),
+    identifier: state.identifier
+  });
+  fb.child("users/" + Cookies.get('userID')).update({
+    tracking: JSON.stringify(Object.values(state.cards).filter(x=>!!x)),
+    identifier: state.identifier
+  });
 };
 
 window.render = function(){
@@ -288,11 +300,14 @@ window.render = function(){
     document.getElementById('app')
   );
   if(!Cookies.get('userID'))
-    Cookies.set('userID', uuidv4());
+    Cookies.set('userID', uuid.v4());
   console.log(Cookies.get('userID'));
-  
-  var ref = fb.child("users/" + Cookies.get('userID'));
-  ref.onDisconnect().update({
-    tracking: null
+
+  var connectedRef = firebase.database().ref(".info/connected");
+  connectedRef.on("value", function(snap) {
+    if (snap.val() === true) {
+      fb.child("users/" + Cookies.get('userID')).onDisconnect().set(null);
+      window.updateUserStatus();
+    }
   });
 };
