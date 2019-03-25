@@ -7,14 +7,6 @@ const dClass = window.dClass;
 const dTitle = window.dTitle;
 const numPackets = window.numPackets; //if currentQuestion hits this then display end screen - actually very awkward to change (firebase persistence), so don't.
 
-//start/stop clock functionality
-
-//instead of textbox, use a selection segmented button
-
-//use IDs: separate page to edit ID=>name associations (up to 50 teams)
-
-//auth is definitely necessary
-
 class RadioBtnGroup extends React.Component {
   constructor(props) {
     super(props);
@@ -53,9 +45,18 @@ class DifficultySection extends React.Component {
     };
     this.ref = fb.child('scores')
       .child('team'+this.props.teamId)
-      .child(["easy", "medium", "hard"][this.props.difficulty]);
+      .child(window.dClass[this.props.difficulty]);
   }
-  componentWillMount(){
+  componentDidMount(){
+    this.ref.once('value', function(snapshot){
+      if(!snapshot.val())
+        this.ref.set(this.state.scores);
+      else {
+        var currentQuestion = snapshot.val().indexOf(-1);
+        if(currentQuestion == -1) currentQuestion = this.state.scores.length - 1;
+        this.setState({scores: snapshot.val(), currentQuestion: currentQuestion});
+      }
+    }.bind(this));
     this.ref.on('value', function(snapshot){
       if(!snapshot.val())
         this.ref.set(this.state.scores);
@@ -95,7 +96,6 @@ class TeamCard extends React.Component {
     super(props);
     this.state = {
       teamName: null,
-      color: 'grey',
       autocompleteTeams: []
     };
   }
@@ -121,9 +121,6 @@ class TeamCard extends React.Component {
         if(snapshot.val())
           this.setState({teamName: snapshot.val().name});
       }.bind(this));
-  }
-  changeColor(event){
-    this.setState({color: event.target.value});
   }
   componentWillUnmount(){
     if(this.props.teamId)
@@ -152,10 +149,10 @@ class TeamCard extends React.Component {
       difficultySections = <p>Invalid team ID.</p>;
     var teamName = this.state.teamName || "Unknown Team";
     return (
-      <Card inverse style={{ backgroundColor: this.state.color, borderColor: this.state.color }}>
+      <Card inverse style={{ backgroundColor: this.props.color, borderColor: this.props.color }}>
         <CardBody>
           <a href="#" onClick={this.props.remove} className="xBtn">&#x2715;</a>
-          <select value={this.state.color} style={{color: "white", backgroundColor: this.state.color}} onChange={this.changeColor.bind(this)}>
+          <select value={this.props.color} style={{color: "white", backgroundColor: this.props.color}} onChange={this.props.changeColor}>
             <option style={{backgroundColor: "grey"}}>grey</option>
             {Object.keys(spectrum).reduce(function(previous, current) {
                 previous.push(<option key={spectrum[current]} value={spectrum[current]} style={{backgroundColor: spectrum[current]}}>{current}</option>);
@@ -191,12 +188,15 @@ class TeamCardSet extends React.Component {
     super(props);
     
     if(!Cookies.get('state'))
-      Cookies.set('state', JSON.stringify({cards: {}}));
+      Cookies.set('state', JSON.stringify({cards: {}, colors: {}}));
     this.state = JSON.parse(Cookies.get('state'));
+    if(!this.state.cards) this.state.cards = {};
+    if(!this.state.colors) this.state.colors = {};
   }
   setStateSave(newstate){
-    this.setState(newstate);
-    Cookies.set('state', JSON.stringify(newstate));
+    this.setState(newstate, function(){
+      Cookies.set('state', JSON.stringify(this.state));
+    });
   }
   addCard(id){
     var index;
@@ -204,6 +204,7 @@ class TeamCardSet extends React.Component {
     while(this.state.cards[index] !== undefined);
     
     this.state.cards[index] = typeof id == "string" ? id : "";
+    this.state.colors[index] = "gray";
     this.setStateSave({cards: this.state.cards});
   }
   removeCard(i){
@@ -214,13 +215,17 @@ class TeamCardSet extends React.Component {
     this.state.cards[i] = newid || "";
     this.setStateSave({cards: this.state.cards});
   }
+  changeCardColor(i, event){
+    this.state.colors[i] = event.target.value;
+    this.setStateSave({colors: this.state.colors});
+  }
   render() {
     if(true||window.token){
       var cards = [];
       for(var prop in this.state.cards){
-        console.log(this.state.cards);
+        // console.log(this.state.cards);
         if(this.state.cards.hasOwnProperty(prop) && this.state.cards[prop] !== undefined)
-          cards.push(<TeamCard token={window.token} remove={this.removeCard.bind(this, prop)} updateId={this.updateId.bind(this, prop)} teamId={this.state.cards[prop]} key={prop} />);
+          cards.push(<TeamCard token={window.token} remove={this.removeCard.bind(this, prop)} updateId={this.updateId.bind(this, prop)} teamId={this.state.cards[prop]} color={this.state.colors[prop]} changeColor={this.changeCardColor.bind(this, prop)} key={prop} />);
       }
       if(cards.length == 0)
         cards = <div style={{width: "50%"}}>
@@ -240,7 +245,7 @@ class TeamCardSet extends React.Component {
             <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
             <a href="#" className="add" onClick={this.addCard.bind(this)} title="Press the + button above to start tracking a team! You can:&#013;&bull; Enter a team ID to begin tracking a team's score live&#013;&bull; Set colors to help quickly visually identify teams&#013;&bull; Enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.&#013;&bull; Advance to the next question (>) or go back to a previous question (<). The packet difficulty and number shown should always be the one that the team has or can take next.&#013;&bull; Everything updates instantly on the scoreboard."><i className="fas fa-plus" aria-hidden="true"></i></a>
             <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div>
-            <a href="#" className="signout" onClick={function(){window.signOut()}}><i className="fas fa-sign-out-alt" aria-hidden="true"></i></a>
+            <a href="#" className="signout" onClick={function(){window.signOut()}}><i className="fas fa-sign-out-alt" aria-hidden="true" title="Log out"></i></a>
           </header>
           <div>{cards}</div>
         </div>
