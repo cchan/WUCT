@@ -116,3 +116,53 @@ h2 {
 h3 {
   font-size: 1.2em;
   text-align: center; }
+
+.removeBtn {
+  font-weight: bold;
+  border-radius: 0.3em;
+  background-color: black;
+  color: white;
+  font-size: 0.7em;
+  vertical-align: 0.1em;
+  border: 0;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  padding: 0;
+  transition: background-color 0.2s; }
+  .removeBtn + span {
+    display: inline-block;
+    position: relative; }
+    .removeBtn + span:after {
+      content: '';
+      position: absolute;
+      display: block;
+      width: 0%;
+      height: 0.1em;
+      margin-top: -0.7em;
+      background: black;
+      transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1); }
+  .removeBtn:hover {
+    background-color: gray; }
+    .removeBtn:hover + span:after {
+      width: 100%; }
+
+.teamid {
+  position: relative;
+  cursor: pointer; }
+  .teamid span {
+    font-size: 0.7em;
+    top: 0.2em;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    white-space: nowrap;
+    pointer-events: none;
+    margin-left: 0.15em;
+    padding: 0 0.2em;
+    background-color: white; }
+  .teamid:hover {
+    outline: solid 0.1em black; }
+  .teamid:hover span {
+    display: inline-block;
+    outline: solid 0.1em black; }
