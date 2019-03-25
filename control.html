@@ -5,9 +5,9 @@
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-  <script src="common.js?1553472921572"></script>
+  <script src="common.js?1553473878483"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1553472921572" />
+  <link rel="stylesheet" href="main.css?1553473878483" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -22,7 +22,7 @@
   
   <h2>Timer</h2>
   <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
-  <p>Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></p>
+  <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
   <p>CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
   
   <h2>Teams</h2>
@@ -104,8 +104,15 @@
       bindinputfb(document.getElementById('timerlength'), fb.child('timer').child('timerlength'), function(x){timerlength = x;});
       bindinputfb(document.getElementById('hidetime'), fb.child('timer').child('hidetime'), function(x){hidetime = x;});
       
-      document.getElementById('timerset').onclick = function(){
-        fb.child('timer').child('target').set(parseFloat(document.getElementById('timerplus').value) * 60 * 1000 + (new Date()).getTime());
+      document.getElementById('timerset_form').onsubmit = function(){
+        var mins = parseFloat(document.getElementById('timerplus').value);
+        if (!isNaN(mins)){
+          fb.child('timer').child('target').set(mins * 60 * 1000 + (new Date()).getTime());
+          document.getElementById('timerplus').value = '';
+        } else {
+          alert("Invalid number of minutes");
+        }
+        return false;
       };
       
       setTimer(document.getElementById('timer'), function(total){
