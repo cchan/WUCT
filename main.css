@@ -46,6 +46,8 @@ header {
   width: 450px;
   margin: 10px;
   color: white; }
+  .card .card-title {
+    font-weight: bold; }
   .card .card-body {
     padding: 0.5em; }
   .card select {
