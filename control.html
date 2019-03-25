@@ -5,9 +5,10 @@
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-  <script src="common.js?1553473878483"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="common.js?1553474863647"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1553473878483" />
+  <link rel="stylesheet" href="main.css?1553474863647" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -15,6 +16,10 @@
   <header>
     <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
   </header>
+  <div class="alerts" style="position: fixed; top: 4em; left: 1em; right: 1em; height: 4em;">
+    <div class="alert alert-success" id="success-alert" style="position:absolute; width:100%; text-align: center;"></div>
+    <div class="alert alert-danger" id="failure-alert" style="position:absolute; width:100%; text-align: center;"></div>
+  </div>
   <h2>Tips</h2>
   <p>The recommended way of using the timer is to set it to 999999999999 until you're ready to start (the timer will only display up to the limit, so it'll just sit there), then setting it to 60 (or whatever the limit may be) once the round starts.</p>
   <p>To disable scoreboard-hiding, set the hidden score time to a large negative value.</p>
@@ -37,6 +42,21 @@
   <div id="scoreboard"></div>
   
   <script>
+    $("#success-alert").hide();
+    function alertSuccess(text) {
+        $("#success-alert").text(text);
+        $("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
+           $("#success-alert").slideUp(3000);
+        });
+    }
+    $("#failure-alert").hide();
+    function alertFailure(text) {
+        $("#failure-alert").text(text);
+        $("#failure-alert").fadeTo(2000, 500).slideUp(500, function(){
+           $("#failure-alert").slideUp(3000);
+        });
+    }
+
     firebase.auth().onAuthStateChanged(function(user){
       if (user && user.email == 'wuct@clive.io')
           document.getElementById("not-logged-in").style.display = "none";
@@ -52,7 +72,7 @@
           document.getElementById('newid').value = '';
           document.getElementById('newname').value = '';
         } else {
-          alert("Invalid team ID");
+          alertFailure("Invalid team ID");
         }
         return false;
     }
@@ -67,7 +87,7 @@
           document.getElementById('newname').value = '';
         }
       } else {
-        alert("Invalid team ID");
+        alertFailure("Invalid team ID");
       }
       return false;
     }
@@ -110,7 +130,7 @@
           fb.child('timer').child('target').set(mins * 60 * 1000 + (new Date()).getTime());
           document.getElementById('timerplus').value = '';
         } else {
-          alert("Invalid number of minutes");
+          alertFailure("Invalid number of minutes");
         }
         return false;
       };
