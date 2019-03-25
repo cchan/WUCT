@@ -201,10 +201,12 @@ class TeamCardSet extends React.Component {
     this.state = JSON.parse(Cookies.get('state'));
     if(!this.state.cards) this.state.cards = {};
     if(!this.state.colors) this.state.colors = {};
+    window.updateUserStatus({tracking:Object.values(this.state.cards)})
   }
   setStateSave(newstate){
     this.setState(newstate, function(){
       Cookies.set('state', JSON.stringify(this.state));
+      window.updateUserStatus({tracking:Object.values(this.state.cards)})
     });
   }
   addCard(id){
@@ -253,7 +255,7 @@ class TeamCardSet extends React.Component {
           <header>
             <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
             <a href="#" className="add" onClick={this.addCard.bind(this)} title="Press the + button above to start tracking a team! You can:&#013;&bull; Enter a team ID to begin tracking a team's score live&#013;&bull; Set colors to help quickly visually identify teams&#013;&bull; Enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.&#013;&bull; Advance to the next question (>) or go back to a previous question (<). The packet difficulty and number shown should always be the one that the team has or can take next.&#013;&bull; Everything updates instantly on the scoreboard."><i className="fas fa-plus" aria-hidden="true"></i></a>
-            <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div>
+            <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{fontSize: "1.5em"}}>Identifier: <input type="text" id="identifier" placeholder="Scoring Station 3" onChange={function(e){window.updateUserStatus({identifier:e.target.value})}} /></label>
             <a href="#" className="signout" onClick={function(){window.signOut()}}><i className="fas fa-sign-out-alt" aria-hidden="true" title="Log out"></i></a>
           </header>
           <div>{cards}</div>
@@ -273,9 +275,24 @@ class TeamCardSet extends React.Component {
   }
 }
 
+window.updateUserStatus = function(obj){
+  // obj.tracking is a list
+  // obj.identifier is a string
+  if(obj.tracking) fb.child("users/" + Cookies.get('userID')).update({tracking: obj.tracking});
+  if(obj.identifier) fb.child("users/" + Cookies.get('userID')).update({identifier: obj.identifier});
+};
+
 window.render = function(){
   ReactDOM.render(
     <TeamCardSet />,
     document.getElementById('app')
   );
+  if(!Cookies.get('userID'))
+    Cookies.set('userID', uuidv4());
+  console.log(Cookies.get('userID'));
+  
+  var ref = fb.child("users/" + Cookies.get('userID'));
+  ref.onDisconnect().update({
+    tracking: null
+  });
 };

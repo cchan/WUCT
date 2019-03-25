@@ -29,6 +29,9 @@
   <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
   <p>CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
   
+  <h2>Active Scoring Stations</h2>
+  <div id="stations"></div>
+  
   <h2>Teams</h2>
   <input type="text" placeholder="id" id="newid" />
   <input type="text" placeholder="new name" id="newname" />
@@ -202,6 +205,19 @@
         sel.removeAllRanges();
         sel.addRange(range);
     }
+    
+    fb.child("users").on('value', function(snapshot){
+      $("#stations").text('');
+      if(snapshot.val()){
+        var allTracked = new Set();
+        for(var u in snapshot.val())
+          if(snapshot.val().hasOwnProperty(u) && snapshot.val()[u].tracking && snapshot.val()[u].tracking.length){
+            $("#stations").append($('<div>').text((snapshot.val()[u].identifier || 'Unidentified Station') + ' is tracking: ' + snapshot.val()[u].tracking.join(', ')));
+            snapshot.val()[u].tracking.forEach(x => allTracked.add(parseInt(x)));
+          }
+        $('#stations').append("<div><b>Unassigned:</b> " + Object.keys(window.teamNames).map(x=>parseInt(x.slice(4))).filter(x => !allTracked.has(x)).join(', ') + "</div>");
+      }
+    });
 
   </script>
   <style>
