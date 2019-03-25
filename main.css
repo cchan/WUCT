@@ -110,6 +110,9 @@ input[type=text] {
     .difficulty button.back {
       float: left; }
 
+h2 {
+  margin-top: 1em; }
+
 h3 {
   font-size: 1.2em;
   text-align: center; }
