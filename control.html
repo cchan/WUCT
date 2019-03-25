@@ -9,9 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.js?1553484205239"></script>
+  <script src="common.js?1553484887144"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1553484205239" />
+  <link rel="stylesheet" href="main.css?1553484887144" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -19,10 +19,6 @@
   <header>
     <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
   </header>
-  <div class="alerts" style="position: fixed; top: 4em; left: 1em; right: 1em; height: 4em; pointer-events: none;">
-    <div class="alert alert-success" id="success-alert" style="position:absolute; width:100%; text-align: center;"></div>
-    <div class="alert alert-danger" id="failure-alert" style="position:absolute; width:100%; text-align: center;"></div>
-  </div>
   <h2>Tips</h2>
   <p>The recommended way of using the timer is to set it to 999999999999 until you're ready to start (the timer will only display up to the limit, so it'll just sit there), then setting it to 60 (or whatever the limit may be) once the round starts.</p>
   <p>To disable scoreboard-hiding, set the hidden score time to a large negative value.</p>
@@ -45,21 +41,6 @@
   <div id="scoreboard"></div>
   
   <script>
-    $("#success-alert").hide();
-    function alertSuccess(text) {
-        $("#success-alert").text(text);
-        $("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
-           $("#success-alert").slideUp(3000);
-        });
-    }
-    $("#failure-alert").hide();
-    function alertFailure(text) {
-        $("#failure-alert").text(text);
-        $("#failure-alert").fadeTo(2000, 500).slideUp(500, function(){
-           $("#failure-alert").slideUp(3000);
-        });
-    }
-
     firebase.auth().onAuthStateChanged(function(user){
       if (user && user.email == 'wuct@clive.io')
           document.getElementById("not-logged-in").style.display = "none";
