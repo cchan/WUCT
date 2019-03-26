@@ -297,8 +297,8 @@ window.updateUserStatus = function(){
 window.render = function(){
   if(!Cookies.get('userID'))
     Cookies.set('userID', uuid.v4());
-  console.log(Cookies.get('userID'));
-  console.trace();
+  //console.log(Cookies.get('userID'));
+  //console.trace();
 
   ReactDOM.render(
     <TeamCardSet />,
