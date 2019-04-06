@@ -49,7 +49,7 @@ class DifficultySection extends React.Component {
   }
   componentDidMount(){
     this.ref.once('value', function(snapshot){
-      if(!snapshot.val())
+      if(!snapshot.val()) // Can this happen in any situation other than there being no value?
         this.ref.set(this.state.scores);
       else {
         var currentQuestion = snapshot.val().indexOf(-1);
