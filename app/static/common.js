@@ -5,7 +5,12 @@ window.numPackets = [20, 14, 7];
 window.scoreValues = [1, 3, 7];
 window.dbName = 'wuct2019';
 
-if(window.location.hostname != 'wuct.clive.io' && (window.location.hostname != 'localhost' || window.location.port != 8849)) throw new Error();
+if(window.location.hostname != 'wuct.clive.io'){
+  if (window.location.hostname == 'localhost' && window.location.port == 8849)
+    window.dbName = 'wucttest';
+  else
+    throw new Error();
+}
 
 window.getScore = function(scores){
   var totalScore = 0;

@@ -5,15 +5,24 @@ var serve =       require('gulp-serve');
 var browserify =  require('browserify');
 var babelify =    require('babelify');
 var source =      require('vinyl-source-stream');
+var buffer =      require('vinyl-buffer');
 var browserSync = require('browser-sync').create();
 var sass =        require('gulp-sass');
 var template =    require('gulp-template');
+var sourcemaps =  require('gulp-sourcemaps');
+var aliasify =    require('aliasify');
 
 gulp.task('build-jsx', function () {
+  var tinyify = require('tinyify');
   return browserify({entries: 'app/scripts/app.jsx', extensions: ['.jsx'], debug: true})
-    .transform('babelify', {presets: ["@babel/preset-env","@babel/preset-react"]})
+    .transform(aliasify, {global: true, aliases: {"react": "preact-compat", "react-dom": "preact-compat" } })
+    .transform(babelify, {presets: ["@babel/preset-env", "@babel/preset-react"]})
+    .plugin(tinyify)
     .bundle()
     .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest('dist'));
 });
 

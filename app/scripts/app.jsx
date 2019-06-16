@@ -104,8 +104,10 @@ class TeamCard extends React.Component {
     if(this.props.teamId)
       this.setTeamId({target:{value:this.props.teamId}});
     fb.child('teams').on('value', function(snapshot){
-      if(snapshot.val())
+      if(snapshot.val()){
         this.setState({'autocompleteTeams': Object.keys(snapshot.val()).map(k=>{return{id:k,name:snapshot.val()[k].name}})});
+        this.setTeamId(this.props.teamId);
+      }
     }.bind(this));
   }
   setTeamId(event){
@@ -119,7 +121,7 @@ class TeamCard extends React.Component {
     else teamId = event;
     this.setState({teamName: null});
     this.props.updateId(teamId);
-    if(teamId){
+    if(teamId && this.state.autocompleteTeams.some(t => t.id == teamId)){
       fb.child('teams').child(teamId).child('name').on('value', function(snapshot){
         if(snapshot.val())
           this.setState({teamName: snapshot.val()});
