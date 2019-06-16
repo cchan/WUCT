@@ -11,13 +11,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.min.js" integrity="sha256-h7PiJxtxsf7+VkAGN6N+8/0qZrhK7oYJc/pguDnYJi4=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-  <script src="common.js?<%= timestamp %>"></script>
+  <script src="common.min.js?<%= timestamp %>"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.0/css/all.min.css" />
   <link rel="stylesheet" href="main.css?<%= timestamp %>" />
 </head>
 <body>
-  <div id="app">
+  <div id="app" style="display: none">
     <header>
       <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
     </header>
@@ -25,7 +25,7 @@
     <input type="submit" id="passsubmit" value="Log In" />
   </div>
 
-  <script src="bundle.js?<%= timestamp %>"></script>
+  <script src="bundle.min.js?<%= timestamp %>"></script>
   <script>
     window.cancelAuthStateChanged = false;
     window.signOut = function(){
@@ -36,13 +36,13 @@
     firebase.auth().onAuthStateChanged(function(user){
       if(window.cancelAuthStateChanged)
         return;
-      
       if (user) {
         if(user.email != 'wuct@clive.io')
           window.signOut();
         else
           window.render();
       }
+      document.getElementById('app').style.display='block';
     });
     document.getElementById('password').onkeypress = function(e){
       if(e.keyCode == 13)
@@ -53,7 +53,7 @@
       if(!password)
         document.getElementById('app').innerHTML = 'failed to sign in';
       else
-        firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).then(window.render).catch(function(error){
+        firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).catch(function(error){
           document.getElementById('app').innerHTML = 'failed to sign in';
         });
       e.preventDefault();

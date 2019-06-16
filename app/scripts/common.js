@@ -55,7 +55,7 @@ function setTimer(el, cb){
       timerlength = snapshot.val().timerlength;
     }
   });
-  setInterval(function(){
+  return setInterval(function(){
     var total = Math.floor((currentTarget - (new Date()).getTime())/1000);
     if(cb)
       cb(total);

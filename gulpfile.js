@@ -1,40 +1,84 @@
 //based on http://egorsmirnov.me/2015/05/22/react-and-es6-part1.html
 
-var gulp =        require('gulp');
-var serve =       require('gulp-serve');
-var browserify =  require('browserify');
-var babelify =    require('babelify');
-var source =      require('vinyl-source-stream');
-var buffer =      require('vinyl-buffer');
-var browserSync = require('browser-sync').create();
-var sass =        require('gulp-sass');
-var template =    require('gulp-template');
-var sourcemaps =  require('gulp-sourcemaps');
-var aliasify =    require('aliasify');
+const gulp =        require('gulp');
+const browserSync = require('browser-sync').create();
+const sourcemaps =  require('gulp-sourcemaps');
+const rename =      require('gulp-rename');
 
 gulp.task('build-jsx', function () {
-  var tinyify = require('tinyify');
-  return browserify({entries: 'app/scripts/app.jsx', extensions: ['.jsx'], debug: true})
-    .transform(aliasify, {global: true, aliases: {"react": "preact-compat", "react-dom": "preact-compat" } })
-    .transform(babelify, {presets: ["@babel/preset-env", "@babel/preset-react"]})
-    .plugin(tinyify)
-    .bundle()
-    .pipe(source('bundle.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(sourcemaps.write("./"))
-    .pipe(gulp.dest('dist'));
+  const rollup =   require('gulp-better-rollup');
+  const babel =    require('rollup-plugin-babel');
+  const resolve =  require('rollup-plugin-node-resolve');
+  const commonjs = require('rollup-plugin-commonjs');
+  const replace =  require('rollup-plugin-replace');
+  const terser =   require('gulp-terser');
+  const alias = aliases => ({
+    resolveId(importee) {
+      const alias = aliases[importee];
+      return alias ? this.resolveId(alias) : null;
+    }
+  });
+
+  return gulp.src('app/scripts/app.jsx')
+    .pipe(sourcemaps.init())
+    .pipe(rollup({
+      plugins: [
+        alias({ 'react': 'inferno-compat', 'react-dom': 'inferno-compat' }),
+        babel({
+          presets: ["@babel/preset-env", "@babel/preset-react"],
+          exclude: 'node_modules/**'
+        }),
+        resolve({
+          browser: true,
+        }),
+        commonjs({
+          include: 'node_modules/**',
+        }),
+        replace({
+          'process.env.NODE_ENV': JSON.stringify('production')
+        })
+      ]
+    }, {
+      format: 'iife'
+    }))
+    .pipe(terser())
+    .pipe(rename('bundle.min.js'))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('dist'))
+    .pipe(browserSync.stream());
+});
+
+gulp.task('build-js', function () {
+  const terser = require('gulp-terser');
+  return gulp.src('app/scripts/*.js')
+    .pipe(sourcemaps.init())
+    .pipe(terser())
+    .pipe(rename('common.min.js'))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('dist'))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('build-html', function () {
+  const template = require('gulp-template');
   return gulp.src('app/views/*.html')
     .pipe(template({timestamp: new Date().getTime()}))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist'))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('build-sass', function() {
+  const sass =         require('gulp-sass');
+  const autoprefixer = require('gulp-autoprefixer');
+  const purify =       require('gulp-purifycss');
+  const uglify =       require('gulp-uglifycss');
   return gulp.src('app/styles/*.sass')
-    .pipe(sass())
+    .pipe(sourcemaps.init())
+    .pipe(sass({outputStyle:'compressed'}))
+    .pipe(autoprefixer())
+    .pipe(purify(['./build/**.html', './dist/**.js']))
+    .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('dist'))
     .pipe(browserSync.stream());
 });
@@ -50,8 +94,12 @@ gulp.task('build-static', function(){
     .pipe(browserSync.stream());
 });
 
-gulp.task('build', gulp.parallel('build-html', 'build-sass', 'build-jsx', 'build-static'));
+gulp.task('build', gulp.series(
+  gulp.parallel('build-html', 'build-jsx', 'build-js', 'build-static'),
+  'build-sass'
+));
 
+const serve = require('gulp-serve');
 gulp.task('serve', gulp.series('build', serve({
   root: 'dist',
   port: process.env.PORT || 8849
