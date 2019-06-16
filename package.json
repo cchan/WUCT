@@ -33,7 +33,7 @@
     "inferno": "^7.1.13",
     "inferno-compat": "^7.1.13",
     "react-autocomplete": "^1.8.1",
-    "reactstrap": "^7.1.0",
+    "reactstrap": "^8.0.0",
     "rollup": "^1.15.6",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^10.0.0",
