@@ -262,7 +262,7 @@ class TeamCardSet extends React.Component {
       return (
         <div>
           <header>
-            <h1><img src="wuct.jpg" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
+            <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
             <a href="#" className="add" onClick={this.addCard.bind(this)} title="Press the ADD TRACKER button above to start tracking a team! You can:&#013;&bull; Enter a team ID to begin tracking a team's score live&#013;&bull; Set colors to help quickly visually identify teams&#013;&bull; Enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.&#013;&bull; Advance to the next question (>) or go back to a previous question (<). The packet difficulty and number shown should always be the one that the team has or can take next.&#013;&bull; Everything updates instantly on the scoreboard.">ADD TRACKER</a>
             <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{verticalAlign: "0.2em"}}>Identifier: <input type="text" id="identifier" placeholder="Scoring Station 3" onChange={this.updateIdentifier.bind(this)} value={this.state.identifier} /></label>
             <a href="#" className="signout" onClick={function(){window.signOut()}}>LOGOUT</a>
