@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/cchan/WUCT#readme",
   "dependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.2",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
-    "gulp-autoprefixer": "^6.1.0",
+    "gulp-autoprefixer": "^7.0.0",
     "gulp-better-rollup": "^4.0.1",
     "gulp-purifycss": "^0.2.0",
     "gulp-rename": "^1.4.0",
@@ -30,19 +30,19 @@
     "gulp-template": "^5.0.0",
     "gulp-terser": "^1.2.0",
     "gulp-uglifycss": "^1.1.0",
-    "inferno": "^7.1.13",
-    "inferno-compat": "^7.1.13",
+    "inferno": "^7.3.1",
+    "inferno-compat": "^7.3.1",
     "react-autocomplete": "^1.8.1",
-    "reactstrap": "^8.0.0",
-    "rollup": "^1.15.6",
-    "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-commonjs": "^10.0.0",
-    "rollup-plugin-node-resolve": "^5.0.2",
+    "reactstrap": "^8.0.1",
+    "rollup": "^1.20.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.3",
-    "gulp": "^4.0.0",
+    "browser-sync": "^2.26.7",
+    "gulp": "^4.0.2",
     "gulp-sass": "^4.0.2"
   }
 }
