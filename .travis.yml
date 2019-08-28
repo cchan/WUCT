@@ -2,10 +2,9 @@ language: node_js
 node_js:
 - '11'
 install:
-- yarn global add node-gyp
-- yarn global add gulp
-- yarn
-cache: yarn
+- npm i -g node-gyp
+- npm i -g gulp
+- npm i
 script: gulp build
 deploy:
   provider: pages
