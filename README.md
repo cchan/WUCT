@@ -10,3 +10,5 @@ WUCT
 - https://wuct.clive.io/control.html shows the control panel. This is intended to be the central control for everything.
 
 Based off of the Lexington Math Tournament Guts Round, which is in turn based off of the HMMT Guts Round.
+
+Thanks to [BugSnag](https://www.bugsnag.com) for generously providing an open source license.
