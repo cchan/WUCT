@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1616911148447"></script>
+  <script src="common.min.js?1616919428465"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1616911148447" />
+  <link rel="stylesheet" href="main.css?1616919428465" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -20,11 +20,11 @@
   </header>
 
   <h2>Timer</h2>
-  <p>The recommended way of using the timer is:</p>
+  <p>The timer is always counting down. The recommended way of using the timer is:</p>
   <ul>
-    <li>Set it to 999999999999 until you're ready to start (the timer will only display up to the limit, so it'll just sit there)</li>
-    <li>Set it to 60 (or whatever the limit may be) once the round starts</li>
-    <li>Use a scoreboard-hiding time of around 5 minutes to create a bit of suspense during the awards ceremony (optional; to avoid this just set the score-hiding time to a large negative value)</li>
+    <li><a href="#" onclick="setTimerMins(1e20);return false;">Set timer to 99999999999999999</a> until you're ready to start (the timer will only display up to the limit, so it'll just stay maxed out)</li>
+    <li><a href="#" onclick="setTimerMins(60);return false;">Set timer to 60</a> (or whatever the actual limit is) to start the round</li>
+    <li>Use a scoreboard-hiding time of around 5 minutes to enable a bit of suspense during the awards ceremony (optional; to avoid this just <a href="#" onclick="setHidetimeMins(-1e20);return false;">set the score-hiding time to -99999999999999999</a>)</li>
   </ul>
   <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
   <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
@@ -42,6 +42,7 @@
   <div id="teamlist"></div>
 
   <h2>Copyable Scoreboard Table</h2>
+  This table only shows teams that have ever had any score entered.
   <div id="scoreboard"></div>
   
   <script>
@@ -80,7 +81,7 @@
     function deleteTeam(newid){
       newid = parseInt(newid);
       if(!isNaN(newid)){
-        if (confirm("This will remove team "+newid+" and all of its scores. Are you sure?")){
+        if (confirm("This will permanently delete team "+newid+" and all of its scores. Are you sure?")){
           fb.child('teams').child(newid).remove();
           fb.child('scores').child('team'+newid).remove();
           //console.log('team'+document.getElementById('newid').value);
@@ -117,6 +118,9 @@
           })(id);
     }
     
+    function setTimerMins(mins) {
+      fb.child('timer').child('target').set(mins * 60 * 1000 + (new Date()).getTime());
+    }
     
     //Don't use this during leap seconds btw.
     (function(){
@@ -134,11 +138,15 @@
       var timerlength, hidetime;
       bindinputfb(document.getElementById('timerlength'), fb.child('timer').child('timerlength'), function(x){timerlength = x;});
       bindinputfb(document.getElementById('hidetime'), fb.child('timer').child('hidetime'), function(x){hidetime = x;});
+      window.setHidetime = function(mins) {
+        document.getElementById('hidetime').value = mins;
+        document.getElementById('hidetime').dispatchEvent(new Event('change'))
+      }
       
       document.getElementById('timerset_form').onsubmit = function(){
         var mins = parseFloat(document.getElementById('timerplus').value);
         if (!isNaN(mins)){
-          fb.child('timer').child('target').set(mins * 60 * 1000 + (new Date()).getTime());
+          setTimerMins(mins);
           document.getElementById('timerplus').value = '';
         } else {
           alertFailure("Invalid number of minutes");
@@ -230,7 +238,7 @@
         sel.addRange(range);
     }
     
-    fb.child("users").on('value', function(snapshot){
+    function updateStations(snapshot){
       $("#stations").text('');
       var allTracked = new Set();
       if(snapshot.val()){
@@ -274,7 +282,10 @@
                         .append($("<span>").text(window.teamNames['team'+t]))
                         .outerHTML()
                       ).join(', ') || 'no one'));
-    });
+    };
+    fb.child("users").on('value', updateStations);
+    fb.child("teams").on('child_added', updateStations);
+    fb.child("teams").on('child_removed', updateStations);
 
   </script>
   <style>
