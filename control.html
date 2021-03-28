@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1616923815918"></script>
+  <script src="common.min.js?1616929928568"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1616923815918" />
+  <link rel="stylesheet" href="main.css?1616929928568" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -28,7 +28,7 @@
   </ul>
   <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
   <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
-  <p>CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
+  <p id="timer-wrap">CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
   
   <h2>Active Scoring Stations <sup><small><a href="https://github.com/cchan/WUCT/issues">beta</a></small></sup></h2>
   <p>This tracks all currently active scoring stations and all teams that they are tracking. Scoring stations may identify themselves using the Identifier textbox in the scoring page header. Use the 'x' to remove stray scoring stations (which forces them to log out).</p>
@@ -42,7 +42,7 @@
   <div id="teamlist"></div>
 
   <h2>Copyable Scoreboard Table</h2>
-  This table only shows teams that have ever had any score entered.
+  This table only shows teams that have ever had any score entered. <span id="scoreboard-updated">[update indicator]</span>
   <div id="scoreboard"></div>
   
   <script>
@@ -79,7 +79,7 @@
         return false;
     }
     function deleteTeam(newid){
-      newid = parseInt(newid);
+      newid = parseInt(newid.substr(4));
       if(!isNaN(newid)){
         if (confirm("This will permanently delete team "+newid+" and all of its scores. Are you sure?")){
           fb.child('teams').child(newid).remove();
@@ -94,7 +94,7 @@
       return false;
     }
     
-    function render(){
+    function renderTeams(){
       $('#teamlist').html('');
       for(var id in teamNames)
         if(teamNames.hasOwnProperty(id))
@@ -106,14 +106,27 @@
                   deleteTeam(id);
                 })
               ).append(' ').append(
-                $("<span>"+ id + ": "+ window.teamNames[id] +"</span>")
+                $("<span>"+ id.substr(4) + ": "+ window.teamNames[id] +"</span>")
               )
             );
           })(id);
     }
     
     function setTimerMins(mins) {
-      fb.child('timer').child('target').set(mins * 60 * 1000 + (new Date()).getTime());
+      fb.child('timer').child('target').set(mins * 60 * 1000 + (new Date()).getTime()).then(function(){
+        flashGreen(document.getElementById("timer-wrap"));
+      });
+    }
+
+    function flashGreen(elem) {
+      if(elem.flash) {
+        clearTimeout(elem.flash);
+      }
+      elem.style.transition = "none";
+      elem.style.backgroundColor = "#AFA";
+      elem.offsetHeight; /* trigger reflow */
+      elem.style.transition = "background-color 1s";
+      elem.style.backgroundColor = "white";
     }
     
     //Don't use this during leap seconds btw.
@@ -121,10 +134,13 @@
       function bindinputfb(input, ref, cb){
         ref.on('value', function(snapshot){
           input.value = parseInt(snapshot.val());
+          flashGreen(input);
           cb(parseInt(snapshot.val()));
         });
         input.onchange = function(e){
-          ref.set(parseInt(e.target.value));
+          ref.set(parseInt(e.target.value)).then(function(){
+            flashGreen(input);
+          });
           cb(parseInt(e.target.value));
         };
       }
@@ -157,8 +173,6 @@
     }());
     
     (function(){
-      teamNames = {};
-      scores = [];
       fb.child('teams').on('value', function(snapshot){
         teamNames = {};
         var teams = snapshot.val();
@@ -166,7 +180,10 @@
           if(teams.hasOwnProperty(teamId))
             teamNames['team'+teamId] = teams[teamId].name;
         fb.child("users").once('value', updateStations);
-        render();
+        renderTeams();
+        renderTable();
+        flashGreen(document.getElementById("teamlist"));
+        flashGreen(document.getElementById("scoreboard-updated"));
       });
       
       fb.child('scores').on('value', function(snapshot){
@@ -180,10 +197,11 @@
           }
         }
         scores.sort(function(a,b){return b.score - a.score;});
-        render();
+        renderTable();
+        flashGreen(document.getElementById("scoreboard-updated"));
       });
       
-      function render(){
+      function renderTable(){
         var s = "<tr><th>Rank</th><th>Team ID</th><th>Team Name</th><th>Total Score</th>"
                +"<th>Submitted "+window.dTitle[0]+" packets (of "+window.numPackets[0]+" total)</th>"
                +"<th>Submitted "+window.dTitle[1]+" packets (of "+window.numPackets[1]+" total)</th>"
@@ -277,6 +295,7 @@
                         .append($("<span>").text(window.teamNames['team'+t]))
                         .outerHTML()
                       ).join(', ') || 'no one'));
+      flashGreen(document.getElementById("stations"));
     };
     fb.child("users").on('value', updateStations);
 
