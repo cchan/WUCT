@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1616920639630"></script>
+  <script src="common.min.js?1616923481256"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1616920639630" />
+  <link rel="stylesheet" href="main.css?1616923481256" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -94,6 +94,12 @@
       return false;
     }
     
+//     fb.child('teams').on('value', function(snapshot){
+//       window.teamNames = {};
+//       teamNames = snapshot.val();
+//       render();
+//     });
+    
     function render(){
       $('#teamlist').html('');
       for(var id in teamNames)
@@ -160,7 +166,11 @@
       teamNames = {};
       scores = [];
       fb.child('teams').on('value', function(snapshot){
-        teamNames = snapshot.val();
+        teamNames = {};
+        var teams = snapshot.val();
+        for(var teamId in teams)
+          if(teams.hasOwnProperty(teamId))
+            teamNames['team'+teamId] = teams[teamId].name;
         fb.child("users").once('value', updateStations);
         render();
       });
