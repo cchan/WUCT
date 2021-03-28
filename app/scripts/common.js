@@ -14,7 +14,7 @@ else
 window.getScore = function(scores){
   var totalScore = 0;
   for(var i = 0; i < window.dClass.length; i++)
-    totalScore += (scores[window.dClass[i]] || scores[i]).map(function(a){
+    totalScore += (scores[window.dClass[i]] || scores[i] || []).map(function(a){
       if(a == -1)
         return 0;
       if(a == 3)
@@ -66,7 +66,7 @@ function setTimer(el, cb){
     var minutes = "" + Math.floor(total/60) % 60;
     var seconds = "" + total % 60;
     el.innerHTML = ((hours<10)?"0":"") + hours + ":" + ((minutes<10)?"0":"") + minutes + ":" + ((seconds<10)?"0":"") + seconds;
-  }, 200);
+  }, 500);
 }
 
 

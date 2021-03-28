@@ -1,19 +1,16 @@
 $green: #255D38
 
-body
-  padding: 3em
-  padding-top: 5em
 header
-  position: fixed
-  left: 0
-  right: 0
-  top: 0
-  height: 3em
+  min-height: 3em
   background-color: $green
   color: white
+  z-index: 1000
+  *
+    background-color: $green
   h1
     font-size: 1.5em
     line-height: 2em
+    margin: 0
     display: inline-block
     img
       height: 1.9em
@@ -23,7 +20,14 @@ header
     display: inline-block
     vertical-align: top
     &.signout
-      float: right
+      // float: right
+    &.help
+      // float: right
+      font-weight: bold
+      font-size: 2em
+      padding: 0 0.5em
+      line-height: 1.5em
+      height: 1.5em
     &.add
       margin-left: 1em
     i.fa, i.fas, i.fab
@@ -43,6 +47,9 @@ header
       background-color: darken($green, 10%)
       color: white
       text-decoration: none
+    &::after
+      clear: both
+      display: block
 .card
   display: inline-block
   width: 450px
@@ -163,3 +170,27 @@ h3
   &:hover span
     display: inline-block
     outline: solid 0.1em black
+#plusbtn
+  background-color: $green
+  color: white
+  font-size: 1.5em
+  position: fixed
+  right: 2em
+  bottom: 2em
+  width: 3em
+  height: 3em
+  border: 0
+  border-radius: 100em
+  box-shadow: 0 0.1em 0.3em rgba(0,0,0,0.12), 0 0.1em 0.2em rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  &:hover
+    cursor: pointer
+    box-shadow: 0 0.7em 1.4em rgba(0,0,0,0.25), 0 0.5em 0.5em rgba(0,0,0,0.22);
+#identifier, #identifier:focus
+  border: solid 1px gray
+  border-radius: 5px
+  width: 15em
+  color: white
+  background-color: black
+  &:valid
+    border: solid 1px white
