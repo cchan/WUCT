@@ -5,9 +5,9 @@ window.numPackets = [20, 14, 7];
 window.scoreValues = [1, 3, 7];
 
 if(window.location.hostname == 'wuct.clive.io')
-  window.dbName = 'wucttest';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2021';
 else if (window.location.hostname == 'localhost' && window.location.port == 8849)
-  window.dbName = 'wucttest';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wucttest';
 else
   throw new Error();
 
