@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1616919428465"></script>
+  <script src="common.min.js?1616919994740"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1616919428465" />
+  <link rel="stylesheet" href="main.css?1616919994740" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -94,11 +94,11 @@
       return false;
     }
     
-    fb.child('teams').on('value', function(snapshot){
-      window.teamNames = {};
-      teamNames = snapshot.val();
-      render();
-    });
+//     fb.child('teams').on('value', function(snapshot){
+//       window.teamNames = {};
+//       teamNames = snapshot.val();
+//       render();
+//     });
     
     function render(){
       $('#teamlist').html('');
@@ -138,7 +138,7 @@
       var timerlength, hidetime;
       bindinputfb(document.getElementById('timerlength'), fb.child('timer').child('timerlength'), function(x){timerlength = x;});
       bindinputfb(document.getElementById('hidetime'), fb.child('timer').child('hidetime'), function(x){hidetime = x;});
-      window.setHidetime = function(mins) {
+      window.setHidetimeMins = function(mins) {
         document.getElementById('hidetime').value = mins;
         document.getElementById('hidetime').dispatchEvent(new Event('change'))
       }
@@ -171,6 +171,7 @@
         for(var teamId in teams)
           if(teams.hasOwnProperty(teamId))
             teamNames['team'+teamId] = teams[teamId].name;
+        fb.child("users").once('value', updateStations);
         render();
       });
       
@@ -284,8 +285,6 @@
                       ).join(', ') || 'no one'));
     };
     fb.child("users").on('value', updateStations);
-    fb.child("teams").on('child_added', updateStations);
-    fb.child("teams").on('child_removed', updateStations);
 
   </script>
   <style>
