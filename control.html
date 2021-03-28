@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1616923481256"></script>
+  <script src="common.min.js?1616923815918"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1616923481256" />
+  <link rel="stylesheet" href="main.css?1616923815918" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -22,9 +22,9 @@
   <h2>Timer</h2>
   <p>The timer is always counting down. The recommended way of using the timer is:</p>
   <ul>
-    <li><a href="#" onclick="setTimerMins(1e20);return false;">Set timer to 99999999999999999</a> until you're ready to start (the timer will only display up to the limit, so it'll just stay maxed out)</li>
+    <li><a href="#" onclick="setTimerMins(99999999999999999);return false;">Set timer to 99999999999999999</a> until you're ready to start (the timer will only display up to the limit, so it'll just stay maxed out)</li>
     <li><a href="#" onclick="setTimerMins(60);return false;">Set timer to 60</a> (or whatever the actual limit is) to start the round</li>
-    <li>Use a scoreboard-hiding time of around 5 minutes to enable a bit of suspense during the awards ceremony (optional; to avoid this just <a href="#" onclick="setHidetimeMins(-1e20);return false;">set the score-hiding time to -99999999999999999</a>)</li>
+    <li>Use a scoreboard-hiding time of around 5 minutes to enable a bit of suspense during the awards ceremony (optional; to avoid this just <a href="#" onclick="setHidetimeMins(-99999999999999999);return false;">set the score-hiding time to -99999999999999999</a>)</li>
   </ul>
   <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
   <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
@@ -94,16 +94,10 @@
       return false;
     }
     
-//     fb.child('teams').on('value', function(snapshot){
-//       window.teamNames = {};
-//       teamNames = snapshot.val();
-//       render();
-//     });
-    
     function render(){
       $('#teamlist').html('');
       for(var id in teamNames)
-        if(teamNames.hasOwnProperty(id) && window.teamNames[id].name)
+        if(teamNames.hasOwnProperty(id))
           (function(id){
             $('#teamlist').append(
               $('<div>').append(
@@ -112,7 +106,7 @@
                   deleteTeam(id);
                 })
               ).append(' ').append(
-                $("<span>"+ id + ": "+ window.teamNames[id].name +"</span>")
+                $("<span>"+ id + ": "+ window.teamNames[id] +"</span>")
               )
             );
           })(id);
