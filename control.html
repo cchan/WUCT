@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1616929928568"></script>
+  <script src="common.min.js?1616938089513"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1616929928568" />
+  <link rel="stylesheet" href="main.css?1616938089513" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -19,31 +19,35 @@
     <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
   </header>
 
-  <h2>Timer</h2>
-  <p>The timer is always counting down. The recommended way of using the timer is:</p>
-  <ul>
-    <li><a href="#" onclick="setTimerMins(99999999999999999);return false;">Set timer to 99999999999999999</a> until you're ready to start (the timer will only display up to the limit, so it'll just stay maxed out)</li>
-    <li><a href="#" onclick="setTimerMins(60);return false;">Set timer to 60</a> (or whatever the actual limit is) to start the round</li>
-    <li>Use a scoreboard-hiding time of around 5 minutes to enable a bit of suspense during the awards ceremony (optional; to avoid this just <a href="#" onclick="setHidetimeMins(-99999999999999999);return false;">set the score-hiding time to -99999999999999999</a>)</li>
-  </ul>
-  <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
-  <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
-  <p id="timer-wrap">CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
-  
-  <h2>Active Scoring Stations <sup><small><a href="https://github.com/cchan/WUCT/issues">beta</a></small></sup></h2>
-  <p>This tracks all currently active scoring stations and all teams that they are tracking. Scoring stations may identify themselves using the Identifier textbox in the scoring page header. Use the 'x' to remove stray scoring stations (which forces them to log out).</p>
-  <div id="stations"></div>
-  
-  <h2>Teams</h2>
-  <input type="text" placeholder="id" id="newid" />
-  <input type="text" placeholder="new name" id="newname" />
-  <input type="submit" value="Add/Set team name" onclick="addTeam();" />
-  
-  <div id="teamlist"></div>
+  <div style="padding: 2em">
+    <h2 style="margin-top: 0">Timer</h2>
+    <p>The timer is always counting down. The recommended way of using the timer is:</p>
+    <ul>
+      <li><a href="#" onclick="setTimerMins(99999999999999999);return false;">Set timer to 99999999999999999</a> until you're ready to start (the timer will only display up to the limit, so it'll just stay maxed out)</li>
+      <li><a href="#" onclick="setTimerMins(60);return false;">Set timer to 60</a> (or whatever the actual limit is) to start the round</li>
+      <li>Use a scoreboard-hiding time of around 5 minutes to enable a bit of suspense during the awards ceremony (optional; to avoid this just <a href="#" onclick="setHidetimeMins(-99999999999999999);return false;">set the score-hiding time to -99999999999999999</a>)</li>
+    </ul>
+    <p>Timer is <input type="text" id="timerlength" /> minutes long and hides scores at <input type="text" id="hidetime" /> minutes.</p>
+    <p><form action="" method="GET" id="timerset_form">Set timer to <input type="text" id="timerplus" /> minutes: <input type="submit" id="timerset" /></form></p>
+    <p id="timer-wrap">CURRENT TIMER DISPLAY: <span id="timer">not loaded yet</span></p>
+    
+    <h2>Active Scoring Stations <sup><small><a href="https://github.com/cchan/WUCT/issues">beta</a></small></sup></h2>
+    <p>This tracks all currently active scoring stations and all teams that they are tracking. Scoring stations may identify themselves using the Identifier textbox in the scoring page header. Use the 'x' to remove stray scoring stations (which forces them to log out).</p>
+    <div id="stations"></div>
+    
+    <h2>Teams</h2>
+    <input type="text" placeholder="id" id="newid" />
+    <input type="text" placeholder="new name" id="newname" />
+    <input type="submit" value="Add/Set team name" onclick="addTeam();" />
+    
+    <div id="teamlist"></div>
 
-  <h2>Copyable Scoreboard Table</h2>
-  This table only shows teams that have ever had any score entered. <span id="scoreboard-updated">[update indicator]</span>
-  <div id="scoreboard"></div>
+    <h2>Copyable Scoreboard Table&nbsp;<sup id="scoreboard-updated"><small>[update&nbsp;indicator]</small></sup></h2>
+    <p>This table only shows teams that have ever had any score entered.</p>
+
+    <p>Right click > Copy.</p>
+    <div id="scoreboard"></div>
+  </div>
   
   <script>
     $.fn.outerHTML = function(){
