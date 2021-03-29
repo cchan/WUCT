@@ -7,9 +7,10 @@ window.scoreValues = [1, 3, 7];
 if(window.location.hostname == 'wuct.clive.io')
   window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2021';
 else if (window.location.hostname == 'localhost' && window.location.port == 8849)
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wucttest';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2021';
 else
   throw new Error();
+console.log(window.dbName);
 
 window.getScore = function(scores){
   var totalScore = 0;
@@ -90,8 +91,8 @@ function alertFailure(text, persistent) {
 }
 $(function(){
   $('body').append(`<div class="alerts" style="position: fixed; top: 4em; left: 1em; right: 1em; height: 4em; pointer-events: none;">
-    <div class="alert alert-success" id="success-alert" style="position:absolute; width:100%; text-align: center;"></div>
-    <div class="alert alert-danger" id="failure-alert" style="position:absolute; width:100%; text-align: center;"></div>
+    <div class="alert alert-success" id="success-alert" style="position:absolute; width: 15em; right: 1em; text-align: center;"></div>
+    <div class="alert alert-danger" id="failure-alert" style="position:absolute; width: 15em; right: 1em; text-align: center;"></div>
   </div>`);
   $("#success-alert").hide();
   $("#failure-alert").hide();

@@ -70,13 +70,13 @@ gulp.task('build-html', function () {
 gulp.task('build-sass', function() {
   const sass =         require('gulp-sass');
   const autoprefixer = require('gulp-autoprefixer');
-  const purify =       require('gulp-purifycss');
+  // const purify =       require('gulp-purifycss');
   const uglify =       require('gulp-uglifycss');
   return gulp.src('app/styles/*.sass')
     .pipe(sourcemaps.init())
     .pipe(sass({outputStyle:'compressed'}))
     .pipe(autoprefixer())
-    .pipe(purify(['./build/**.html', './dist/**.js']))
+    // .pipe(purify(['./build/**.html', './dist/**.js']))
     .pipe(uglify())
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('dist'))

@@ -1,10 +1,23 @@
 {
   "rules": {
-    ".read": "true",
-    ".write": "false",
-    "wuct2019": {
+    "$wuct": {
+      ".read": "auth != null && auth.token.email == 'wuct@clive.io'",
+      ".write": "$wuct == 'wuct2021' && auth != null && auth.token.email == 'wuct@clive.io'",
+      "answers": {
+        "$id": {
+          "$passcode": {
+            ".read": "true",
+        		".write": "$wuct == 'wuct2021' && data.exists()"
+          }
+        }
+      },
+      "scores": { ".read": "true" },
+      "teams": { ".read": "true" },
+      "timer": { ".read": "true" },
+    },
+    "wucttest": {
       ".read": "true",
       ".write": "auth != null && auth.token.email == 'wuct@clive.io'"
-    },
+    }
   }
 }
