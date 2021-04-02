@@ -225,14 +225,16 @@ h3
     display: block
     color: black
     transition: color 0.4s
-  &:hover .desc
+  &:not(.disabled):hover .desc
     color: white
-  &.easy:hover
+  &:not(.disabled).easy:hover
     background-color: #090
-  &.medium:hover
+  &:not(.disabled).medium:hover
     background-color: #009
-  &.hard:hover
+  &:not(.disabled).hard:hover
     background-color: #900
+  &.disabled
+    opacity: 20%
 .easy
   border-color: #0f0
   &.filled
@@ -245,8 +247,8 @@ h3
   border-color: #f00
   &.filled
     background-color: #900
-#teamname
-  font-weight: bold
+a>b
+  background-color: transparent
 
 .pdfansbox_left
   float: left

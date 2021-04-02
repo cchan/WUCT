@@ -31,21 +31,29 @@
   <div style="position:relative;" id="competeApp">
     <div id="scoreboxes"></div>
     <div id="selection">
-        <div id="app"></div>
-        <p>Click to start a packet! Remember that once your team starts a packet, <b>you must submit before moving on to the next</b>.</p>
-        <div id="buttons">
-            <button class="easy selectbox" onclick="startPacket('easy'); return false">+<span class="desc">start easy packet</span></button>
-            <button class="medium selectbox" onclick="startPacket('medium'); return false">+<span class="desc">start medium packet</span></button>
-            <button class="hard selectbox" onclick="startPacket('hard'); return false">+<span class="desc">start hard packet</span></button>
+        <div id="notstarted"><h2>Time hasn't started yet!</h2>
+          <p>While you're here, here's some tips!</p>
+          <ul style="width: 40em; display: inline-block; text-align: left">
+            <li>Having tech problems? Your progress is always saved and it's always safe to reload. And please report bugs after the competition ends!</li>
+            <li>Keep an eye on your time! You will not finish all the packets - you might want to give up on a difficult question to get access to other ones.</li>
+            <li>Designate one teammate to enter the answers to avoid submitting accidentally.</li>
+          </ul>
         </div>
+        <div id="buttons" style="display: none;">
+            <button id="starteasy" class="easy selectbox" onclick="if(confirm('Start an easy packet?'))startPacket('easy'); return false">+<span class="desc">start easy packet</span></button>
+            <button id="startmedium" class="medium selectbox" onclick="if(confirm('Start a medium packet?'))startPacket('medium'); return false">+<span class="desc">start medium packet</span></button>
+            <button id="starthard" class="hard selectbox" onclick="if(confirm('Start a hard packet?'))startPacket('hard'); return false">+<span class="desc">start hard packet</span></button>
+            <p>Click to start a packet! Remember that once your team starts a packet, <b>you must submit before moving on to the next</b>.</p>
+        </div>
+        <div id="app"></div>
     </div>
     <div id="answering">
-        <h2 id="questionname"></h2>
         <div class="pdfansbox_left">
           <iframe id="pdf" src=""></iframe>
           <!-- <p><a id="pdf">PDF Link</a></p> -->
         </div>
         <div class="pdfansbox_right">
+          <h2 id="questionname"></h2>
           <div><span>1</span><textarea id="q1" disabled></textarea></div>
           <div><span>2</span><textarea id="q2" disabled></textarea></div>
           <div><span>3</span><textarea id="q3" disabled></textarea></div>
@@ -53,7 +61,8 @@
           <p><b>You cannot undo a submission</b>, so make sure you're really ready!</p>
         </div>
     </div>
-    <div id="hidden" style="position: absolute; margin-top: 1em;">Time's up!</div>
+    <div id="hidden" style="position: absolute; margin-top: 1em;">Scores hidden for awards ceremony suspense :)</div>
+    <div id="timeup" style="position: absolute; margin-top: 1em;">Time's up! <div style="font-size: 0.5em;">If you were in the middle of an answer, it's been submitted automatically.</div></div>
   </div>
   <style>
     body{
@@ -141,7 +150,7 @@
     #app ol li:nth-child(odd){
       background-color: #ccc
     }
-    #hidden{
+    #timeup, #hidden{
       opacity: 0;
       transition: opacity 1s;
       width: 1000px;
@@ -183,8 +192,14 @@
     #selection {
       display: none;
     }
+    #competeApp {
+      width: 100%
+    }
     #competeApp.answering #answering {
       display: block;
+    }
+    #competeApp.answering .scorebox {
+      font-size: 0.7em;
     }
   </style>
   
@@ -208,7 +223,9 @@
                     Cookies.set("passcode", passcode);
                     document.body.className = "loggedIn";
                     fb.child("teams").child(teamid).child("name").once("value", function(snapshot){
-                        document.getElementById("teamname").innerText = snapshot.val();
+                        var b = document.createElement("b");
+                        b.innerText = snapshot.val();
+                        document.getElementById("teamname").innerHTML = "Competing as " + b.outerHTML;
                     });
                     loadApp(teamid, passcode);
                     alertSuccess("Logged in!");
@@ -282,6 +299,10 @@
                       var s = scores[window.dClass[i]][j];
                       var content = (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
                       scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
+                      if(j == window.numPackets[i] - 1 && content != "") {
+                        document.getElementById("start"+window.dClass[i]).disabled = true;
+                        document.getElementById("start"+window.dClass[i]).className += " disabled";
+                      }
                   }
                   scoreboxes += "</div>";
               }
@@ -292,44 +313,61 @@
 
         fb.child('timer').once('value', function(snapshot){
             if(Math.floor((snapshot.val().target - (new Date()).getTime())/1000) < 0){
-                document.getElementById("hidden").style.opacity = "1";
+                document.getElementById("timeup").style.opacity = "1";
                 return;
             }
+            document.getElementById("notstarted").style.display = "none";
+            document.getElementById("buttons").style.display = "block";
 
             // IF WE'RE ON THE ANSWER ENTRY PAGE
-            answersFB.child("currPacket").on("value", function(snap) {
-              var c = snap.val();
-              console.log("currPacket", c)
-              if(c) {
-                var difficulty = c.match(/[^\d]+/)[0];
-                var n = parseInt(c.match(/\d+/)[0]);
-                document.getElementById("questionname").innerText = difficulty.charAt(0).toUpperCase() + difficulty.slice(1) + " " + (n+1);
-                fb.child('questions').off();
-                fb.child('questions').child(difficulty).child(n).on("value", function(snap) {
-                  document.getElementById("pdf").src = snap.val()
-                });
-                bind(answersFB.child(difficulty).child(n).child("q1"), document.getElementById("q1"));
-                bind(answersFB.child(difficulty).child(n).child("q2"), document.getElementById("q2"));
-                bind(answersFB.child(difficulty).child(n).child("q3"), document.getElementById("q3"));
-                document.getElementById("answersubmit").onclick = function(e) {
-                    // set scores to -2??? ... but permissions
-                    // also just use firebase auth rules for the actual question-related entries
-                    // what happens when multiple people click close to the same time?
-                    // check for .off's  too
-                    // backup page that outputs a log of the entire database
-                    // verify works without admin logged in
-                    // test timer running out hiding things properly
-                    // test preventing access before round start
-                    answersFB.child(difficulty).child(n).child("submit").set(true)
-                    answersFB.child("currPacket").set(null)
-                    e.preventDefault();
-                    return false;
+            function reloadScreenSelect() {
+              answersFB.child("currPacket").off();
+              answersFB.child("currPacket").on("value", function(snap) {
+                var c = snap.val();
+                document.getElementById("answersubmit").onclick = null;
+                console.log("currPacket", c)
+                if(c) {
+                  var difficulty = c.match(/[^\d]+/)[0];
+                  var n = parseInt(c.match(/\d+/)[0]);
+                  document.getElementById("questionname").innerText = difficulty.charAt(0).toUpperCase() + difficulty.slice(1) + " " + (n+1);
+                  fb.child('questions').off();
+                  fb.child('questions').child(difficulty).child(n).on("value", function(snap) {
+                    document.getElementById("pdf").src = snap.val()
+                  });
+                  bind(answersFB.child(difficulty).child(n).child("q1"), document.getElementById("q1"));
+                  bind(answersFB.child(difficulty).child(n).child("q2"), document.getElementById("q2"));
+                  bind(answersFB.child(difficulty).child(n).child("q3"), document.getElementById("q3"));
+                  document.getElementById("answersubmit").onclick = function(e) {
+                      // x also just use firebase auth rules for the actual question-related entries
+                      // [] what happens when multiple people click close to the same time?
+                      // [] check for .off's for every .on
+                      // [] backup page that outputs a log of the entire database
+                      // x verify works without admin logged in
+                      // x test timer running out hiding things properly (and revealing things)
+                      // x test preventing access before round start
+                      // x hide scores properly on both pages
+                      // [] who's logged in on the competitor side
+                      // x blank pages temporarily for the demo
+                      // x Are you sure submit
+                      // n checkboxes
+                      // x test out 40 teams
+                      // x "undefined" in grader boxes when submit empty?
+                      // x graders should still be able to grade after time up
+                      // x security rules to enforce some secrecy
+                      if(!e || confirm("Submit final answer?")) {
+                        answersFB.child(difficulty).child(n).child("submit").set(true)
+                        answersFB.child("currPacket").set(null)
+                      }
+                      if(e)
+                        e.preventDefault();
+                      return false;
+                  }
+                  document.getElementById("competeApp").className = "answering";
                 }
-                document.getElementById("competeApp").className = "answering";
-              }
-              else
-                document.getElementById("competeApp").className = "selection";
-            })
+                else
+                  document.getElementById("competeApp").className = "selection";
+              })
+            }
 
             window.startPacket = function(difficulty) {
               answersFB.child(difficulty).once("value", function(snap){
@@ -342,7 +380,7 @@
                   n = val.length;
                 console.log("Starting", difficulty, n)
                 document.getElementById("answersubmit").onclick = null;
-                if(n > window.numPacketsDict[difficulty])
+                if(n >= window.numPacketsDict[difficulty])
                   alertFailure("Unable to start packet - there are no more " + difficulty + " packets")
                 else {
                   answersFB.child("currPacket").set(difficulty+n)
@@ -388,20 +426,61 @@
                 document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
             }
             
-            var hidetime;
-            fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
+            var hidetime, target, timerlength;
+            fb.child('timer').on('value', function(snapshot){
+              hidetime = snapshot.val().hidetime;
+              timerlength = snapshot.val().timerlength;
+            });
+            var hasStartedYet = false;
             setTimer(document.getElementById("timer"), function(seconds){
                 // Both cases, so that we stay up to date if hidetime changes.
-                if(seconds <= 0)
-                    document.getElementById("timer").style.color = "red";
-                else
+                if(seconds > timerlength * 60) {
+                  document.getElementById("timer").style.color = "white";
+                  document.getElementById("answering").style.display = "none";
+                  document.getElementById("buttons").style.display = "none";
+                  document.getElementById("selection").style.display = "block";
+                  document.getElementById("notstarted").style.display = "block";
+                  document.getElementById('timeup').style.opacity = 0;
+                  document.getElementById('app').style.opacity = 1;
+                  document.getElementById('hidden').style.opacity = 0;
+                  document.getElementById('hidden').style.display = "block";
+                  hasStartedYet = false;
+                }
+                else if(seconds <= 0) {
+                  if(document.getElementById("answersubmit").onclick)
+                    document.getElementById("answersubmit").onclick();
+                  document.getElementById("timer").style.color = "red";
+                  document.getElementById("answering").style.display = "none";
+                  document.getElementById("buttons").style.display = "none";
+                  document.getElementById("selection").style.display = "none";
+                  document.getElementById("notstarted").style.display = "none";
+                  document.getElementById('timeup').style.opacity = 1;
+                  document.getElementById('app').style.opacity = 0;
+                  document.getElementById('hidden').style.opacity = 0;
+                  document.getElementById('hidden').style.display = "none";
+                  hasStartedYet = false;
+                }
+                else {
+                    if(!hasStartedYet) {
+                      reloadScreenSelect()
+                    }
                     document.getElementById("timer").style.color = "white";
-                if(seconds < hidetime * 60){
-                    document.getElementById('app').style.opacity = 0;
-                    document.getElementById('hidden').style.opacity = 1;
-                }else{
+                    // document.getElementById("answering").style.display = "block";
+                    document.getElementById("buttons").style.display = "block";
+                    // document.getElementById("selection").style.display = "block";
+                    document.getElementById("notstarted").style.display = "none";
+                    document.getElementById('timeup').style.opacity = 0;
                     document.getElementById('app').style.opacity = 1;
                     document.getElementById('hidden').style.opacity = 0;
+                    document.getElementById('hidden').style.display = "block";
+                    hasStartedYet = true;
+                    if(seconds < hidetime * 60) {
+                      document.getElementById('app').style.opacity = 0;
+                      document.getElementById('hidden').style.opacity = 1;
+                      if(seconds < hidetime * 60 - 1) {
+                        document.getElementById('app').style.display = "none";
+                      }
+                    }
                 }
             });
         });

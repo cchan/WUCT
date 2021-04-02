@@ -22,13 +22,13 @@ window.getScore = function(scores){
       if(a == 3)
         a++;
       return a*window.scoreValues[i];
-    }).reduce(function(a,b){return a+b;});
+    }).reduce(function(a,b){return a+b;}, 0);
   return totalScore;
 }
 window.getProgress = function(scores){
   var progress = [];
   for(var i = 0; i < window.dClass.length; i++){
-    progress[i] = scores[window.dClass[i]].findIndex(a => a == -1); // Number they finished
+    progress[i] = scores[window.dClass[i]] ? scores[window.dClass[i]].findIndex(a => a == -1) : 0; // Number they finished
     if(progress[i] == -1)
       progress[i] = scores[window.dClass[i]].length;
     progress[i] /= numPackets[i];

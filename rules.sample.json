@@ -7,9 +7,16 @@
         "$id": {
           "$passcode": {
             ".read": "true",
-        		".write": "$wuct == 'wuct2021' && data.exists()"
+            "$d": {
+              "$n": {
+                ".write": "$wuct == 'wuct2021' && data.parent().parent().exists() && !data.child('submit').exists() && data.parent().parent().parent().parent().parent().child('timer').child('target').val() >= now && data.parent().parent().parent().parent().parent().child('timer').child('target').val() - data.parent().parent().parent().parent().parent().child('timer').child('timerlength').val() * 60000 <= now"
+              }
+            }
           }
         }
+      },
+      "questions": {
+        ".read": "$wuct == 'wuct2021' && data.parent().child('timer').child('target').val() >= now && data.parent().child('timer').child('target').val() - data.parent().child('timer').child('timerlength').val() * 60000 <= now"
       },
       "scores": { ".read": "true" },
       "teams": { ".read": "true" },

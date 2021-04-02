@@ -282,7 +282,7 @@ class TeamCardSet extends React.Component {
             <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{verticalAlign: "0.2em"}}>Identifier: <input type="text" id="identifier" placeholder="Unidentified Scoring Station" required onChange={this.updateIdentifier.bind(this)} value={this.state.identifier} /></label>
             <div style={{float: "right"}}>
               <a href="#" className="help" onClick={()=>window.alert("Press the + button below to start tracking a team! You can:\n- Enter a team ID to begin tracking a team's score live.\n- Set colors to help quickly visually identify teams.\n- Examine and score a team's answers by clicking the difficulty-specific button when it's available.\n- Manually enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.\n- Advance to the next question (>) or go back to a previous question (<). The last packet difficulty and number shown should always be the one that the team has or can take next.\n- Everything updates instantly on the scoreboard.")}>?</a>
-              <a href="#" className="signout" onClick={function(){window.signOut()}}>LOGOUT</a>
+              <a href="#" className="signout" onClick={function(){window.signOut()}}>LOG OUT [admin]</a>
             </div>
           </header>
           <div id="notside">
@@ -290,11 +290,11 @@ class TeamCardSet extends React.Component {
             <button id="plusbtn" onClick={this.addCard.bind(this)}>+</button>
           </div>
           <div id="side" style="display: none">
-            <h2 id="pdfansbox_title"></h2>
             <div class="pdfansbox_left">
               <p><iframe src="" id="pdf"></iframe></p>
             </div>
             <div class="pdfansbox_right">
+              <h2 id="pdfansbox_title"></h2>
               <div><span>1</span><textarea id="q1" disabled></textarea></div>
               <div><span>2</span><textarea id="q2" disabled></textarea></div>
               <div><span>3</span><textarea id="q3" disabled></textarea></div>
@@ -323,6 +323,7 @@ class TeamCardSet extends React.Component {
 window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
   document.getElementById("notside").style.display = "block";
   document.getElementById("side").style.display = "none";
+  document.getElementById("pdf").src = "";
   // alertSuccess("hi " + id + " " + d + " " + n);
   fb.child("answers").off();
   document.getElementById("scoresubmit").onclick = null;
@@ -337,12 +338,13 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
         document.getElementById("side").style.display = "block";
         document.getElementById("pdf").src = window.ak[dClass[d]];
         document.getElementById("pdfansbox_title").innerText = teamname + ": " + dTitle[d] + " " + n
-        document.getElementById("q1").value = ans["q1"];
-        document.getElementById("q2").value = ans["q2"];
-        document.getElementById("q3").value = ans["q3"];
+        document.getElementById("q1").value = ans["q1"] || "";
+        document.getElementById("q2").value = ans["q2"] || "";
+        document.getElementById("q3").value = ans["q3"] || "";
         document.getElementById("scorecancel").onclick = function(e) {
           document.getElementById("notside").style.display = "block";
           document.getElementById("side").style.display = "none";
+          document.getElementById("pdf").src = "";
           fb.child("answers").off();
           document.getElementById("scoresubmit").onclick = null;
         }
@@ -355,6 +357,7 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
             if(successCallback) successCallback();
             document.getElementById("notside").style.display = "block";
             document.getElementById("side").style.display = "none";
+            document.getElementById("pdf").src = "";
             fb.child("answers").off();
             document.getElementById("scoresubmit").onclick = null;
           }

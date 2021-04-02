@@ -14,12 +14,13 @@
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
-  <div id="not-logged-in" style="color: red">You are not logged in. You can see these settings but cannot change them. Go to the <a href="scoring.html">scoring page</a> to log in.</div>
   <header>
     <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
+    <div style="float: right; display:inline-block; padding: 0.5em" id="not-logged-in">Log in to make changes and see all data: <input type="password" id="password"><button id="passsubmit" style="background-color: white;">Go</button>.</div>
+    <a href="#"  style="float: right; display: none" id="logout" onClick="window.signOut()">LOG OUT [admin]</a>
   </header>
 
-  <div style="padding: 2em">
+  <div style="padding: 2em" id="app" style="display: none">
     <h2 style="margin-top: 0">Timer</h2>
     <p>The timer is always counting down. The recommended way of using the timer is:</p>
     <ul>
@@ -44,7 +45,7 @@
     
     <div id="teamlist"></div>
 
-    <h2>Copyable Scoreboard Table&nbsp;<sup id="scoreboard-updated"><small>[update&nbsp;indicator]</small></sup></h2>
+    <h2>Copyable Scoreboard Table&nbsp;<sup id="scoreboard-updated"><small>[update&nbsp;flasher]</small></sup></h2>
     <p>This table only shows teams that have ever had any score entered.</p>
 
     <p>Right click > Copy.</p>
@@ -66,8 +67,10 @@
     };
 
     firebase.auth().onAuthStateChanged(function(user){
-      if (user && user.email == 'wuct@clive.io')
+      if (user && user.email == 'wuct@clive.io') {
           document.getElementById("not-logged-in").style.display = "none";
+          document.getElementById("logout").style.display = "inline-block";
+      }
     });
     
     window.teamNames = {};
@@ -79,6 +82,14 @@
           var newname = document.getElementById('newname').value;
           if(newname) fb.child('teams').child(newid).child("name").set(newname);
           var newpasscode = document.getElementById('newpasscode').value;
+          fb.child('scores').child("team"+newid).once('value', function(snapshot) {
+            if(!snapshot.val()) {
+              var scores = {};
+              for(var i = 0 ; i < window.dClass.length; i++)
+                scores[window.dClass[i]] = new Array(window.numPackets[i]).fill(-1);
+              fb.child('scores').child("team"+newid).set(scores);
+            }
+          })
           if(newpasscode) {
             fb.child('answers').child(newid).once('value', function(snapshot) {
               var obj = snapshot.val();
@@ -324,6 +335,38 @@
     };
     fb.child("users").on('value', updateStations);
 
+
+
+    window.signOut = function(){
+      window.cancelAuthStateChanged = true;
+      firebase.auth().signOut();
+      window.location.reload();
+    }
+    firebase.auth().onAuthStateChanged(function(user){
+      if(window.cancelAuthStateChanged)
+        return;
+      if (user) {
+        if(user.email != 'wuct@clive.io')
+          window.signOut();
+        else
+          document.getElementById('app').style.display='block';
+      }
+    });
+    document.getElementById('password').onkeypress = function(e){
+      if(e.keyCode == 13)
+        document.getElementById('passsubmit').click();
+    }
+    document.getElementById('passsubmit').onclick = function(e){
+      var password = document.getElementById('password').value;
+      if(!password)
+        alertFailure('failed to sign in');
+      else
+        firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).catch(function(error){
+          alertFailure('failed to sign in');
+        });
+      e.preventDefault();
+      return false;
+    };
   </script>
   <style>
     td{

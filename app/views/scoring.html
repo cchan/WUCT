@@ -18,12 +18,12 @@
   <div id="app" style="display: none">
     <header>
       <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
-      <a id="logout" style="display:none; float: right;" href="#" onclick="window.signOut()">LOG OUT</a>
+      <a id="logout" style="display:none; float: right;" href="#" onclick="window.signOut()">LOG OUT [admin]</a>
+      <div id="loginform" style="display: inline-block; float: right; color: white; padding: 0.5em;">
+        Password: <input type="password" id="password" />
+        <input type="submit" id="passsubmit" value="Go" style="background-color: white" />
+      </div>
     </header>
-    <div id="loginform">
-      <label>Password: <input type="password" id="password" /></label>
-      <input type="submit" id="passsubmit" value="Log In" />
-    </div>
     <div id="teamtracking_app" style="display: none;">
       Team ID: <input type="text" id="teamid" style="border:solid 1px black" /><input type="submit" id="teamwatch" value="Watch" /><input type="submit" id="teamunwatch" value="Unwatch" />
       <!--question stuff
@@ -33,7 +33,7 @@
       -->
     </div>
     <div id="scoreentry_app" style="display: none;">
-      Score: <input type="text" id="score" style="border:solid 1px black" /><input type="submit" id="scoresubmit" />
+      Number correct: <input type="text" id="score" style="border:solid 1px black" /><input type="submit" id="scoresubmit" />
     </div>
   </div>
 

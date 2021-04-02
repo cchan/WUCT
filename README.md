@@ -14,3 +14,5 @@ Based off of the Lexington Math Tournament Guts Round, which is in turn based of
 Thanks to [BugSnag](https://www.bugsnag.com) for generously providing an open source license.
 
 [Figma mockup](https://www.figma.com/file/wq4gmjooSrRJBbULKhIoa3/wuct) of the new online grading version.
+
+Probably the lowest code quality codebase I have ever written, oops.
