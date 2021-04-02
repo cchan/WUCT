@@ -34,13 +34,25 @@
         <div id="app"></div>
         <p>Click to start a packet! Remember that once your team starts a packet, <b>you must submit before moving on to the next</b>.</p>
         <div id="buttons">
-            <button class="easy selectbox" onclick="startPacket('easy')">+<span class="desc">start easy packet</span></button>
-            <button class="medium selectbox" onclick="startPacket('easy')">+<span class="desc">start medium packet</span></button>
-            <button class="hard selectbox" onclick="startPacket('easy')">+<span class="desc">start hard packet</span></button>
+            <button class="easy selectbox" onclick="startPacket('easy'); return false">+<span class="desc">start easy packet</span></button>
+            <button class="medium selectbox" onclick="startPacket('medium'); return false">+<span class="desc">start medium packet</span></button>
+            <button class="hard selectbox" onclick="startPacket('hard'); return false">+<span class="desc">start hard packet</span></button>
         </div>
     </div>
     <div id="answering">
-        <!---->
+        <h2 id="questionname"></h2>
+        <div style="float: left; width: 60%;">
+        <p><a id="pdf">PDF Link</a></p>
+        </div>
+        <div style="float: left; width: 40%;">
+        <div><span>1</span><textarea id="q1" disabled></textarea></div>
+        <div><span>2</span><textarea id="q2" disabled></textarea></div>
+        <div><span>3</span><textarea id="q3" disabled></textarea></div>
+        <div>
+        <button id="answersubmit">Submit</button>
+        <p><b>You cannot undo a submission</b>, so make sure you're really ready!</p>
+        </div>
+        </div>
     </div>
     <div id="hidden" style="position: absolute; margin-top: 1em;">Time's up!</div>
   </div>
@@ -158,6 +170,23 @@
         line-height: 3em;
         display: inline-block;
     }
+    #competeApp.selection #selection {
+      display: block;
+    }
+    #answering {
+      display: none;
+    }
+    #answering:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    #selection {
+      display: none;
+    }
+    #competeApp.answering #answering {
+      display: block;
+    }
   </style>
   
   <script>
@@ -208,11 +237,31 @@
         e.preventDefault();
         return false;
     }
-    
+    function bind(ref, elem) {
+      elem.onchange = null;
+      if(elem.ref)
+        elem.ref.off("value");
+      elem.disabled = true;
+      elem.value = "Loading...";
+      elem.ref = ref;
+      elem.onchange = function(e){ console.log(e); ref.set(e.target.value); };
+      ref.on("value", function(snap) {
+        elem.value = snap.val();
+        elem.disabled = false;
+      });
+      var connectedRef = firebase.database().ref(".info/connected");
+      connectedRef.on("value", function(snap) {
+        if (snap.val() === false) {
+          elem.disabled = true; // TODO
+        } else {
+          elem.disabled = false;
+        }
+      });
+    }
+
     function loadApp(teamid, passcode){
         var answersFB = fb.child("answers").child(teamid).child(passcode);
         var scoresFB = fb.child("scores").child("team" + teamid);
-
         scoresFB.on('value', function(snapshot) {
             if(!snapshot.val()) {
                 var scores = {};
@@ -222,16 +271,22 @@
             } else {
                 var scores = snapshot.val();
             }
-            var scoreboxes = "";
-            for(var i = 0; i < window.dClass.length; i++) {
-                scoreboxes += "<div style='display: inline-block'>";
-                for(var j = 0; j < window.numPackets[i]; j++) {
-                    var s = scores[window.dClass[i]][j];
-                    scoreboxes += "<div class='scorebox "+window.dClass[i]+(s>=0?" filled":"")+"'>" + (s >= 0 ? s : "") + "</div>";
-                }
-                scoreboxes += "</div>";
-            }
-            document.getElementById("scoreboxes").innerHTML = scoreboxes;
+            answersFB.on('value', function(snapshot2) {
+              var answers = snapshot2.val();
+              if(!answers) answers = {};
+              for(var i = 0; i < window.dClass.length; i++)
+                if(!answers[window.dClass[i]]) answers[window.dClass[i]] = [];
+              var scoreboxes = "";
+              for(var i = 0; i < window.dClass.length; i++) {
+                  scoreboxes += "<div style='display: inline-block'>";
+                  for(var j = 0; j < window.numPackets[i]; j++) {
+                      var s = scores[window.dClass[i]][j];
+                      scoreboxes += "<div class='scorebox "+window.dClass[i]+(s>=0?" filled":"")+"'>" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "") + "</div>";
+                  }
+                  scoreboxes += "</div>";
+              }
+              document.getElementById("scoreboxes").innerHTML = scoreboxes;
+            });
         });
         //["easy"][4+1]
 
@@ -240,17 +295,61 @@
                 document.getElementById("hidden").style.opacity = "1";
                 return;
             }
-            answersFB.child('currPacket').on('value', function(snapshot){
-                // switch(snapshot.val()) {
-                //     case "selecti"
-                // }
-                
-            })
 
             // IF WE'RE ON THE ANSWER ENTRY PAGE
-            // TODO
+            answersFB.child("currPacket").on("value", function(snap) {
+              var c = snap.val();
+              console.log("currPacket", c)
+              if(c) {
+                var difficulty = c.match(/[^\d]+/)[0];
+                var n = parseInt(c.match(/\d+/)[0]);
+                document.getElementById("questionname").innerText = difficulty.charAt(0).toUpperCase() + difficulty.slice(1) + " " + (n+1);
+                fb.child('questions').off();
+                fb.child('questions').child(difficulty).child(n).on("value", function(snap) {
+                  document.getElementById("pdf").href = snap.val()
+                });
+                bind(answersFB.child(difficulty).child(n).child("q1"), document.getElementById("q1"));
+                bind(answersFB.child(difficulty).child(n).child("q2"), document.getElementById("q2"));
+                bind(answersFB.child(difficulty).child(n).child("q3"), document.getElementById("q3"));
+                document.getElementById("answersubmit").onclick = function(e) {
+                    // set scores to -2??? ... but permissions
+                    // also just use firebase auth rules for the actual question-related entries
+                    // what happens when multiple people click close to the same time?
+                    // check for .off's  too
+                    // backup page that outputs a log of the entire database
+                    // verify works without admin logged in
+                    // test timer running out hiding things properly
+                    // test preventing access before round start
+                    answersFB.child(difficulty).child(n).child("submit").set(true)
+                    answersFB.child("currPacket").set(null)
+                    e.preventDefault();
+                    return false;
+                }
+                document.getElementById("competeApp").className = "answering";
+              }
+              else
+                document.getElementById("competeApp").className = "selection";
+            })
+
+            window.startPacket = function(difficulty) {
+              answersFB.child(difficulty).once("value", function(snap){
+                if(!snap.val()) {
+                  answersFB.child(difficulty).set([])
+                }
+                var val = snap.val() || [];
+                var n = val.findIndex(e=>!e || !e["submit"]);
+                if(n == -1)
+                  n = val.length;
+                console.log("Starting", difficulty, n)
+                document.getElementById("answersubmit").onclick = null;
+                if(n > window.numPacketsDict[difficulty])
+                  alertFailure("Unable to start packet - there are no more " + difficulty + " packets")
+                else {
+                  answersFB.child("currPacket").set(difficulty+n)
+                }
+              });
+            }
             
-            // IF answersFB.child('currPacket') == "selection"
             fb.child('teams').on('value', function(snapshot){
                 teamNames = snapshot.val();
                 render();

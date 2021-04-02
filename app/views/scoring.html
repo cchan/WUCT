@@ -18,12 +18,42 @@
   <div id="app" style="display: none">
     <header>
       <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
+      <a id="logout" style="display:none; float: right;" href="#" onclick="window.signOut()">LOG OUT</a>
     </header>
-    <label>Password: <input type="password" id="password" /></label>
-    <input type="submit" id="passsubmit" value="Log In" />
+    <div id="loginform">
+      <label>Password: <input type="password" id="password" /></label>
+      <input type="submit" id="passsubmit" value="Log In" />
+    </div>
+    <div id="teamtracking_app" style="display: none;">
+      Team ID: <input type="text" id="teamid" style="border:solid 1px black" /><input type="submit" id="teamwatch" value="Watch" /><input type="submit" id="teamunwatch" value="Unwatch" />
+      <!--question stuff
+      fb.child("answers").child(watched_id).on("value", function() {
+
+      })
+      -->
+    </div>
+    <div id="scoreentry_app" style="display: none;">
+      Score: <input type="text" id="score" style="border:solid 1px black" /><input type="submit" id="scoresubmit" />
+    </div>
   </div>
 
   <script src="bundle.min.js?<%= timestamp %>"></script>
+  <script>
+    // function render() {
+    //   document.getElementById("teamtracking_app").style.display = "block";
+    //   document.getElementById("loginform").style.display = "none"
+    //   document.getElementById("logout").style.display = "inline-block"
+    // }
+    // document.getElementById("scoresubmit").onclick = function(e) {
+    //   var score = parseInt(document.getElementById("score").value);
+    //   if(!(score == 0 || score == 1 || score == 2 || score == 3))
+    //     alertFailure("Invalid score - must be 0, 1, 2, or 3");
+    //   else
+    //     fb.child("scores").child(teamid/**/).child(difficulty).child(n).set(score);
+    //   e.preventDefault();
+    //   return false;
+    // }
+  </script>
   <script>
     window.cancelAuthStateChanged = false;
     window.signOut = function(){

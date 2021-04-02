@@ -36,12 +36,12 @@ class DifficultySection extends React.Component {
   constructor(props) {
     super(props);
     
-    var initialScores = [];
-    for(var i = 0; i < numPackets[props.difficulty]; i++)
-      initialScores.push(-1);
+    var initialScores = new Array(numPackets[props.difficulty]).fill(-1);
+    var initialSubmitted = new Array(numPackets[props.difficulty]).fill(false);
     this.state = {
       currentQuestion: 0,
-      scores: initialScores
+      scores: initialScores,
+      submitted: initialSubmitted,
     };
     this.ref = fb.child('scores')
       .child('team'+this.props.teamId)
@@ -62,6 +62,16 @@ class DifficultySection extends React.Component {
         this.ref.set(this.state.scores);
       else
         this.setState({scores: snapshot.val()});
+    }.bind(this));
+
+    fb.child("answers").child(this.props.teamId).child(this.props.passcode).child(dClass[this.props.difficulty]).on('value', function(snapshot){
+      var submitted = new Array(numPackets[this.props.difficulty]).fill(false);
+      var answers = snapshot.val();
+      if(answers)
+        for(var i = 0; i < answers.length; i++)
+          if(answers[i].submit)
+            submitted[i] = true;
+      this.setState({submitted: submitted});
     }.bind(this));
   }
   componentWillUnmount(){
@@ -84,7 +94,7 @@ class DifficultySection extends React.Component {
       <span className={"difficulty "+dClass[this.props.difficulty]}>
         <Button className="back" onClick={this.back.bind(this)} disabled={this.state.currentQuestion <= 0}>&lt;</Button>
         <Button className="next" onClick={this.next.bind(this)} disabled={this.state.currentQuestion >= numPackets[this.props.difficulty] - 1 || this.state.scores[this.state.currentQuestion] == -1}>&gt;</Button>
-        <h3>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</h3>
+        <h3><button disabled={!this.state.submitted[this.state.currentQuestion]} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>
         <RadioBtnGroup selected={this.state.scores[this.state.currentQuestion]} scoreHandler={this.scoreHandler.bind(this)} xdisabled={this.state.currentQuestion < numPackets[this.props.difficulty] - 1 && this.state.scores[this.state.currentQuestion + 1] != -1} />
       </span>
     );
@@ -97,7 +107,8 @@ class TeamCard extends React.Component {
     this.state = {
       totalScore: 0,
       teamName: null,
-      autocompleteTeams: []
+      autocompleteTeams: [],
+      passcode: null,
     };
   }
   componentWillMount(){
@@ -119,9 +130,13 @@ class TeamCard extends React.Component {
     var teamId;
     if(event.target) teamId = event.target.value;
     else teamId = event;
-    this.setState({teamName: null});
+    this.setState({teamName: null, passcode: null});
     this.props.updateId(teamId);
     if(teamId && this.state.autocompleteTeams.some(t => t.id == teamId)){
+      fb.child("answers").child(teamId).once("value", function(snap) { // TODO: "once" hmmm
+        if(snap.val())
+          this.setState({ passcode: Object.keys(snap.val())[0] });
+      }.bind(this));
       fb.child('teams').child(teamId).child('name').on('value', function(snapshot){
         if(snapshot.val())
           this.setState({teamName: snapshot.val()});
@@ -148,12 +163,12 @@ class TeamCard extends React.Component {
     };
     
     var difficultySections;
-    if(this.state.teamName != null)
+    if(this.state.teamName != null && this.state.passcode != null)
       difficultySections = 
         <div>
-          <DifficultySection difficulty="0" teamId={this.props.teamId}/>
-          <DifficultySection difficulty="1" teamId={this.props.teamId}/>
-          <DifficultySection difficulty="2" teamId={this.props.teamId}/>
+          <DifficultySection difficulty="0" teamId={this.props.teamId} passcode={this.state.passcode}/>
+          <DifficultySection difficulty="1" teamId={this.props.teamId} passcode={this.state.passcode}/>
+          <DifficultySection difficulty="2" teamId={this.props.teamId} passcode={this.state.passcode}/>
         </div>;
     else
       difficultySections = <p>Invalid team ID.</p>;
@@ -260,7 +275,7 @@ class TeamCardSet extends React.Component {
                   </ul>
                 </div>;
       return (
-        <div>
+      <div>
           <header>
             <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
             <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{verticalAlign: "0.2em"}}>Identifier: <input type="text" id="identifier" placeholder="Unidentified Scoring Station" required onChange={this.updateIdentifier.bind(this)} value={this.state.identifier} /></label>
@@ -269,8 +284,17 @@ class TeamCardSet extends React.Component {
               <a href="#" className="signout" onClick={function(){window.signOut()}}>LOGOUT</a>
             </div>
           </header>
-          <div>{cards}</div>
-          <button id="plusbtn" onClick={this.addCard.bind(this)}>+</button>
+          <div id="notside">
+            <div>{cards}</div>
+            <button id="plusbtn" onClick={this.addCard.bind(this)}>+</button>
+          </div>
+          <div id="side" style="display: none">
+            <a href="" id="aklink">Answer Key</a>
+            <div><span>1</span><textarea id="q1" disabled></textarea></div>
+            <div><span>2</span><textarea id="q2" disabled></textarea></div>
+            <div><span>3</span><textarea id="q3" disabled></textarea></div>
+            Score: <input type="text" id="score" style="border:solid 1px black" /><button id="scoresubmit">Submit</button><button id="scorecancel">Cancel</button>
+          </div>
         </div>
       );
     }else{
@@ -290,6 +314,54 @@ class TeamCardSet extends React.Component {
   }
 }
 
+window.renderSide = function(e, id, pc, d, n, successCallback) {
+  document.getElementById("notside").style.display = "block";
+  document.getElementById("side").style.display = "none";
+  // alertSuccess("hi " + id + " " + d + " " + n);
+  fb.child("answers").off();
+  document.getElementById("scoresubmit").onclick = null;
+  fb.child("answers").child(id).child(pc).child(window.dClass[d]).child(n).on("value", function(snap) {
+    var ans = snap.val();
+    if(ans && ans["submit"]) {
+      fb.child("scores").child("team"+id).child(window.dClass[d]).child(n).once("value", function(snap) {
+        var currscore = snap.val();
+        if(currscore < 0) currscore = "";
+        document.getElementById("score").value = currscore;
+        document.getElementById("notside").style.display = "none";
+        document.getElementById("side").style.display = "block";
+        document.getElementById("aklink").href = window.ak[dClass[d]];
+        document.getElementById("aklink").innerText = dTitle[d] + " Answer Key";
+        document.getElementById("q1").value = ans["q1"];
+        document.getElementById("q2").value = ans["q2"];
+        document.getElementById("q3").value = ans["q3"];
+        document.getElementById("scorecancel").onclick = function(e) {
+          document.getElementById("notside").style.display = "block";
+          document.getElementById("side").style.display = "none";
+          fb.child("answers").off();
+          document.getElementById("scoresubmit").onclick = null;
+        }
+        document.getElementById("scoresubmit").onclick = function(e) {
+          var score = parseInt(document.getElementById("score").value);
+          if(!(score == 0 || score == 1 || score == 2 || score == 3))
+            alertFailure("Invalid score - must be 0, 1, 2, or 3");
+          else {
+            fb.child("scores").child("team"+id).child(window.dClass[d]).child(n).set(score);
+            if(successCallback) successCallback();
+            document.getElementById("notside").style.display = "block";
+            document.getElementById("side").style.display = "none";
+            fb.child("answers").off();
+            document.getElementById("scoresubmit").onclick = null;
+          }
+          e.preventDefault();
+          return false;
+        }
+      });
+    }
+  });
+  e.preventDefault();
+  return false;
+}
+
 window.updateUserStatus = function(){
   var state = Cookies.getJSON('state');
   fb.child("users/" + Cookies.get('userID')).update({
@@ -307,6 +379,11 @@ window.render = function(){
     <TeamCardSet />,
     document.getElementById('app')
   );
+
+  fb.child("ak").on("value", function(snap) {
+    if(snap.val())
+      window.ak = snap.val()
+  })
 
   var connectedRef = firebase.database().ref(".info/connected");
   connectedRef.on("value", function(snap) {
