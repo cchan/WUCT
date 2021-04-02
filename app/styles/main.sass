@@ -212,7 +212,9 @@ h3
   box-sizing: border-box
   margin: 0.1em;
 .scorebox
-  font-size: 2vw
+  font-size: 1.5vw
+  &.plus
+    font-size: 2vw
 .selectbox
   font-size: 10vw
   padding-top: 0.05em
@@ -245,3 +247,23 @@ h3
     background-color: #900
 #teamname
   font-weight: bold
+
+.pdfansbox_left
+  float: left
+  width: 60%
+  iframe
+    width: 100%
+    height: 100%
+.pdfansbox_right
+  float: right
+  width: 40%
+  &>div>span
+    font-size: 3em
+    padding: 0 0.2em
+    vertical-align: 0.2em
+  #score
+    width: 3em
+#side, #answering
+  text-align: center
+#side::after, #answering::after
+  clear: both

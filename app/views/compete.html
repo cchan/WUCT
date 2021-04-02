@@ -41,17 +41,16 @@
     </div>
     <div id="answering">
         <h2 id="questionname"></h2>
-        <div style="float: left; width: 60%;">
-        <p><a id="pdf">PDF Link</a></p>
+        <div class="pdfansbox_left">
+          <iframe id="pdf" src=""></iframe>
+          <!-- <p><a id="pdf">PDF Link</a></p> -->
         </div>
-        <div style="float: left; width: 40%;">
-        <div><span>1</span><textarea id="q1" disabled></textarea></div>
-        <div><span>2</span><textarea id="q2" disabled></textarea></div>
-        <div><span>3</span><textarea id="q3" disabled></textarea></div>
-        <div>
-        <button id="answersubmit">Submit</button>
-        <p><b>You cannot undo a submission</b>, so make sure you're really ready!</p>
-        </div>
+        <div class="pdfansbox_right">
+          <div><span>1</span><textarea id="q1" disabled></textarea></div>
+          <div><span>2</span><textarea id="q2" disabled></textarea></div>
+          <div><span>3</span><textarea id="q3" disabled></textarea></div>
+          <button id="answersubmit">Submit</button>
+          <p><b>You cannot undo a submission</b>, so make sure you're really ready!</p>
         </div>
     </div>
     <div id="hidden" style="position: absolute; margin-top: 1em;">Time's up!</div>
@@ -281,7 +280,8 @@
                   scoreboxes += "<div style='display: inline-block'>";
                   for(var j = 0; j < window.numPackets[i]; j++) {
                       var s = scores[window.dClass[i]][j];
-                      scoreboxes += "<div class='scorebox "+window.dClass[i]+(s>=0?" filled":"")+"'>" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "") + "</div>";
+                      var content = (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
+                      scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
                   }
                   scoreboxes += "</div>";
               }
@@ -306,7 +306,7 @@
                 document.getElementById("questionname").innerText = difficulty.charAt(0).toUpperCase() + difficulty.slice(1) + " " + (n+1);
                 fb.child('questions').off();
                 fb.child('questions').child(difficulty).child(n).on("value", function(snap) {
-                  document.getElementById("pdf").href = snap.val()
+                  document.getElementById("pdf").src = snap.val()
                 });
                 bind(answersFB.child(difficulty).child(n).child("q1"), document.getElementById("q1"));
                 bind(answersFB.child(difficulty).child(n).child("q2"), document.getElementById("q2"));

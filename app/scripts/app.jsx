@@ -94,7 +94,7 @@ class DifficultySection extends React.Component {
       <span className={"difficulty "+dClass[this.props.difficulty]}>
         <Button className="back" onClick={this.back.bind(this)} disabled={this.state.currentQuestion <= 0}>&lt;</Button>
         <Button className="next" onClick={this.next.bind(this)} disabled={this.state.currentQuestion >= numPackets[this.props.difficulty] - 1 || this.state.scores[this.state.currentQuestion] == -1}>&gt;</Button>
-        <h3><button disabled={!this.state.submitted[this.state.currentQuestion]} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>
+        <h3><button disabled={!this.state.submitted[this.state.currentQuestion]} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.teamName, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>
         <RadioBtnGroup selected={this.state.scores[this.state.currentQuestion]} scoreHandler={this.scoreHandler.bind(this)} xdisabled={this.state.currentQuestion < numPackets[this.props.difficulty] - 1 && this.state.scores[this.state.currentQuestion + 1] != -1} />
       </span>
     );
@@ -166,9 +166,9 @@ class TeamCard extends React.Component {
     if(this.state.teamName != null && this.state.passcode != null)
       difficultySections = 
         <div>
-          <DifficultySection difficulty="0" teamId={this.props.teamId} passcode={this.state.passcode}/>
-          <DifficultySection difficulty="1" teamId={this.props.teamId} passcode={this.state.passcode}/>
-          <DifficultySection difficulty="2" teamId={this.props.teamId} passcode={this.state.passcode}/>
+          <DifficultySection difficulty="0" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/>
+          <DifficultySection difficulty="1" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/>
+          <DifficultySection difficulty="2" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/>
         </div>;
     else
       difficultySections = <p>Invalid team ID.</p>;
@@ -266,10 +266,11 @@ class TeamCardSet extends React.Component {
         cards = <div style={{width: "50%", margin: "2em"}}>
                   Press the + below to start tracking a team! You can:
                   <ul>
-                    <li>Enter a team ID to begin tracking a team's score live</li>
-                    <li>Set colors to help quickly visually identify teams</li>
-                    <li>Enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.</li>
-                    <li>Advance to the next question (&gt;) or go back to a previous question (&lt;). The packet difficulty and number shown should always be the one that the team has or can take next.</li>
+                    <li>Enter a team ID to begin tracking a team's score live.</li>
+                    <li>Set colors to help quickly visually identify teams.</li>
+                    <li>Examine and score a team's answers by clicking the difficulty-specific button when it's available.</li>
+                    <li>Manually enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.</li>
+                    <li>Advance to the next question (&gt;) or go back to a previous question (&lt;). The last packet difficulty and number shown should always be the one that the team has or can take next.</li>
                     <li>Everything updates instantly on the scoreboard.</li>
                     <li><i>Mouse over the + button to display these instructions again.</i></li>
                   </ul>
@@ -280,7 +281,7 @@ class TeamCardSet extends React.Component {
             <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
             <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{verticalAlign: "0.2em"}}>Identifier: <input type="text" id="identifier" placeholder="Unidentified Scoring Station" required onChange={this.updateIdentifier.bind(this)} value={this.state.identifier} /></label>
             <div style={{float: "right"}}>
-              <a href="#" className="help" onClick={()=>window.alert("Press the + button below to start tracking a team! You can:\n- Enter a team ID to begin tracking a team's score live\n- Set colors to help quickly visually identify teams\n- Enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.\n- Advance to the next question (>) or go back to a previous question (<). The packet difficulty and number shown should always be the one that the team has or can take next.\n- Everything updates instantly on the scoreboard.")}>?</a>
+              <a href="#" className="help" onClick={()=>window.alert("Press the + button below to start tracking a team! You can:\n- Enter a team ID to begin tracking a team's score live.\n- Set colors to help quickly visually identify teams.\n- Examine and score a team's answers by clicking the difficulty-specific button when it's available.\n- Manually enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.\n- Advance to the next question (>) or go back to a previous question (<). The last packet difficulty and number shown should always be the one that the team has or can take next.\n- Everything updates instantly on the scoreboard.")}>?</a>
               <a href="#" className="signout" onClick={function(){window.signOut()}}>LOGOUT</a>
             </div>
           </header>
@@ -289,11 +290,16 @@ class TeamCardSet extends React.Component {
             <button id="plusbtn" onClick={this.addCard.bind(this)}>+</button>
           </div>
           <div id="side" style="display: none">
-            <a href="" id="aklink">Answer Key</a>
-            <div><span>1</span><textarea id="q1" disabled></textarea></div>
-            <div><span>2</span><textarea id="q2" disabled></textarea></div>
-            <div><span>3</span><textarea id="q3" disabled></textarea></div>
-            Score: <input type="text" id="score" style="border:solid 1px black" /><button id="scoresubmit">Submit</button><button id="scorecancel">Cancel</button>
+            <h2 id="pdfansbox_title"></h2>
+            <div class="pdfansbox_left">
+              <p><iframe src="" id="pdf"></iframe></p>
+            </div>
+            <div class="pdfansbox_right">
+              <div><span>1</span><textarea id="q1" disabled></textarea></div>
+              <div><span>2</span><textarea id="q2" disabled></textarea></div>
+              <div><span>3</span><textarea id="q3" disabled></textarea></div>
+              Score: <input type="text" id="score" style="border:solid 1px black" /><button id="scoresubmit">Submit</button><button id="scorecancel">Back</button>
+            </div>
           </div>
         </div>
       );
@@ -314,7 +320,7 @@ class TeamCardSet extends React.Component {
   }
 }
 
-window.renderSide = function(e, id, pc, d, n, successCallback) {
+window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
   document.getElementById("notside").style.display = "block";
   document.getElementById("side").style.display = "none";
   // alertSuccess("hi " + id + " " + d + " " + n);
@@ -329,8 +335,8 @@ window.renderSide = function(e, id, pc, d, n, successCallback) {
         document.getElementById("score").value = currscore;
         document.getElementById("notside").style.display = "none";
         document.getElementById("side").style.display = "block";
-        document.getElementById("aklink").href = window.ak[dClass[d]];
-        document.getElementById("aklink").innerText = dTitle[d] + " Answer Key";
+        document.getElementById("pdf").src = window.ak[dClass[d]];
+        document.getElementById("pdfansbox_title").innerText = teamname + ": " + dTitle[d] + " " + n
         document.getElementById("q1").value = ans["q1"];
         document.getElementById("q2").value = ans["q2"];
         document.getElementById("q3").value = ans["q3"];
