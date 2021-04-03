@@ -276,6 +276,7 @@ class TeamCardSet extends React.Component {
                     <li>Everything updates instantly on the scoreboard.</li>
                     <li><i>Mouse over the + button to display these instructions again.</i></li>
                   </ul>
+                  Don't open multiple scoring windows in the same browser! It will get confused.
                 </div>;
       return (
       <div>
@@ -283,7 +284,7 @@ class TeamCardSet extends React.Component {
             <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
             <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{verticalAlign: "0.2em"}}>Identifier: <input type="text" id="identifier" placeholder="Unidentified Scoring Station" required onChange={this.updateIdentifier.bind(this)} value={this.state.identifier} /></label>
             <div style={{float: "right"}}>
-              <a href="#" className="help" onClick={()=>window.alert("Press the + button below to start tracking a team! You can:\n- Enter a team ID to begin tracking a team's score live.\n- Set colors to help quickly visually identify teams.\n- Examine and score a team's answers by clicking the difficulty-specific button when it's available.\n- Manually enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.\n- Advance to the next question (>) or go back to a previous question (<). The last packet difficulty and number shown should always be the one that the team has or can take next.\n- Everything updates instantly on the scoreboard.")}>?</a>
+              <a href="#" className="help" onClick={()=>window.alert("Press the + button below to start tracking a team! You can:\n- Enter a team ID to begin tracking a team's score live.\n- Set colors to help quickly visually identify teams.\n- Examine and score a team's answers by clicking the difficulty-specific button when it's available.\n- Manually enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.\n- Advance to the next question (>) or go back to a previous question (<). The last packet difficulty and number shown should always be the one that the team has or can take next.\n- Everything updates instantly on the scoreboard.\nDon't open multiple scoring windows in the same browser! It will get confused.")}>?</a>
               <a href="#" className="signout" onClick={function(){window.signOut()}}>LOG OUT [admin]</a>
             </div>
           </header>
