@@ -10,9 +10,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-  <script src="common.min.js?1617424052590"></script>
+  <script src="common.min.js?1617425199331"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1617424052590" />
+  <link rel="stylesheet" href="main.css?1617425199331" />
 </head>
 <body>
   <header>
@@ -212,7 +212,6 @@
         Cookies.remove("passcode");
         document.body.className = "";
         document.getElementById("teamname").innerText = "compete";
-        window.location.reload();
     }
 
     function tryLogin(teamid, passcode){
@@ -251,6 +250,7 @@
     document.getElementById("logout").onclick = function(e) {
         logout();
         alertFailure("Logged out.");
+        window.location.reload();
         e.preventDefault();
         return false;
     }
@@ -339,23 +339,25 @@
                   bind(answersFB.child(difficulty).child(n).child("q2"), document.getElementById("q2"));
                   bind(answersFB.child(difficulty).child(n).child("q3"), document.getElementById("q3"));
                   document.getElementById("answersubmit").onclick = function(e) {
-                      // [] what happens when multiple people click close to the same time?
+                      // [] sometimes leaves you on the selection page when you select, while still changing the top bar to small scoreboxes
+                      // [] More obvious color change for whole team’s scoring thing
+                      // [] security rules for starting questions - the status field??
+                      // [] front scoreboard doesn’t show timer when scores hidden
+                      // [] test offline
+                      // [] how do we log people out in case they come back next year LOL (one of the execs was still logged in from wuct2019)
+                      // [] what happens when multiple people select a difficulty close to the same time?
+                      // [] more margin on “compete” on scoreboard page and also make it more obvious
+                      //     - tested this, not much? the currentQuestion field is only one field
                       // [] check for .off's for every .on
                       //     [] cleaning up event handlers - logging in as multiple.
                       //         x just force reload on log out
                       // [] backup page that outputs a log of the entire database
                       // [] who's logged in on the competitor side
                       // x 0 not getting a color
-                      // [] security rules for starting questions - the status field??
-                      // [] front scoreboard doesn’t show timer when scores hidden
                       // x .append($("<span>").text(window.teamNames[t].name)) : on active scoring stations: doesn’t display all teams
-                      // [] More obvious color change for whole team’s scoring thing
                       // [] multiple scoring windows: reappearing teams from the other window's memory
                       // [] not immediately logged out
-                      // [] x verify injection of text - try it everywhere
-                      // [] test offline
-                      // [] sometimes leaves you on the selection page when you select, while still changing the top bar to small scoreboxes
-                      // [] more margin on “compete” on scoreboard page and also make it more obvious
+                      // [] fix XSS injection for team name. search for all innerHTML references?
                       // x random passcode generation
                       if(!e || confirm("Submit final answer?")) {
                         answersFB.child(difficulty).child(n).child("submit").set(true)
