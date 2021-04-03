@@ -9,9 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1617425199331"></script>
+  <script src="common.min.js?1617480276117"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1617425199331" />
+  <link rel="stylesheet" href="main.css?1617480276117" />
 </head>
 <body>
   <header>
@@ -158,23 +158,22 @@
         }
         document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
       }
-      
-      var hidetime;
-      fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
-      setTimer(document.getElementById("timer"), function(seconds){
-        // Both cases, so that we stay up to date if hidetime changes.
-        if(seconds <= 0)
-          document.getElementById("timer").style.color = "red";
-        else
-          document.getElementById("timer").style.color = "black";
-        if(seconds < hidetime * 60){
-          document.getElementById('app').style.opacity = 0;
-          document.getElementById('hidden').style.opacity = 1;
-        }else{
-          document.getElementById('app').style.opacity = 1;
-          document.getElementById('hidden').style.opacity = 0;
-        }
-      });
+    });
+    var hidetime;
+    fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
+    setTimer(document.getElementById("timer"), function(seconds){
+      // Both cases, so that we stay up to date if hidetime changes.
+      if(seconds <= 0)
+        document.getElementById("timer").style.color = "red";
+      else
+        document.getElementById("timer").style.color = "black";
+      if(seconds < hidetime * 60){
+        document.getElementById('app').style.opacity = 0;
+        document.getElementById('hidden').style.opacity = 1;
+      }else{
+        document.getElementById('app').style.opacity = 1;
+        document.getElementById('hidden').style.opacity = 0;
+      }
     });
   </script>
 </body>
