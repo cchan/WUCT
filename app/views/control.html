@@ -417,10 +417,6 @@
                       var s = scores[window.dClass[i]][j];
                       var content = "" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
                       scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
-                      if(j == window.numPackets[i] - 1 && content != "") {
-                        document.getElementById("start"+window.dClass[i]).disabled = true;
-                        document.getElementById("start"+window.dClass[i]).actually_disabled = true;
-                      }
                   }
                   scoreboxes += "</div>";
               }
