@@ -41,6 +41,7 @@
     <input type="text" placeholder="id" id="newid" />
     <input type="text" placeholder="new name" id="newname" />
     <input type="text" placeholder="new passcode" id="newpasscode" />
+    <input type="submit" onclick="document.getElementById('newpasscode').value=Math.random().toString().slice(2,7); return false;" value="Random Passcode">
     <input type="submit" value="Add/Update" onclick="addTeam();" />
     
     <div id="teamlist"></div>
@@ -129,7 +130,7 @@
     function renderTeams(){
       $('#teamlist').html('');
       for(var id in teamNames)
-        if(teamNames.hasOwnProperty(id))
+        if(teamNames.hasOwnProperty(id) && teamNames[id])
           (function(id){
             fb.child('answers').child(id).once('value', function(snapshot) {
               var obj = snapshot.val();
@@ -312,11 +313,12 @@
                   .append(' is tracking: ')
                   .append(
                     $('<span>').append(
-                      tracking ? tracking.map(t=>
-                        $('<span class="teamid">').text(t)
-                        .append($("<span>").text(window.teamNames[t].name))
-                        .outerHTML()
-                      ).join(', ') : 'no one'
+                      tracking ? tracking.map(t=>{
+                        if(window.teamNames[t])
+                          return $('<span class="teamid">').text(t)
+                          .append($("<span>").text(window.teamNames[t].name))
+                          .outerHTML();
+                      }).filter(x=>x).join(', ') : 'no one'
                     )
                   )
                 )
