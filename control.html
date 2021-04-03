@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1617485994507"></script>
+  <script src="common.min.js?1617489489298"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1617485994507" />
+  <link rel="stylesheet" href="main.css?1617489489298" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -51,6 +51,8 @@
 
     <p>Right click > Copy.</p>
     <div id="scoreboard"></div>
+
+    <h2>Live Scoreboard</h2>
   </div>
   
   <script>
@@ -237,6 +239,21 @@
         flashGreen(document.getElementById("scoreboard-updated"));
       });
       
+      // fb.child('scores').on('value', function(snapshot){
+      //   scores = [];
+      //   var teams = snapshot.val();
+      //   for(var teamId in teams){
+      //     if(teams.hasOwnProperty(teamId)){
+      //       var score = window.getScore(teams[teamId]);
+      //       var progress = window.getProgress(teams[teamId]);
+      //       scores.push({id: teamId, score: score, progress: progress});
+      //     }
+      //   }
+      //   scores.sort(function(a,b){return b.score - a.score;});
+      //   renderTable();
+      //   flashGreen(document.getElementById("scoreboard-updated"));
+      // });
+      
       function renderTable(){
         var s = "<tr><th>Rank</th><th>Team ID</th><th>Team Name</th><th>Total Score</th>"
                +"<th>Submitted "+window.dTitle[0]+" packets (of "+window.numPackets[0]+" total)</th>"
@@ -369,10 +386,57 @@
       e.preventDefault();
       return false;
     };
+    for(var teamid = 1; teamid <= 44; teamid++) {
+      document.getElementById("app").innerHTML += "<div id='scoreboxes"+teamid+"'></div>";
+    }
+    for(var teamid = 1; teamid <= 44; teamid++) {
+      (function(teamid){
+      fb.child("answers").child(teamid).once("value", function(snap){
+        var passcode = Object.keys(snap.val())[0];
+        var answersFB = fb.child("answers").child(teamid).child(passcode);
+        var scoresFB = fb.child("scores").child("team" + teamid);
+        scoresFB.on('value', function(snapshot) {
+            if(!snapshot.val()) {
+                var scores = {};
+                for(var i = 0 ; i < window.dClass.length; i++)
+                    scores[window.dClass[i]] = new Array(window.numPackets[i]).fill(-1);
+                scoresFB.set(scores);
+            } else {
+                var scores = snapshot.val();
+            }
+            answersFB.off('value');
+            answersFB.on('value', function(snapshot2) {
+              var answers = snapshot2.val();
+              if(!answers) answers = {};
+              for(var i = 0; i < window.dClass.length; i++)
+                if(!answers[window.dClass[i]]) answers[window.dClass[i]] = [];
+              var scoreboxes = "";
+              for(var i = 0; i < window.dClass.length; i++) {
+                  scoreboxes += "<div style='display: inline-block'>";
+                  for(var j = 0; j < window.numPackets[i]; j++) {
+                      var s = scores[window.dClass[i]][j];
+                      var content = "" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
+                      scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
+                      if(j == window.numPackets[i] - 1 && content != "") {
+                        document.getElementById("start"+window.dClass[i]).disabled = true;
+                        document.getElementById("start"+window.dClass[i]).actually_disabled = true;
+                      }
+                  }
+                  scoreboxes += "</div>";
+              }
+              document.getElementById("scoreboxes"+teamid).innerHTML = teamid+scoreboxes;
+            });
+        });
+      });
+      })(teamid);
+    }
   </script>
   <style>
     td{
       padding: 0.3em;
+    }
+    .scorebox, .scorebox.plus {
+      font-size: 0.5em;
     }
   </style>
 </body>
