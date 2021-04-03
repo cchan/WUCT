@@ -46,6 +46,7 @@ class DifficultySection extends React.Component {
     this.ref = fb.child('scores')
       .child('team'+this.props.teamId)
       .child(window.dClass[this.props.difficulty]);
+    this.ref2 = fb.child("answers").child(this.props.teamId).child(this.props.passcode).child(dClass[this.props.difficulty]);
   }
   componentDidMount(){
     this.ref.once('value', function(snapshot){
@@ -64,7 +65,7 @@ class DifficultySection extends React.Component {
         this.setState({scores: snapshot.val()});
     }.bind(this));
 
-    fb.child("answers").child(this.props.teamId).child(this.props.passcode).child(dClass[this.props.difficulty]).on('value', function(snapshot){
+    this.ref2.on('value', function(snapshot){
       var submitted = new Array(numPackets[this.props.difficulty]).fill(false);
       var answers = snapshot.val();
       if(answers)
@@ -76,6 +77,7 @@ class DifficultySection extends React.Component {
   }
   componentWillUnmount(){
     this.ref.off('value');
+    this.ref2.off('value');
   }
   scoreHandler(selected){
     var newScores = this.state.scores;

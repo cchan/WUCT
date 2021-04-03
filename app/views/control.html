@@ -177,7 +177,7 @@
           flashGreen(input);
           cb(parseInt(snapshot.val()));
         });
-        input.onchange = function(e){
+        input.oninput = function(e){
           ref.set(parseInt(e.target.value)).then(function(){
             flashGreen(input);
           });

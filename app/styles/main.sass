@@ -225,15 +225,15 @@ h3
     display: block
     color: black
     transition: color 0.4s
-  &:not(.disabled):hover .desc
+  &:not(:disabled):hover .desc
     color: white
-  &:not(.disabled).easy:hover
+  &:not(:disabled).easy:hover
     background-color: #090
-  &:not(.disabled).medium:hover
+  &:not(:disabled).medium:hover
     background-color: #009
-  &:not(.disabled).hard:hover
+  &:not(:disabled).hard:hover
     background-color: #900
-  &.disabled
+  &:disabled
     opacity: 20%
 .easy
   border-color: #0f0

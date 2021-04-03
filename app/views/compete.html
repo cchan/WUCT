@@ -39,7 +39,7 @@
             <li>Designate one teammate to enter the answers to avoid submitting accidentally.</li>
           </ul>
         </div>
-        <div id="buttons" style="display: none;">
+        <div id="buttons">
             <button id="starteasy" class="easy selectbox" onclick="if(confirm('Start an easy packet?'))startPacket('easy'); return false">+<span class="desc">start easy packet</span></button>
             <button id="startmedium" class="medium selectbox" onclick="if(confirm('Start a medium packet?'))startPacket('medium'); return false">+<span class="desc">start medium packet</span></button>
             <button id="starthard" class="hard selectbox" onclick="if(confirm('Start a hard packet?'))startPacket('hard'); return false">+<span class="desc">start hard packet</span></button>
@@ -178,9 +178,46 @@
         line-height: 3em;
         display: inline-block;
     }
-    #competeApp.selection #selection {
-      display: block;
-    }
+
+    #selection { display: none; }
+    #buttons { display: block; }
+    #answering { display: none; }
+    #notstarted { display: none; }
+    #timeup { opacity: 0; }
+    #app { opacity: 1; }
+    #hidden { opacity: 0; display: block; }
+    #timer { color: white; }
+
+    .notstarted #selection { display: block; }
+    .notstarted #buttons { display: none; }
+    .notstarted #answering { display: none; }
+    .notstarted #notstarted { display: block; }
+    .notstarted #timeup { opacity: 0; }
+    .notstarted #app { opacity: 1; }
+    .notstarted #hidden { opacity: 0; display: block; }
+    .notstarted #timer { color: white; }
+
+    .timeup #answering {display: none}
+    .timeup #buttons {display: none}
+    .timeup #selection {display: none}
+    .timeup #notstarted {display: none}
+    .timeup #timeup {opacity: 1}
+    .timeup #app {opacity: 0}
+    .timeup #hidden {opacity: 0}
+    .timeup #hidden {display: none}
+    .timeup #timer { color: red; }
+
+    .selection #selection { display: block; }
+    .selection #buttons, #competeApp.answering #buttons { display: block; }
+    .selection #notstarted, #competeApp.answering #notstarted { display: none; }
+    .selection #timeup, #competeApp.answering #timeup { opacity: 0; }
+    .selection #app, #competeApp.answering #app { opacity: 1; }
+    .selection #hidden, #competeApp.answering #hidden { opacity: 0; display: block; }
+
+    .answering #answering { display: block; }
+
+    .answering .scorebox { font-size: 0.7em; }
+
     #answering {
       display: none;
     }
@@ -195,22 +232,19 @@
     #competeApp {
       width: 100%
     }
-    #competeApp.answering #answering {
-      display: block;
-    }
-    #competeApp.answering .scorebox {
-      font-size: 0.7em;
-    }
   </style>
   
   <script>
     window.teamNames = {};
     window.scores = [];
+    window.globalClasses = ["", ""];
 
     function logout() {
         Cookies.remove("teamid");
         Cookies.remove("passcode");
         document.body.className = "";
+        window.globalClasses[0] = "";
+        document.body.className = window.globalClasses.join(' ')
         document.getElementById("teamname").innerText = "compete";
     }
 
@@ -219,9 +253,11 @@
             console.log(teamid, passcode, "null", null)
             fb.child("answers").child(teamid).child(passcode).once('value', function(snapshot){
                 if(snapshot.val()) {
+                    console.log("hi")
                     Cookies.set("teamid", teamid);
                     Cookies.set("passcode", passcode);
-                    document.body.className = "loggedIn";
+                    window.globalClasses[0] = "loggedIn";
+                    document.body.className = window.globalClasses.join(' ')
                     fb.child("teams").child(teamid).child("name").once("value", function(snapshot){
                         var b = document.createElement("b");
                         b.innerText = snapshot.val();
@@ -255,13 +291,13 @@
         return false;
     }
     function bind(ref, elem) {
-      elem.onchange = null;
+      elem.oninput = null;
       if(elem.ref)
         elem.ref.off("value");
       elem.disabled = true;
       elem.value = "Loading...";
       elem.ref = ref;
-      elem.onchange = function(e){ console.log(e); ref.set(e.target.value); };
+      elem.oninput = function(e){ console.log(e); ref.set(e.target.value); };
       ref.on("value", function(snap) {
         elem.value = snap.val();
         elem.disabled = false;
@@ -269,14 +305,30 @@
       var connectedRef = firebase.database().ref(".info/connected");
       connectedRef.on("value", function(snap) {
         if (snap.val() === false) {
-          elem.disabled = true; // TODO
+          elem.disabled = true;
         } else {
           elem.disabled = false;
         }
       });
     }
+    var connectedRef = firebase.database().ref(".info/connected");
+    connectedRef.on("value", function(snap) {
+      if (snap.val() === false) {
+        document.getElementById("answersubmit").disabled = true;
+        for(var i = 0; i < window.dClass.length; i++)
+          if(!document.getElementById("start"+window.dClass[i]).actually_disabled)
+            document.getElementById("start"+window.dClass[i]).disabled = true;
+      } else {
+        document.getElementById("answersubmit").disabled = false;
+        for(var i = 0; i < window.dClass.length; i++)
+          if(!document.getElementById("start"+window.dClass[i]).actually_disabled)
+            document.getElementById("start"+window.dClass[i]).disabled = false;
+      }
+    });
 
     function loadApp(teamid, passcode){
+        fb.child("answers").off()
+        fb.child("scores").off()
         var answersFB = fb.child("answers").child(teamid).child(passcode);
         var scoresFB = fb.child("scores").child("team" + teamid);
         scoresFB.on('value', function(snapshot) {
@@ -302,7 +354,7 @@
                       scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
                       if(j == window.numPackets[i] - 1 && content != "") {
                         document.getElementById("start"+window.dClass[i]).disabled = true;
-                        document.getElementById("start"+window.dClass[i]).className += " disabled";
+                        document.getElementById("start"+window.dClass[i]).actually_disabled = true;
                       }
                   }
                   scoreboxes += "</div>";
@@ -317,8 +369,6 @@
                 document.getElementById("timeup").style.opacity = "1";
                 return;
             }
-            document.getElementById("notstarted").style.display = "none";
-            document.getElementById("buttons").style.display = "block";
 
             // IF WE'RE ON THE ANSWER ENTRY PAGE
             function reloadScreenSelect() {
@@ -339,15 +389,17 @@
                   bind(answersFB.child(difficulty).child(n).child("q2"), document.getElementById("q2"));
                   bind(answersFB.child(difficulty).child(n).child("q3"), document.getElementById("q3"));
                   document.getElementById("answersubmit").onclick = function(e) {
-                      // [] sometimes leaves you on the selection page when you select, while still changing the top bar to small scoreboxes
+                      // x sometimes leaves you on the selection page when you select, while still changing the top bar to small scoreboxes [this was because of timer setting styles directly instead of using classes!]
                       // [] More obvious color change for whole team’s scoring thing
-                      // [] security rules for starting questions - the status field??
-                      // [] front scoreboard doesn’t show timer when scores hidden
-                      // [] test offline
+                      // x security rules for starting questions - the status field!
+                      // x front scoreboard doesn’t show timer when scores hidden
+                      // x test offline (just disabled elements!)
+                      // [] security rule to prevent changing currPacket back to null unless that packet is done?
+                      // [] "If you were in the middle of an answer, it's been submitted automatically." only if one of the team had it open
                       // [] how do we log people out in case they come back next year LOL (one of the execs was still logged in from wuct2019)
                       // [] what happens when multiple people select a difficulty close to the same time?
-                      // [] more margin on “compete” on scoreboard page and also make it more obvious
                       //     - tested this, not much? the currentQuestion field is only one field
+                      // [] more margin on “compete” on scoreboard page and also make it more obvious
                       // [] check for .off's for every .on
                       //     [] cleaning up event handlers - logging in as multiple.
                       //         x just force reload on log out
@@ -440,44 +492,23 @@
             setTimer(document.getElementById("timer"), function(seconds){
                 // Both cases, so that we stay up to date if hidetime changes.
                 if(seconds > timerlength * 60) {
-                  document.getElementById("timer").style.color = "white";
-                  document.getElementById("answering").style.display = "none";
-                  document.getElementById("buttons").style.display = "none";
-                  document.getElementById("selection").style.display = "block";
-                  document.getElementById("notstarted").style.display = "block";
-                  document.getElementById('timeup').style.opacity = 0;
-                  document.getElementById('app').style.opacity = 1;
-                  document.getElementById('hidden').style.opacity = 0;
-                  document.getElementById('hidden').style.display = "block";
+                  window.globalClasses[1] = "notstarted";
+                  document.body.className = window.globalClasses.join(' ')
                   hasStartedYet = false;
                 }
                 else if(seconds <= 0) {
                   if(document.getElementById("answersubmit").onclick)
                     document.getElementById("answersubmit").onclick();
-                  document.getElementById("timer").style.color = "red";
-                  document.getElementById("answering").style.display = "none";
-                  document.getElementById("buttons").style.display = "none";
-                  document.getElementById("selection").style.display = "none";
-                  document.getElementById("notstarted").style.display = "none";
-                  document.getElementById('timeup').style.opacity = 1;
-                  document.getElementById('app').style.opacity = 0;
-                  document.getElementById('hidden').style.opacity = 0;
-                  document.getElementById('hidden').style.display = "none";
+                  window.globalClasses[1] = "timeup";
+                  document.body.className = window.globalClasses.join(' ')
                   hasStartedYet = false;
                 }
                 else {
                     if(!hasStartedYet) {
                       reloadScreenSelect()
                     }
-                    document.getElementById("timer").style.color = "white";
-                    // document.getElementById("answering").style.display = "block";
-                    document.getElementById("buttons").style.display = "block";
-                    // document.getElementById("selection").style.display = "block";
-                    document.getElementById("notstarted").style.display = "none";
-                    document.getElementById('timeup').style.opacity = 0;
-                    document.getElementById('app').style.opacity = 1;
-                    document.getElementById('hidden').style.opacity = 0;
-                    document.getElementById('hidden').style.display = "block";
+                    window.globalClasses[1] = "";
+                    document.body.className = window.globalClasses.join(' ')
                     hasStartedYet = true;
                     if(seconds < hidetime * 60) {
                       document.getElementById('app').style.opacity = 0;

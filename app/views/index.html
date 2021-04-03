@@ -158,23 +158,22 @@
         }
         document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
       }
-      
-      var hidetime;
-      fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
-      setTimer(document.getElementById("timer"), function(seconds){
-        // Both cases, so that we stay up to date if hidetime changes.
-        if(seconds <= 0)
-          document.getElementById("timer").style.color = "red";
-        else
-          document.getElementById("timer").style.color = "black";
-        if(seconds < hidetime * 60){
-          document.getElementById('app').style.opacity = 0;
-          document.getElementById('hidden').style.opacity = 1;
-        }else{
-          document.getElementById('app').style.opacity = 1;
-          document.getElementById('hidden').style.opacity = 0;
-        }
-      });
+    });
+    var hidetime;
+    fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
+    setTimer(document.getElementById("timer"), function(seconds){
+      // Both cases, so that we stay up to date if hidetime changes.
+      if(seconds <= 0)
+        document.getElementById("timer").style.color = "red";
+      else
+        document.getElementById("timer").style.color = "black";
+      if(seconds < hidetime * 60){
+        document.getElementById('app').style.opacity = 0;
+        document.getElementById('hidden').style.opacity = 1;
+      }else{
+        document.getElementById('app').style.opacity = 1;
+        document.getElementById('hidden').style.opacity = 0;
+      }
     });
   </script>
 </body>

@@ -2,29 +2,28 @@
   "rules": {
     "$wuct": {
       ".read": "auth != null && auth.token.email == 'wuct@clive.io'",
-      ".write": "$wuct == 'wuct2021' && auth != null && auth.token.email == 'wuct@clive.io'",
+      ".write": "($wuct == 'wuct2021' || $wuct == 'wucttest') && auth != null && auth.token.email == 'wuct@clive.io'",
       "answers": {
         "$id": {
           "$passcode": {
             ".read": "true",
+            "currPacket": {
+              ".write": "($wuct == 'wuct2021' || $wuct == 'wucttest') && data.parent().exists() && data.parent().parent().parent().parent().child('timer').child('target').val() >= now - 10000 && data.parent().parent().parent().parent().child('timer').child('target').val() - data.parent().parent().parent().parent().child('timer').child('timerlength').val() * 60000 <= now + 10000",
+            },
             "$d": {
               "$n": {
-                ".write": "$wuct == 'wuct2021' && data.parent().parent().exists() && !data.child('submit').exists() && data.parent().parent().parent().parent().parent().child('timer').child('target').val() >= now && data.parent().parent().parent().parent().parent().child('timer').child('target').val() - data.parent().parent().parent().parent().parent().child('timer').child('timerlength').val() * 60000 <= now"
+                ".write": "($wuct == 'wuct2021' || $wuct == 'wucttest') && data.parent().parent().exists() && !data.child('submit').exists() && data.parent().parent().parent().parent().parent().child('timer').child('target').val() >= now - 10000 && data.parent().parent().parent().parent().parent().child('timer').child('target').val() - data.parent().parent().parent().parent().parent().child('timer').child('timerlength').val() * 60000 <= now + 10000"
               }
             }
           }
         }
       },
       "questions": {
-        ".read": "$wuct == 'wuct2021' && data.parent().child('timer').child('target').val() >= now && data.parent().child('timer').child('target').val() - data.parent().child('timer').child('timerlength').val() * 60000 <= now"
+        ".read": "($wuct == 'wuct2021' || $wuct == 'wucttest') && data.parent().child('timer').child('target').val() >= now - 10000 && data.parent().child('timer').child('target').val() - data.parent().child('timer').child('timerlength').val() * 60000 <= now + 10000"
       },
       "scores": { ".read": "true" },
       "teams": { ".read": "true" },
       "timer": { ".read": "true" },
-    },
-    "wucttest": {
-      ".read": "true",
-      ".write": "auth != null && auth.token.email == 'wuct@clive.io'"
     }
   }
 }
