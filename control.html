@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1617490326961"></script>
+  <script src="common.min.js?1617500931908"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1617490326961" />
+  <link rel="stylesheet" href="main.css?1617500931908" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -46,13 +46,12 @@
     
     <div id="teamlist"></div>
 
-    <h2>Copyable Scoreboard Table&nbsp;<sup id="scoreboard-updated"><small>[update&nbsp;flasher]</small></sup></h2>
-    <p>This table only shows teams that have ever had any score entered.</p>
+    <h2>Live Scoreboard Boxes</h2>
+    <div id="liveboxes"></div>
 
+    <h2>Copyable Scoreboard Table&nbsp;<sup id="scoreboard-updated"><small>[update&nbsp;flasher]</small></sup></h2>
     <p>Right click > Copy.</p>
     <div id="scoreboard"></div>
-
-    <h2>Live Scoreboard</h2>
   </div>
   
   <script>
@@ -139,7 +138,6 @@
               var passcode = null;
               if(obj && Object.keys(obj).length)
                 passcode = Object.keys(obj)[0];
-              console.log(passcode);
               $('#teamlist').append(
                 $('<div>').append(
                   $('<button class="removeBtn">&#x2715;</button>')
@@ -235,6 +233,7 @@
           }
         }
         scores.sort(function(a,b){return b.score - a.score;});
+        console.log("!!", scores)
         renderTable();
         flashGreen(document.getElementById("scoreboard-updated"));
       });
@@ -261,18 +260,21 @@
                +"<th>Submitted "+window.dTitle[2]+" packets (of "+window.numPackets[2]+" total)</th>"
                +"</tr>";
         var prevRank = 0;
+        console.log("??", scores)
         for(let i = 0; i < scores.length; i++){
-          if(teamNames[scores[i].id] === undefined)
+          console.log(teamNames);
+          if(teamNames[parseInt(scores[i].id.slice(4))] === undefined)
             continue;
           if(i > 0 && scores[i].score != scores[i-1].score)
             prevRank = i;
           
-          s += "<tr><td>" + (prevRank + 1) + "</td><td>"+scores[i].id.slice(4)+"</td><td>" + teamNames[scores[i].id].name + "</td><td>" + scores[i].score + "</td>";
+          s += "<tr><td>" + (prevRank + 1) + "</td><td>"+scores[i].id.slice(4)+"</td><td>" + teamNames[parseInt(scores[i].id.slice(4))].name + "</td><td>" + scores[i].score + "</td>";
           s += "<td>"+(scores[i].progress[0]*window.numPackets[0])+"</td>";
           s += "<td>"+(scores[i].progress[1]*window.numPackets[1])+"</td>";
           s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
           s += "</tr>";
         }
+        console.log(s)
         document.getElementById('scoreboard').innerHTML = "<table id='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
 
         document.querySelector('#clickselectall').onfocus = function(e) {
@@ -380,49 +382,51 @@
       if(!password)
         alertFailure('failed to sign in');
       else
-        firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).catch(function(error){
+        firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).then(function(){
+          window.location.reload()
+        }).catch(function(error){
           alertFailure('failed to sign in');
         });
       e.preventDefault();
       return false;
     };
     for(var teamid = 1; teamid <= 44; teamid++) {
-      document.getElementById("app").innerHTML += "<div id='scoreboxes"+teamid+"'></div>";
-    }
-    for(var teamid = 1; teamid <= 44; teamid++) {
+      document.getElementById("liveboxes").innerHTML += "<div id='scoreboxes"+teamid+"'></div>";
       (function(teamid){
       fb.child("answers").child(teamid).once("value", function(snap){
-        var passcode = Object.keys(snap.val())[0];
-        var answersFB = fb.child("answers").child(teamid).child(passcode);
-        var scoresFB = fb.child("scores").child("team" + teamid);
-        scoresFB.on('value', function(snapshot) {
-            if(!snapshot.val()) {
-                var scores = {};
-                for(var i = 0 ; i < window.dClass.length; i++)
-                    scores[window.dClass[i]] = new Array(window.numPackets[i]).fill(-1);
-                scoresFB.set(scores);
-            } else {
-                var scores = snapshot.val();
-            }
-            answersFB.off('value');
-            answersFB.on('value', function(snapshot2) {
-              var answers = snapshot2.val();
-              if(!answers) answers = {};
-              for(var i = 0; i < window.dClass.length; i++)
-                if(!answers[window.dClass[i]]) answers[window.dClass[i]] = [];
-              var scoreboxes = "";
-              for(var i = 0; i < window.dClass.length; i++) {
-                  scoreboxes += "<div style='display: inline-block'>";
-                  for(var j = 0; j < window.numPackets[i]; j++) {
-                      var s = scores[window.dClass[i]][j];
-                      var content = "" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
-                      scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
-                  }
-                  scoreboxes += "</div>";
+        if(snap.val()) {
+          var passcode = Object.keys(snap.val())[0];
+          var answersFB = fb.child("answers").child(teamid).child(passcode);
+          var scoresFB = fb.child("scores").child("team" + teamid);
+          scoresFB.on('value', function(snapshot) {
+              if(!snapshot.val()) {
+                  var scores = {};
+                  for(var i = 0 ; i < window.dClass.length; i++)
+                      scores[window.dClass[i]] = new Array(window.numPackets[i]).fill(-1);
+                  scoresFB.set(scores);
+              } else {
+                  var scores = snapshot.val();
               }
-              document.getElementById("scoreboxes"+teamid).innerHTML = teamid+scoreboxes;
-            });
-        });
+              answersFB.off('value');
+              answersFB.on('value', function(snapshot2) {
+                var answers = snapshot2.val();
+                if(!answers) answers = {};
+                for(var i = 0; i < window.dClass.length; i++)
+                  if(!answers[window.dClass[i]]) answers[window.dClass[i]] = [];
+                var scoreboxes = "";
+                for(var i = 0; i < window.dClass.length; i++) {
+                    scoreboxes += "<div style='display: inline-block'>";
+                    for(var j = 0; j < window.numPackets[i]; j++) {
+                        var s = scores[window.dClass[i]][j];
+                        var content = "" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
+                        scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
+                    }
+                    scoreboxes += "</div>";
+                }
+                document.getElementById("scoreboxes"+teamid).innerHTML = teamid+scoreboxes;
+              });
+          });
+        }
       });
       })(teamid);
     }
