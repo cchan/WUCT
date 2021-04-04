@@ -21,7 +21,7 @@
       "questions": {
         ".read": "($wuct == 'wuct2021' || $wuct == 'wucttest') && data.parent().child('timer').child('target').val() >= now - 10000 && data.parent().child('timer').child('target').val() - data.parent().child('timer').child('timerlength').val() * 60000 <= now + 10000"
       },
-      "scores": { ".read": "true" },
+      "scores": { ".read": "($wuct == 'wuct2021' || $wuct == 'wucttest') && data.parent().child('timer').child('target').val() >= now - 30000" },
       "teams": { ".read": "true" },
       "timer": { ".read": "true" },
     }
