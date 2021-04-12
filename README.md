@@ -1,6 +1,8 @@
 WUCT
 ====
 
+Want to get in touch? Reach out at cc@clive.io.
+
 [![Build Status](https://travis-ci.org/cchan/WUCT.svg?branch=master)](https://travis-ci.org/cchan/WUCT)
 [![License](https://img.shields.io/github/license/cchan/WUCT.svg)](https://github.com/cchan/WUCT/blob/master/LICENSE)
 ![Dependencies](https://img.shields.io/david/cchan/WUCT.svg)
