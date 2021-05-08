@@ -20,13 +20,13 @@ class RadioBtnGroup extends React.Component {
   render() {
     return (
       <div>
-        <ButtonGroup>
+        {/* <ButtonGroup>
           <Button onClick={() => this.onRadioBtnClick(-1)} active={this.props.selected === -1} disabled={this.props.xdisabled}>x</Button>
           <Button onClick={() => this.onRadioBtnClick(0)} active={this.props.selected === 0}>0</Button>
           <Button onClick={() => this.onRadioBtnClick(1)} active={this.props.selected === 1}>1</Button>
           <Button onClick={() => this.onRadioBtnClick(2)} active={this.props.selected === 2}>2</Button>
           <Button onClick={() => this.onRadioBtnClick(3)} active={this.props.selected === 3}>3</Button>
-        </ButtonGroup>
+        </ButtonGroup> */}
       </div>
     )
   }
@@ -168,8 +168,8 @@ class TeamCard extends React.Component {
     if(this.state.teamName != null && this.state.passcode != null)
       difficultySections = 
         <div>
-          <DifficultySection difficulty="0" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/>
-          <DifficultySection difficulty="1" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/>
+          {/* <DifficultySection difficulty="0" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/>
+          <DifficultySection difficulty="1" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/> */}
           <DifficultySection difficulty="2" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/>
         </div>;
     else
@@ -281,7 +281,7 @@ class TeamCardSet extends React.Component {
       return (
       <div>
           <header>
-            <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
+            <h1><img src="lmtlogowhite.svg" alt="LMT" />Guts Round: Scoring</h1>
             <div id="timer" style={{display: "inline-block", margin: "0 1em", fontSize: "1.5em"}}></div><label style={{verticalAlign: "0.2em"}}>Identifier: <input type="text" id="identifier" placeholder="Unidentified Scoring Station" required onChange={this.updateIdentifier.bind(this)} value={this.state.identifier} /></label>
             <div style={{float: "right"}}>
               <a href="#" className="help" onClick={()=>window.alert("Press the + button below to start tracking a team! You can:\n- Enter a team ID to begin tracking a team's score live.\n- Set colors to help quickly visually identify teams.\n- Examine and score a team's answers by clicking the difficulty-specific button when it's available.\n- Manually enter scores by clicking the score (0, 1, 2, or 3). You can cancel a score by clicking 'x', but you can only cancel the last non-x score.\n- Advance to the next question (>) or go back to a previous question (<). The last packet difficulty and number shown should always be the one that the team has or can take next.\n- Everything updates instantly on the scoreboard.\nDon't open multiple scoring windows in the same browser! It will get confused.")}>?</a>
@@ -298,10 +298,10 @@ class TeamCardSet extends React.Component {
             </div>
             <div class="pdfansbox_right">
               <h2 id="pdfansbox_title"></h2>
-              <div><span>1</span><textarea id="q1" disabled></textarea></div>
-              <div><span>2</span><textarea id="q2" disabled></textarea></div>
-              <div><span>3</span><textarea id="q3" disabled></textarea></div>
-              Score: <input type="text" id="score" style="border:solid 1px black" /><button id="scoresubmit">Submit</button><button id="scorecancel">Back</button>
+              <div><span>1</span><textarea id="q1" disabled></textarea><input id="q1c" type="checkbox" /></div>
+              <div><span>2</span><textarea id="q2" disabled></textarea><input id="q2c" type="checkbox" /></div>
+              <div><span>3</span><textarea id="q3" disabled></textarea><input id="q3c" type="checkbox" /></div>
+              <button id="scoresubmit">Submit</button><button id="scorecancel">Back</button>
             </div>
           </div>
         </div>
@@ -336,7 +336,17 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
       fb.child("scores").child("team"+id).child(window.dClass[d]).child(n).once("value", function(snap) {
         var currscore = snap.val();
         if(currscore < 0) currscore = "";
-        document.getElementById("score").value = currscore;
+        console.log(currscore)
+        if(parseInt(currscore) == currscore && currscore >= 0 && currscore < 8) {
+          document.getElementById("q1c").checked = ((currscore & 1) > 0);
+          document.getElementById("q2c").checked = ((currscore & 2) > 0);
+          document.getElementById("q3c").checked = ((currscore & 4) > 0);
+        } else {
+          document.getElementById("q1c").checked = false;
+          document.getElementById("q2c").checked = false;
+          document.getElementById("q3c").checked = false;
+        }
+        
         document.getElementById("notside").style.display = "none";
         document.getElementById("side").style.display = "block";
         document.getElementById("pdf").src = window.ak[dClass[d]];
@@ -352,10 +362,12 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
           document.getElementById("scoresubmit").onclick = null;
         }
         document.getElementById("scoresubmit").onclick = function(e) {
-          var score = parseInt(document.getElementById("score").value);
-          if(!(score == 0 || score == 1 || score == 2 || score == 3))
-            alertFailure("Invalid score - must be 0, 1, 2, or 3");
-          else {
+          var score = (document.getElementById("q1c").checked ? 1 : 0)
+                    + (document.getElementById("q2c").checked ? 2 : 0)
+                    + (document.getElementById("q3c").checked ? 4 : 0);
+          // if(!(score == 0 || score == 1 || score == 2 || score == 3))
+          //   alertFailure("Invalid score - must be 0, 1, 2, or 3");
+          // else {
             fb.child("scores").child("team"+id).child(window.dClass[d]).child(n).set(score);
             if(successCallback) successCallback();
             document.getElementById("notside").style.display = "block";
@@ -363,7 +375,7 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
             document.getElementById("pdf").src = "";
             fb.child("answers").off();
             document.getElementById("scoresubmit").onclick = null;
-          }
+          // }
           e.preventDefault();
           return false;
         }

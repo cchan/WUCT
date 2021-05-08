@@ -1,27 +1,47 @@
 // note the the number of difficulty classes is fixed at 3, for now
 window.dClass = ["easy", "medium", "hard"];
-window.dTitle = ["Easy", "Med", "Hard"];
-window.numPackets = [20, 13, 7];
-window.numPacketsDict = {"easy": 20, "medium": 13, "hard": 7};
+window.dTitle = ["Easy", "Med", "Packet"];
+window.numPacketsDict = {"easy": 0, "medium": 0, "hard": 12};
+window.numPackets = window.dClass.map(x=>window.numPacketsDict[x]);
 window.scoreValues = [1, 3, 7];
 
-if(window.location.hostname == 'wuct.clive.io')
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2021';
+if(window.location.hostname == 'lmt.clive.io')
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'lmtS21';
 else if (window.location.hostname == 'localhost' && window.location.port == 8849)
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2021';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'lmtS21';
 else
   throw new Error();
 console.log(window.dbName);
 
+window.scoresPerQuestion = [
+  [3, 3, 3],
+  [3, 3, 3],
+  [4, 4, 4],
+  [4, 4, 4],
+  [5, 5, 5],
+  [6, 6, 6],
+  [7, 7, 7],
+  [8, 8, 8],
+  [9, 9, 9],
+  [10, 10, 10],
+  [11, 11, 11],
+  [13, 13, 20],
+];
+
 window.getScore = function(scores){
   var totalScore = 0;
   for(var i = 0; i < window.dClass.length; i++)
-    totalScore += (scores[window.dClass[i]] || scores[i] || []).map(function(a){
-      if(a == -1)
+    totalScore += (scores[window.dClass[i]] || scores[i] || []).map(function(a, n){
+      var packetScore = 0;
+      if(a < 0)
         return 0;
-      if(a == 3)
-        a++;
-      return a*window.scoreValues[i];
+      if(a & 1)
+        packetScore += window.scoresPerQuestion[n][0];
+      if(a & 2)
+        packetScore += window.scoresPerQuestion[n][1];
+      if(a & 4)
+        packetScore += window.scoresPerQuestion[n][2];
+      return packetScore;
     }).reduce(function(a,b){return a+b;}, 0);
   return totalScore;
 }

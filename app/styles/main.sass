@@ -1,4 +1,4 @@
-$green: #255D38
+$green: rgb(21,97,173)
 
 header
   text-align: left
@@ -17,6 +17,8 @@ header
       height: 1.9em
       vertical-align: top
       margin-right: 1em
+      padding: 0.2em
+      box-sizing: border-box
   a
     display: inline-block
     vertical-align: top
@@ -113,7 +115,7 @@ input[type=text]
       background-color: black
       color: white
   button
-    padding: 0 0.35em 0.2em 0.35em
+    padding: 0 0.25em 0.2em 0.25em
     &.next
       float: right
     &.back
@@ -269,3 +271,9 @@ a>b
   text-align: center
 #side::after, #answering::after
   clear: both
+#q1c, #q2c, #q3c
+  font-size: 3em
+  transform: scale(2)
+  position: relative
+  left: 0.5em
+  top: -0.5em
