@@ -10,14 +10,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.min.js" integrity="sha256-h7PiJxtxsf7+VkAGN6N+8/0qZrhK7oYJc/pguDnYJi4=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-  <script src="common.min.js?1618190474090"></script>
+  <script src="common.min.js?1620510513557"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1618190474090" />
+  <link rel="stylesheet" href="main.css?1620510513557" />
 </head>
 <body>
   <div id="app" style="display: none">
     <header>
-      <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Scoring</h1>
+      <h1><img src="lmtlogowhite.svg" alt="LMT" />Guts Round: Scoring</h1>
       <a id="logout" style="display:none; float: right;" href="#" onclick="window.signOut()">LOG OUT [admin]</a>
       <div id="loginform" style="display: inline-block; float: right; color: white; padding: 0.5em;">
         Password: <input type="password" id="password" />
@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <script src="bundle.min.js?1618190474090"></script>
+  <script src="bundle.min.js?1620510513557"></script>
   <script>
     // function render() {
     //   document.getElementById("teamtracking_app").style.display = "block";
@@ -65,7 +65,7 @@
       if(window.cancelAuthStateChanged)
         return;
       if (user) {
-        if(user.email != 'wuct@clive.io')
+        if(user.email != 'lmt@clive.io')
           window.signOut();
         else
           window.render();
@@ -81,7 +81,7 @@
       if(!password)
         document.getElementById('app').innerHTML = 'failed to sign in';
       else
-        firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).catch(function(error){
+        firebase.auth().signInWithEmailAndPassword('lmt@clive.io', password).catch(function(error){
           document.getElementById('app').innerHTML = 'failed to sign in';
         });
       e.preventDefault();
