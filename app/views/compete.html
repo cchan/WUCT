@@ -258,10 +258,8 @@
 
     function tryLogin(teamid, passcode){
         if(teamid && passcode) {
-            console.log(teamid, passcode, "null", null)
             fb.child("answers").child(teamid).child(passcode).once('value', function(snapshot){
                 if(snapshot.val()) {
-                    console.log("hi")
                     Cookies.set("teamid", teamid);
                     Cookies.set("passcode", passcode);
                     window.globalClasses[0] = "loggedIn";
@@ -386,7 +384,7 @@
               answersFB.child("currPacket").on("value", function(snap) {
                 var c = snap.val();
                 document.getElementById("answersubmit").onclick = null;
-                console.log("currPacket", c)
+                // console.log("currPacket", c)
                 if(c) {
                   var difficulty = c.match(/[^\d]+/)[0];
                   var n = parseInt(c.match(/\d+/)[0]);
@@ -445,7 +443,7 @@
                 var n = val.findIndex(e=>!e || !e["submit"]);
                 if(n == -1)
                   n = val.length;
-                console.log("Starting", difficulty, n)
+                // console.log("Starting", difficulty, n)
                 document.getElementById("answersubmit").onclick = null;
                 if(n >= window.numPacketsDict[difficulty])
                   alertFailure("Unable to start packet - there are no more " + difficulty + " packets")

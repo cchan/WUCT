@@ -98,7 +98,7 @@
               var old = {"created": ""+new Date()};
               if(obj && Object.keys(obj).length)
                 old = obj[Object.keys(obj)[0]];
-              console.log(old);
+              // console.log(old);
 
               fb.child('answers').child(newid).set({[newpasscode]: old}).then(function(){
                 renderTeams();
@@ -233,7 +233,6 @@
           }
         }
         scores.sort(function(a,b){return b.score - a.score;});
-        console.log("!!", scores)
         renderTable();
         flashGreen(document.getElementById("scoreboard-updated"));
       });
@@ -274,7 +273,7 @@
           s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
           s += "</tr>";
         }
-        console.log(s)
+        // console.log(s)
         document.getElementById('scoreboard').innerHTML = "<table id='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
 
         document.querySelector('#clickselectall').onfocus = function(e) {
@@ -345,7 +344,7 @@
               tracking.forEach(x => allTracked.add(parseInt(x)));
             })(u);
       }
-      console.log(window.teamNames)
+      // console.log(window.teamNames)
       $('#stations').append($("<div>").append("<b>Untracked teams:</b> ")
       .append(Object.keys(window.teamNames).map(x=>parseInt(x)).filter(x => !allTracked.has(x)).map(t=>
                         $('<span class="teamid">').text(t)

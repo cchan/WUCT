@@ -336,7 +336,7 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
       fb.child("scores").child("team"+id).child(window.dClass[d]).child(n).once("value", function(snap) {
         var currscore = snap.val();
         if(currscore < 0) currscore = "";
-        console.log(currscore)
+        // console.log(currscore)
         if(parseInt(currscore) == currscore && currscore >= 0 && currscore < 8) {
           document.getElementById("q1c").checked = ((currscore & 1) > 0);
           document.getElementById("q2c").checked = ((currscore & 2) > 0);
