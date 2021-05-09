@@ -25,7 +25,7 @@ window.scoresPerQuestion = [
   [9, 9, 9],
   [11, 11, 11],
   [13, 13, 13],
-  [15, 15, 15],
+  [0, 0, 0],
 ];
 
 window.getScore = function(scores){
@@ -35,6 +35,12 @@ window.getScore = function(scores){
       var packetScore = 0;
       if(a < 0)
         return 0;
+      if(i == 2 && n == 11) {
+        // separate script generates the round 12 scores and inputs them
+        // x also don't let graders score round 12
+        // also don't let teams see their score in round 12
+        return a;
+      }
       if(a & 1)
         packetScore += window.scoresPerQuestion[n][0];
       if(a & 2)

@@ -20,13 +20,13 @@ class RadioBtnGroup extends React.Component {
   render() {
     return (
       <div>
-        {/* <ButtonGroup>
+        <ButtonGroup>
           <Button onClick={() => this.onRadioBtnClick(-1)} active={this.props.selected === -1} disabled={this.props.xdisabled}>x</Button>
           <Button onClick={() => this.onRadioBtnClick(0)} active={this.props.selected === 0}>0</Button>
           <Button onClick={() => this.onRadioBtnClick(1)} active={this.props.selected === 1}>1</Button>
           <Button onClick={() => this.onRadioBtnClick(2)} active={this.props.selected === 2}>2</Button>
           <Button onClick={() => this.onRadioBtnClick(3)} active={this.props.selected === 3}>3</Button>
-        </ButtonGroup> */}
+        </ButtonGroup>
       </div>
     )
   }
@@ -96,8 +96,8 @@ class DifficultySection extends React.Component {
       <span className={"difficulty "+dClass[this.props.difficulty]}>
         <Button className="back" onClick={this.back.bind(this)} disabled={this.state.currentQuestion <= 0}>&lt;</Button>
         <Button className="next" onClick={this.next.bind(this)} disabled={this.state.currentQuestion >= numPackets[this.props.difficulty] - 1 || this.state.scores[this.state.currentQuestion] == -1}>&gt;</Button>
-        <h3><button disabled={!this.state.submitted[this.state.currentQuestion]} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.teamName, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>
-        <RadioBtnGroup selected={this.state.scores[this.state.currentQuestion]} scoreHandler={this.scoreHandler.bind(this)} xdisabled={this.state.currentQuestion < numPackets[this.props.difficulty] - 1 && this.state.scores[this.state.currentQuestion + 1] != -1} />
+        <h3><button disabled={!this.state.submitted[this.state.currentQuestion] || this.state.currentQuestion == numPackets[this.props.difficulty] - 1} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.teamName, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>
+        {/* <RadioBtnGroup selected={this.state.scores[this.state.currentQuestion]} scoreHandler={this.scoreHandler.bind(this)} xdisabled={this.state.currentQuestion < numPackets[this.props.difficulty] - 1 && this.state.scores[this.state.currentQuestion + 1] != -1} /> */}
       </span>
     );
   }
