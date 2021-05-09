@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1620568906693"></script>
+  <script src="common.min.js?1620586186767"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620568906693" />
+  <link rel="stylesheet" href="main.css?1620586186767" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -98,7 +98,7 @@
               var old = {"created": ""+new Date()};
               if(obj && Object.keys(obj).length)
                 old = obj[Object.keys(obj)[0]];
-              console.log(old);
+              // console.log(old);
 
               fb.child('answers').child(newid).set({[newpasscode]: old}).then(function(){
                 renderTeams();
@@ -233,7 +233,6 @@
           }
         }
         scores.sort(function(a,b){return b.score - a.score;});
-        console.log("!!", scores)
         renderTable();
         flashGreen(document.getElementById("scoreboard-updated"));
       });
@@ -260,9 +259,9 @@
                +"<th>Submitted "+window.dTitle[2]+" packets (of "+window.numPackets[2]+" total)</th>"
                +"</tr>";
         var prevRank = 0;
-        console.log("??", scores)
+        // console.log("??", scores)
         for(let i = 0; i < scores.length; i++){
-          console.log(teamNames);
+          // console.log(teamNames);
           if(teamNames[parseInt(scores[i].id.slice(4))] === undefined)
             continue;
           if(i > 0 && scores[i].score != scores[i-1].score)
@@ -274,7 +273,7 @@
           s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
           s += "</tr>";
         }
-        console.log(s)
+        // console.log(s)
         document.getElementById('scoreboard').innerHTML = "<table id='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
 
         document.querySelector('#clickselectall').onfocus = function(e) {
@@ -345,7 +344,7 @@
               tracking.forEach(x => allTracked.add(parseInt(x)));
             })(u);
       }
-      console.log(window.teamNames)
+      // console.log(window.teamNames)
       $('#stations').append($("<div>").append("<b>Untracked teams:</b> ")
       .append(Object.keys(window.teamNames).map(x=>parseInt(x)).filter(x => !allTracked.has(x)).map(t=>
                         $('<span class="teamid">').text(t)

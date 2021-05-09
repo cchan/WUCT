@@ -10,9 +10,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-  <script src="common.min.js?1620568906693"></script>
+  <script src="common.min.js?1620586186767"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620568906693" />
+  <link rel="stylesheet" href="main.css?1620586186767" />
 </head>
 <body>
   <header>
@@ -258,10 +258,8 @@
 
     function tryLogin(teamid, passcode){
         if(teamid && passcode) {
-            console.log(teamid, passcode, "null", null)
             fb.child("answers").child(teamid).child(passcode).once('value', function(snapshot){
                 if(snapshot.val()) {
-                    console.log("hi")
                     Cookies.set("teamid", teamid);
                     Cookies.set("passcode", passcode);
                     window.globalClasses[0] = "loggedIn";
@@ -386,7 +384,7 @@
               answersFB.child("currPacket").on("value", function(snap) {
                 var c = snap.val();
                 document.getElementById("answersubmit").onclick = null;
-                console.log("currPacket", c)
+                // console.log("currPacket", c)
                 if(c) {
                   var difficulty = c.match(/[^\d]+/)[0];
                   var n = parseInt(c.match(/\d+/)[0]);
@@ -445,7 +443,7 @@
                 var n = val.findIndex(e=>!e || !e["submit"]);
                 if(n == -1)
                   n = val.length;
-                console.log("Starting", difficulty, n)
+                // console.log("Starting", difficulty, n)
                 document.getElementById("answersubmit").onclick = null;
                 if(n >= window.numPacketsDict[difficulty])
                   alertFailure("Unable to start packet - there are no more " + difficulty + " packets")
