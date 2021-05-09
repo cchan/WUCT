@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1620586186767"></script>
+  <script src="common.min.js?1620588957623"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620586186767" />
+  <link rel="stylesheet" href="main.css?1620588957623" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -35,6 +35,10 @@
     <h2>Active Scoring Stations <sup><small><a href="https://github.com/cchan/WUCT/issues">beta</a></small></sup></h2>
     <p>This tracks all currently active scoring stations and all teams that they are tracking. Scoring stations may identify themselves using the Identifier textbox in the scoring page header. Use the 'x' to remove stray scoring stations (which forces them to log out).</p>
     <div id="stations"></div>
+
+    <!-- <h2>Estimation Round (Round 12)</h2>
+    <button onclick="setEstimation(); return false;">Set Estimation Round Scores</button>
+    <button onclick="resetEstimation(); return false;">Reset Estimation Round Scores to 0</button> -->
     
     <h2>Teams</h2>
     <p>Note that changing a team's passcode locks them out immediately (and confuses their browser a bit).</p>
@@ -218,6 +222,7 @@
         fb.child("users").once('value', updateStations);
         renderTeams();
         renderTable();
+        renderBoxes();
         flashGreen(document.getElementById("teamlist"));
         flashGreen(document.getElementById("scoreboard-updated"));
       });
@@ -389,47 +394,128 @@
       e.preventDefault();
       return false;
     };
-    for(var teamid = 1; teamid <= 44; teamid++) {
-      document.getElementById("liveboxes").innerHTML += "<div id='scoreboxes"+teamid+"'></div>";
-      (function(teamid){
-      fb.child("answers").child(teamid).once("value", function(snap){
-        if(snap.val()) {
-          var passcode = Object.keys(snap.val())[0];
-          var answersFB = fb.child("answers").child(teamid).child(passcode);
-          var scoresFB = fb.child("scores").child("team" + teamid);
-          scoresFB.on('value', function(snapshot) {
-              if(!snapshot.val()) {
-                  var scores = {};
-                  for(var i = 0 ; i < window.dClass.length; i++)
-                      scores[window.dClass[i]] = new Array(window.numPackets[i]).fill(-1);
-                  scoresFB.set(scores);
-              } else {
-                  var scores = snapshot.val();
-              }
-              answersFB.off('value');
-              answersFB.on('value', function(snapshot2) {
-                var answers = snapshot2.val();
-                if(!answers) answers = {};
-                for(var i = 0; i < window.dClass.length; i++)
-                  if(!answers[window.dClass[i]]) answers[window.dClass[i]] = [];
-                var scoreboxes = "";
-                for(var i = 0; i < window.dClass.length; i++) {
-                    scoreboxes += "<div style='display: inline-block'>";
-                    for(var j = 0; j < window.numPackets[i]; j++) {
-                        var s = scores[window.dClass[i]][j];
-                        if(scores[window.dClass[i]][j] >= 0 && scores[window.dClass[i]][j] < 8)
-                          s = (scores[window.dClass[i]][j] & 1) + (scores[window.dClass[i]][j] & 2)/2 + (scores[window.dClass[i]][j] & 4)/4;
-                        var content = "" + ((j == window.numPackets[i] - 1 && answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "?" : s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
-                        scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
-                    }
-                    scoreboxes += "</div>";
+    function renderBoxes() {
+      for(var teamid of Object.keys(window.teamNames)) {
+        document.getElementById("liveboxes").innerHTML += "<div id='scoreboxes"+teamid+"'></div>";
+        (function(teamid){
+        fb.child("answers").child(teamid).once("value", function(snap){
+          if(snap.val()) {
+            var passcode = Object.keys(snap.val())[0];
+            var answersFB = fb.child("answers").child(teamid).child(passcode);
+            var scoresFB = fb.child("scores").child("team" + teamid);
+            scoresFB.on('value', function(snapshot) {
+                if(!snapshot.val()) {
+                    var scores = {};
+                    for(var i = 0 ; i < window.dClass.length; i++)
+                        scores[window.dClass[i]] = new Array(window.numPackets[i]).fill(-1);
+                    scoresFB.set(scores);
+                } else {
+                    var scores = snapshot.val();
                 }
-                document.getElementById("scoreboxes"+teamid).innerHTML = teamid+scoreboxes;
-              });
-          });
-        }
-      });
-      })(teamid);
+                answersFB.off('value');
+                answersFB.on('value', function(snapshot2) {
+                  var answers = snapshot2.val();
+                  if(!answers) answers = {};
+                  for(var i = 0; i < window.dClass.length; i++)
+                    if(!answers[window.dClass[i]]) answers[window.dClass[i]] = [];
+                  var scoreboxes = "";
+                  for(var i = 0; i < window.dClass.length; i++) {
+                      scoreboxes += "<div style='display: inline-block'>";
+                      for(var j = 0; j < window.numPackets[i]; j++) {
+                          var s = scores[window.dClass[i]][j];
+                          if(scores[window.dClass[i]][j] >= 0 && scores[window.dClass[i]][j] < 8)
+                            s = (scores[window.dClass[i]][j] & 1) + (scores[window.dClass[i]][j] & 2)/2 + (scores[window.dClass[i]][j] & 4)/4;
+                          var content = "" + ((j == window.numPackets[i] - 1 && answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "?" : s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
+                          scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
+                      }
+                      scoreboxes += "</div>";
+                  }
+                  document.getElementById("scoreboxes"+teamid).innerHTML = teamid + " (" + teamNames[teamid].name + ") " + scoreboxes;
+                });
+            });
+          }
+        });
+        })(teamid);
+      }
+    }
+    function setEstimation() {
+      // Do Estimation scores
+      fb.child("estimation").once("value", function(snap){
+        fb.child("answers").once("value", function(snap){
+            // Parsing from the database
+            var answers = snap.val();
+            // console.log(answers)
+            var q1map = {}, q2map = {}, q3map = {};
+            var q1score = {}, q2score = {}, q3score = {};
+            Object.entries(answers).forEach(([teamid, t])=>{
+                if(t[Object.keys(t)[0]]["hard"] && t[Object.keys(t)[0]]["hard"][11]) {
+                    q1map[teamid] = t[Object.keys(t)[0]]["hard"][11]["q1"];
+                    q2map[teamid] = t[Object.keys(t)[0]]["hard"][11]["q2"];
+                    q3map[teamid] = t[Object.keys(t)[0]]["hard"][11]["q3"];
+                }
+            });
+
+            // Question 1
+            var product = BigInt(1);
+            for (const [teamid, answer] of Object.entries(q1map)) {
+                try{
+                    if(BigInt(answer) > 0) {
+                        product *= BigInt(answer);
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+            console.log("Q1 product was", product, "with", BigInt(product.toString().length), "digits");
+            for (const [teamid, answer] of Object.entries(q1map)) {
+                try{
+                    if(BigInt(answer) > 0) {
+                        q1score[teamid] = Math.max(0, Math.ceil(15 - Math.abs(Number(BigInt(product.toString().length) - BigInt(answer)))))
+                    } else {
+                        q1score[teamid] = 0;
+                    }
+                } catch(e) {
+                    console.error(e);
+                    q1score[teamid] = 0;
+                }
+            }
+
+            // Question 2
+            for (const [teamid, answer] of Object.entries(q2map)) {
+                if(!isNaN(Number(answer))) {
+                    q2score[teamid] = Math.max(0, Math.ceil(15 - 2 * Math.abs(40 - Number(answer))));
+                } else {
+                    q2score[teamid] = 0;
+                }
+            }
+
+            // Question 3
+            for (const [teamid, answer] of Object.entries(q3map)) {
+                if(!isNaN(Number(answer))) {
+                    q3score[teamid] = Math.max(0, Math.ceil(15 - Math.log(5157593983596118591 / Number(answer))));
+                    if(isNaN(q3score[teamid])) // If someone enters zero or something, it'll give you a Not a Number (NaN)
+                        q3score[teamid] = 0;
+                } else {
+                    q3score[teamid] = 0;
+                }
+            }
+
+            // Set the scores in the database
+            for(const teamid of Object.keys(answers)) {
+                console.log(teamid, q1score[teamid], q2score[teamid], q3score[teamid]);
+                fb.child("scores").child("team"+teamid).child("hard").child(11).set((q1score[teamid] || 0) + (q2score[teamid] || 0) + (q3score[teamid] || 0));
+            }
+        })
+      })
+    }
+    function resetEstimation() {
+      // Reset Estimation scores
+      fb.child("answers").once("value", function(snap){
+          var answers = snap.val();
+          for(const teamid of Object.keys(answers)) {
+              fb.child("scores").child("team"+teamid).child("hard").child(11).set(0);
+          }
+      })
     }
   </script>
   <style>
