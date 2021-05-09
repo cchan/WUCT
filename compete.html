@@ -10,9 +10,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-  <script src="common.min.js?1620510513557"></script>
+  <script src="common.min.js?1620524182509"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620510513557" />
+  <link rel="stylesheet" href="main.css?1620524182509" />
 </head>
 <body>
   <header>
@@ -25,6 +25,7 @@
     <div>Team ID: <input type="text" id="teamid"></div>
     <div>Passcode: <input type="password" id="passcode"></div>
     <div><input type="submit" id="loginbtn"></div>
+    <div>Your access link can be found at the link in your confirmation email!</div>
   </form>
   
   <!--span id="login-status"></span-->
@@ -532,8 +533,9 @@
     }
 
     (function(){
-        var teamid = Cookies.get("teamid");
-        var passcode = Cookies.get("passcode");
+        const urlParams = new URLSearchParams(window.location.search);
+        var teamid = urlParams.get('id') || Cookies.get("teamid");
+        var passcode = urlParams.get('code') || Cookies.get("passcode");
         tryLogin(teamid, passcode);
     })()
   </script>
