@@ -25,6 +25,7 @@
     <div>Team ID: <input type="text" id="teamid"></div>
     <div>Passcode: <input type="password" id="passcode"></div>
     <div><input type="submit" id="loginbtn"></div>
+    <div>Your access link can be found at the link in your confirmation email!</div>
   </form>
   
   <!--span id="login-status"></span-->
@@ -532,8 +533,9 @@
     }
 
     (function(){
-        var teamid = Cookies.get("teamid");
-        var passcode = Cookies.get("passcode");
+        const urlParams = new URLSearchParams(window.location.search);
+        var teamid = urlParams.get('id') || Cookies.get("teamid");
+        var passcode = urlParams.get('code') || Cookies.get("passcode");
         tryLogin(teamid, passcode);
     })()
   </script>

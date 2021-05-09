@@ -349,7 +349,7 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
         
         document.getElementById("notside").style.display = "none";
         document.getElementById("side").style.display = "block";
-        document.getElementById("pdf").src = window.ak[dClass[d]];
+        document.getElementById("pdf").src = window.ak[dClass[d]][n];
         document.getElementById("pdfansbox_title").innerText = teamname + ": " + dTitle[d] + " " + (n+1)
         document.getElementById("q1").value = ans["q1"] || "";
         document.getElementById("q2").value = ans["q2"] || "";
