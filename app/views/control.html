@@ -260,9 +260,9 @@
                +"<th>Submitted "+window.dTitle[2]+" packets (of "+window.numPackets[2]+" total)</th>"
                +"</tr>";
         var prevRank = 0;
-        console.log("??", scores)
+        // console.log("??", scores)
         for(let i = 0; i < scores.length; i++){
-          console.log(teamNames);
+          // console.log(teamNames);
           if(teamNames[parseInt(scores[i].id.slice(4))] === undefined)
             continue;
           if(i > 0 && scores[i].score != scores[i-1].score)

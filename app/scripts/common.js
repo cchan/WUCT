@@ -30,7 +30,7 @@ window.scoresPerQuestion = [
 
 window.getScore = function(scores){
   var totalScore = 0;
-  for(var i = 0; i < window.dClass.length; i++)
+  for(var i = 0; i < window.dClass.length; i++) {
     totalScore += (scores[window.dClass[i]] || scores[i] || []).map(function(a, n){
       var packetScore = 0;
       if(a < 0)
@@ -49,6 +49,7 @@ window.getScore = function(scores){
         packetScore += window.scoresPerQuestion[n][2];
       return packetScore;
     }).reduce(function(a,b){return a+b;}, 0);
+  }
   return totalScore;
 }
 window.getProgress = function(scores){
