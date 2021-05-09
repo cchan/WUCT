@@ -294,7 +294,7 @@
     document.getElementById("logout").onclick = function(e) {
         logout();
         alertFailure("Logged out.");
-        window.location.reload();
+        window.location = window.location.split("?")[0];
         e.preventDefault();
         return false;
     }
