@@ -10,9 +10,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-  <script src="common.min.js?1620526250729"></script>
+  <script src="common.min.js?1620568906693"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620526250729" />
+  <link rel="stylesheet" href="main.css?1620568906693" />
 </head>
 <body>
   <header>
@@ -360,7 +360,7 @@
                       var s = scores[window.dClass[i]][j];
                       if(scores[window.dClass[i]][j] >= 0 && scores[window.dClass[i]][j] < 8)
                         s = (scores[window.dClass[i]][j] & 1) + (scores[window.dClass[i]][j] & 2)/2 + (scores[window.dClass[i]][j] & 4)/4;
-                      var content = "" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
+                      var content = "" + ((j == window.numPackets[i] - 1 && answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "?" : s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
                       scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
                       if(j == window.numPackets[i] - 1 && content != "") {
                         document.getElementById("start"+window.dClass[i]).disabled = true;
