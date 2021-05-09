@@ -481,7 +481,10 @@
                         continue;
                     if(i > 0 && scores[i].score != scores[i-1].score)
                         prevRank = i;
-                    
+
+                    if(scores[i].score == 0 && scores[i].progress[2] == 0)
+                      break;
+
                     s += "<li"+(id == Cookies.get("teamid")?" style='font-weight:bold'":"")+">" + (prevRank + 1) + ". " + window.teamNames[id].name + "<span>" + scores[i].score + "</span><div></div>"
                     // s += "<span class='progress easy' style='width:"+scores[i].progress[0]*33+"%'></span>"
                     // s += "<span class='progress medium' style='width:"+scores[i].progress[1]*34+"%'></span>"
