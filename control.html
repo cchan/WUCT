@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1620590281075"></script>
+  <script src="common.min.js?1620622739715"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620590281075" />
+  <link rel="stylesheet" href="main.css?1620622739715" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -36,9 +36,10 @@
     <p>This tracks all currently active scoring stations and all teams that they are tracking. Scoring stations may identify themselves using the Identifier textbox in the scoring page header. Use the 'x' to remove stray scoring stations (which forces them to log out).</p>
     <div id="stations"></div>
 
-    <!-- <h2>Estimation Round (Round 12)</h2>
+    <h2>Estimation Round (Round 12)</h2>
+    <p><b>DON'T CLICK THIS UNTIL TIME IS UP! It'll end everyone's answer entry.</b></p>
     <button onclick="setEstimation(); return false;">Set Estimation Round Scores</button>
-    <button onclick="resetEstimation(); return false;">Reset Estimation Round Scores to 0</button> -->
+    <button onclick="resetEstimation(); return false;">Reset Estimation Round Scores to 0</button>
     
     <h2>Teams</h2>
     <p>Note that changing a team's passcode locks them out immediately (and confuses their browser a bit).</p>
@@ -441,6 +442,7 @@
     function setEstimation() {
       // Do Estimation scores
       fb.child("estimation").once("value", function(snap){
+        var true_answers = snap.val();
         fb.child("answers").once("value", function(snap){
             // Parsing from the database
             var answers = snap.val();
@@ -483,7 +485,7 @@
             // Question 2
             for (const [teamid, answer] of Object.entries(q2map)) {
                 if(!isNaN(Number(answer))) {
-                    q2score[teamid] = Math.max(0, Math.ceil(15 - 2 * Math.abs(40 - Number(answer))));
+                    q2score[teamid] = Math.max(0, Math.ceil(15 - 2 * Math.abs(Number(true_answers["q2"]) - Number(answer))));
                 } else {
                     q2score[teamid] = 0;
                 }
@@ -492,7 +494,7 @@
             // Question 3
             for (const [teamid, answer] of Object.entries(q3map)) {
                 if(!isNaN(Number(answer))) {
-                    q3score[teamid] = Math.max(0, Math.ceil(15 - Math.log(5157593983596118591 / Number(answer))));
+                    q3score[teamid] = Math.max(0, Math.ceil(15 - Math.log(Number(true_answers["q3"]) / Number(answer))));
                     if(isNaN(q3score[teamid])) // If someone enters zero or something, it'll give you a Not a Number (NaN)
                         q3score[teamid] = 0;
                 } else {
@@ -513,7 +515,7 @@
       fb.child("answers").once("value", function(snap){
           var answers = snap.val();
           for(const teamid of Object.keys(answers)) {
-              fb.child("scores").child("team"+teamid).child("hard").child(11).set(0);
+              fb.child("scores").child("team"+teamid).child("hard").child(11).set(-1);
           }
       })
     }
