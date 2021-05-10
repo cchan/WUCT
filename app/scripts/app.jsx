@@ -96,7 +96,7 @@ class DifficultySection extends React.Component {
       <span className={"difficulty "+dClass[this.props.difficulty]}>
         <Button className="back" onClick={this.back.bind(this)} disabled={this.state.currentQuestion <= 0}>&lt;</Button>
         <Button className="next" onClick={this.next.bind(this)} disabled={this.state.currentQuestion >= numPackets[this.props.difficulty] - 1 || this.state.scores[this.state.currentQuestion] == -1}>&gt;</Button>
-        <h3><button disabled={!this.state.submitted[this.state.currentQuestion] || this.state.currentQuestion == numPackets[this.props.difficulty] - 1} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.teamName, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>
+        <h3><button disabled={!this.state.submitted[this.state.currentQuestion]} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.teamName, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>
         {/* <RadioBtnGroup selected={this.state.scores[this.state.currentQuestion]} scoreHandler={this.scoreHandler.bind(this)} xdisabled={this.state.currentQuestion < numPackets[this.props.difficulty] - 1 && this.state.scores[this.state.currentQuestion + 1] != -1} /> */}
       </span>
     );
@@ -361,6 +361,7 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
           fb.child("answers").off();
           document.getElementById("scoresubmit").onclick = null;
         }
+        document.getElementById("scoresubmit").disabled = (n == 11);
         document.getElementById("scoresubmit").onclick = function(e) {
           var score = (document.getElementById("q1c").checked ? 1 : 0)
                     + (document.getElementById("q2c").checked ? 2 : 0)
