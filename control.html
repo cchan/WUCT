@@ -8,14 +8,14 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1620622864496"></script>
+  <script src="common.min.js?1648521770552"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620622864496" />
+  <link rel="stylesheet" href="main.css?1648521770552" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
   <header>
-    <h1><img src="lmtlogowhite.svg" alt="LMT" />Guts Round: Control Panel</h1>
+    <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round: Control Panel</h1>
     <div style="float: right; display:inline-block; padding: 0.5em" id="not-logged-in">Log in to make changes and see all data: <input type="password" id="password"><button id="passsubmit" style="background-color: white;">Go</button>.</div>
     <a href="#"  style="float: right; display: none" id="logout" onClick="window.signOut()">LOG OUT [admin]</a>
   </header>
@@ -35,11 +35,6 @@
     <h2>Active Scoring Stations <sup><small><a href="https://github.com/cchan/WUCT/issues">beta</a></small></sup></h2>
     <p>This tracks all currently active scoring stations and all teams that they are tracking. Scoring stations may identify themselves using the Identifier textbox in the scoring page header. Use the 'x' to remove stray scoring stations (which forces them to log out).</p>
     <div id="stations"></div>
-
-    <h2>Estimation Round (Round 12)</h2>
-    <p><b>DON'T CLICK THIS UNTIL TIME IS UP! It'll end everyone's answer entry.</b></p>
-    <button onclick="setEstimation(); return false;">Set Estimation Round Scores</button>
-    <button onclick="resetEstimation(); return false;">Reset Estimation Round Scores to 0</button>
     
     <h2>Teams</h2>
     <p>Note that changing a team's passcode locks them out immediately (and confuses their browser a bit).</p>
@@ -74,7 +69,7 @@
     };
 
     firebase.auth().onAuthStateChanged(function(user){
-      if (user && user.email == 'lmt@clive.io') {
+      if (user && user.email == 'wuct@clive.io') {
           document.getElementById("not-logged-in").style.display = "none";
           document.getElementById("logout").style.display = "inline-block";
       }
@@ -103,7 +98,7 @@
               var old = {"created": ""+new Date()};
               if(obj && Object.keys(obj).length)
                 old = obj[Object.keys(obj)[0]];
-              // console.log(old);
+              console.log(old);
 
               fb.child('answers').child(newid).set({[newpasscode]: old}).then(function(){
                 renderTeams();
@@ -223,7 +218,6 @@
         fb.child("users").once('value', updateStations);
         renderTeams();
         renderTable();
-        renderBoxes();
         flashGreen(document.getElementById("teamlist"));
         flashGreen(document.getElementById("scoreboard-updated"));
       });
@@ -239,6 +233,7 @@
           }
         }
         scores.sort(function(a,b){return b.score - a.score;});
+        console.log("!!", scores)
         renderTable();
         flashGreen(document.getElementById("scoreboard-updated"));
       });
@@ -260,26 +255,26 @@
       
       function renderTable(){
         var s = "<tr><th>Rank</th><th>Team ID</th><th>Team Name</th><th>Total Score</th>"
-              //  +"<th>Submitted "+window.dTitle[0]+" packets (of "+window.numPackets[0]+" total)</th>"
-              //  +"<th>Submitted "+window.dTitle[1]+" packets (of "+window.numPackets[1]+" total)</th>"
+               +"<th>Submitted "+window.dTitle[0]+" packets (of "+window.numPackets[0]+" total)</th>"
+               +"<th>Submitted "+window.dTitle[1]+" packets (of "+window.numPackets[1]+" total)</th>"
                +"<th>Submitted "+window.dTitle[2]+" packets (of "+window.numPackets[2]+" total)</th>"
                +"</tr>";
         var prevRank = 0;
-        // console.log("??", scores)
+        console.log("??", scores)
         for(let i = 0; i < scores.length; i++){
-          // console.log(teamNames);
+          console.log(teamNames);
           if(teamNames[parseInt(scores[i].id.slice(4))] === undefined)
             continue;
           if(i > 0 && scores[i].score != scores[i-1].score)
             prevRank = i;
           
           s += "<tr><td>" + (prevRank + 1) + "</td><td>"+scores[i].id.slice(4)+"</td><td>" + teamNames[parseInt(scores[i].id.slice(4))].name + "</td><td>" + scores[i].score + "</td>";
-          // s += "<td>"+(scores[i].progress[0]*window.numPackets[0])+"</td>";
-          // s += "<td>"+(scores[i].progress[1]*window.numPackets[1])+"</td>";
+          s += "<td>"+(scores[i].progress[0]*window.numPackets[0])+"</td>";
+          s += "<td>"+(scores[i].progress[1]*window.numPackets[1])+"</td>";
           s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
           s += "</tr>";
         }
-        // console.log(s)
+        console.log(s)
         document.getElementById('scoreboard').innerHTML = "<table id='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
 
         document.querySelector('#clickselectall').onfocus = function(e) {
@@ -350,7 +345,7 @@
               tracking.forEach(x => allTracked.add(parseInt(x)));
             })(u);
       }
-      // console.log(window.teamNames)
+      console.log(window.teamNames)
       $('#stations').append($("<div>").append("<b>Untracked teams:</b> ")
       .append(Object.keys(window.teamNames).map(x=>parseInt(x)).filter(x => !allTracked.has(x)).map(t=>
                         $('<span class="teamid">').text(t)
@@ -372,7 +367,7 @@
       if(window.cancelAuthStateChanged)
         return;
       if (user) {
-        if(user.email != 'lmt@clive.io')
+        if(user.email != 'wuct@clive.io')
           window.signOut();
         else
           document.getElementById('app').style.display='block';
@@ -387,7 +382,7 @@
       if(!password)
         alertFailure('failed to sign in');
       else
-        firebase.auth().signInWithEmailAndPassword('lmt@clive.io', password).then(function(){
+        firebase.auth().signInWithEmailAndPassword('wuct@clive.io', password).then(function(){
           window.location.reload()
         }).catch(function(error){
           alertFailure('failed to sign in');
@@ -395,129 +390,45 @@
       e.preventDefault();
       return false;
     };
-    function renderBoxes() {
-      for(var teamid of Object.keys(window.teamNames)) {
-        document.getElementById("liveboxes").innerHTML += "<div id='scoreboxes"+teamid+"'></div>";
-        (function(teamid){
-        fb.child("answers").child(teamid).once("value", function(snap){
-          if(snap.val()) {
-            var passcode = Object.keys(snap.val())[0];
-            var answersFB = fb.child("answers").child(teamid).child(passcode);
-            var scoresFB = fb.child("scores").child("team" + teamid);
-            scoresFB.on('value', function(snapshot) {
-                if(!snapshot.val()) {
-                    var scores = {};
-                    for(var i = 0 ; i < window.dClass.length; i++)
-                        scores[window.dClass[i]] = new Array(window.numPackets[i]).fill(-1);
-                    scoresFB.set(scores);
-                } else {
-                    var scores = snapshot.val();
-                }
-                answersFB.off('value');
-                answersFB.on('value', function(snapshot2) {
-                  var answers = snapshot2.val();
-                  if(!answers) answers = {};
-                  for(var i = 0; i < window.dClass.length; i++)
-                    if(!answers[window.dClass[i]]) answers[window.dClass[i]] = [];
-                  var scoreboxes = "";
-                  for(var i = 0; i < window.dClass.length; i++) {
-                      scoreboxes += "<div style='display: inline-block'>";
-                      for(var j = 0; j < window.numPackets[i]; j++) {
-                          var s = scores[window.dClass[i]][j];
-                          if(scores[window.dClass[i]][j] >= 0 && scores[window.dClass[i]][j] < 8)
-                            s = (scores[window.dClass[i]][j] & 1) + (scores[window.dClass[i]][j] & 2)/2 + (scores[window.dClass[i]][j] & 4)/4;
-                          var content = "" + ((j == window.numPackets[i] - 1 && answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "?" : s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
-                          scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
-                      }
-                      scoreboxes += "</div>";
-                  }
-                  document.getElementById("scoreboxes"+teamid).innerHTML = teamid + " (" + teamNames[teamid].name + ") " + scoreboxes;
-                });
-            });
-          }
-        });
-        })(teamid);
-      }
-    }
-    function setEstimation() {
-      // Do Estimation scores
-      fb.child("estimation").once("value", function(snap){
-        var true_answers = snap.val();
-        fb.child("answers").once("value", function(snap){
-            // Parsing from the database
-            var answers = snap.val();
-            // console.log(answers)
-            var q1map = {}, q2map = {}, q3map = {};
-            var q1score = {}, q2score = {}, q3score = {};
-            Object.entries(answers).forEach(([teamid, t])=>{
-                if(t[Object.keys(t)[0]]["hard"] && t[Object.keys(t)[0]]["hard"][11]) {
-                    q1map[teamid] = t[Object.keys(t)[0]]["hard"][11]["q1"];
-                    q2map[teamid] = t[Object.keys(t)[0]]["hard"][11]["q2"];
-                    q3map[teamid] = t[Object.keys(t)[0]]["hard"][11]["q3"];
-                }
-            });
-
-            // Question 1
-            var product = BigInt(1);
-            for (const [teamid, answer] of Object.entries(q1map)) {
-                try{
-                    if(BigInt(answer) > 0) {
-                        product *= BigInt(answer);
+    for(var teamid = 1; teamid <= 44; teamid++) {
+      document.getElementById("liveboxes").innerHTML += "<div id='scoreboxes"+teamid+"'></div>";
+      (function(teamid){
+      fb.child("answers").child(teamid).once("value", function(snap){
+        if(snap.val()) {
+          var passcode = Object.keys(snap.val())[0];
+          var answersFB = fb.child("answers").child(teamid).child(passcode);
+          var scoresFB = fb.child("scores").child("team" + teamid);
+          scoresFB.on('value', function(snapshot) {
+              if(!snapshot.val()) {
+                  var scores = {};
+                  for(var i = 0 ; i < window.dClass.length; i++)
+                      scores[window.dClass[i]] = new Array(window.numPackets[i]).fill(-1);
+                  scoresFB.set(scores);
+              } else {
+                  var scores = snapshot.val();
+              }
+              answersFB.off('value');
+              answersFB.on('value', function(snapshot2) {
+                var answers = snapshot2.val();
+                if(!answers) answers = {};
+                for(var i = 0; i < window.dClass.length; i++)
+                  if(!answers[window.dClass[i]]) answers[window.dClass[i]] = [];
+                var scoreboxes = "";
+                for(var i = 0; i < window.dClass.length; i++) {
+                    scoreboxes += "<div style='display: inline-block'>";
+                    for(var j = 0; j < window.numPackets[i]; j++) {
+                        var s = scores[window.dClass[i]][j];
+                        var content = "" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
+                        scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
                     }
-                } catch(e) {
-                    console.error(e);
+                    scoreboxes += "</div>";
                 }
-            }
-            console.log("Q1 product was", product, "with", BigInt(product.toString().length), "digits");
-            for (const [teamid, answer] of Object.entries(q1map)) {
-                try{
-                    if(BigInt(answer) > 0) {
-                        q1score[teamid] = Math.max(0, Math.ceil(15 - Math.abs(Number(BigInt(product.toString().length) - BigInt(answer)))))
-                    } else {
-                        q1score[teamid] = 0;
-                    }
-                } catch(e) {
-                    console.error(e);
-                    q1score[teamid] = 0;
-                }
-            }
-
-            // Question 2
-            for (const [teamid, answer] of Object.entries(q2map)) {
-                if(!isNaN(Number(answer))) {
-                    q2score[teamid] = Math.max(0, Math.ceil(15 - 2 * Math.abs(Number(true_answers["q2"]) - Number(answer))));
-                } else {
-                    q2score[teamid] = 0;
-                }
-            }
-
-            // Question 3
-            for (const [teamid, answer] of Object.entries(q3map)) {
-                if(!isNaN(Number(answer))) {
-                    q3score[teamid] = Math.max(0, Math.ceil(15 - Math.log(Number(true_answers["q3"]) / Number(answer))));
-                    if(isNaN(q3score[teamid])) // If someone enters zero or something, it'll give you a Not a Number (NaN)
-                        q3score[teamid] = 0;
-                } else {
-                    q3score[teamid] = 0;
-                }
-            }
-
-            // Set the scores in the database
-            for(const teamid of Object.keys(answers)) {
-                console.log(teamid, q1score[teamid], q2score[teamid], q3score[teamid]);
-                fb.child("scores").child("team"+teamid).child("hard").child(11).set((q1score[teamid] || 0) + (q2score[teamid] || 0) + (q3score[teamid] || 0));
-            }
-        })
-      })
-    }
-    function resetEstimation() {
-      // Reset Estimation scores
-      fb.child("answers").once("value", function(snap){
-          var answers = snap.val();
-          for(const teamid of Object.keys(answers)) {
-              fb.child("scores").child("team"+teamid).child("hard").child(11).set(-1);
-          }
-      })
+                document.getElementById("scoreboxes"+teamid).innerHTML = teamid+scoreboxes;
+              });
+          });
+        }
+      });
+      })(teamid);
     }
   </script>
   <style>

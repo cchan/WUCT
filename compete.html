@@ -3,20 +3,20 @@
   <script src="//d2wy8f7a9ursnm.cloudfront.net/v5/bugsnag.min.js"></script>
   <script>window.bugsnagClient = bugsnag('e68a9c7e8df6ed36d155702829ec5705')</script>
 
-  <title>LMT Guts Round</title>
+  <title>WUCT Breaking Bonds Round</title>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-  <script src="common.min.js?1620622864496"></script>
+  <script src="common.min.js?1648521770552"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620622864496" />
+  <link rel="stylesheet" href="main.css?1648521770552" />
 </head>
 <body>
   <header>
-    <h1><img src="lmtlogowhite.svg" alt="LMT" />Guts Round</h1>
+    <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round</h1>
     <a id="teamname" href="/compete.html">(loading team info...)</a><a href="/index.html">scoreboard</a></span>
     <div style="float: right; white-space: nowrap;"><span id="timer"></span><a id="logout" href="#">LOG OUT</a></div>
   </header>
@@ -25,7 +25,6 @@
     <div>Team ID: <input type="text" id="teamid"></div>
     <div>Passcode: <input type="password" id="passcode"></div>
     <div><input type="submit" id="loginbtn"></div>
-    <div>Your access link can be found at the link in your confirmation email!</div>
   </form>
   
   <!--span id="login-status"></span-->
@@ -41,11 +40,10 @@
           </ul>
         </div>
         <div id="buttons">
-            <button id="starteasy" style="display:none" class="easy selectbox" onclick="if(confirm('Start an easy packet?'))startPacket('easy'); return false">+<span class="desc">start easy packet</span></button>
-            <button id="startmedium" style="display:none" class="medium selectbox" onclick="if(confirm('Start a medium packet?'))startPacket('medium'); return false">+<span class="desc">start medium packet</span></button>
-            <button id="starthard" class="hard selectbox" onclick="if(confirm('Start a packet?'))startPacket('hard'); return false">+<span class="desc">start packet</span></button>
+            <button id="starteasy" class="easy selectbox" onclick="if(confirm('Start an easy packet?'))startPacket('easy'); return false">+<span class="desc">start easy packet</span></button>
+            <button id="startmedium" class="medium selectbox" onclick="if(confirm('Start a medium packet?'))startPacket('medium'); return false">+<span class="desc">start medium packet</span></button>
+            <button id="starthard" class="hard selectbox" onclick="if(confirm('Start a hard packet?'))startPacket('hard'); return false">+<span class="desc">start hard packet</span></button>
             <p>Click to start a packet! Remember that once your team starts a packet, <b>you must submit before moving on to the next</b>.</p>
-            <p>The boxes at the top of the screen show how many questions you answered correctly (out of 3) on each packet.</p>
         </div>
         <div id="app"></div>
     </div>
@@ -73,7 +71,7 @@
     }
     header{
       height: 3em;
-      background-color: rgb(21,97,173);
+      background-color: #255D38;
       color: white;
       text-align: left;
     }
@@ -86,14 +84,10 @@
       height: 1.9em;
       vertical-align: top;
       margin-right: 1em;
-      padding: 0.2em;
-      box-sizing: border-box;
     }
     body>h1 img{
       height: 1.6em;
       vertical-align: -0.143em;
-      padding: 0.2em;
-      box-sizing: border-box;
     }
     body>h1{
       margin:0;
@@ -138,16 +132,14 @@
     #app ol li span.progress.easy{
       background: #0f0;
       left: 0%;
-      display:none;
     }
     #app ol li span.progress.medium{
       background: #09f;
       left: 33%;
-      display:none;
     }
     #app ol li span.progress.hard{
       background: #f00;
-      left: 0%;
+      left: 67%;
     }
     #app ol li span{
       float: right;
@@ -258,8 +250,10 @@
 
     function tryLogin(teamid, passcode){
         if(teamid && passcode) {
+            console.log(teamid, passcode, "null", null)
             fb.child("answers").child(teamid).child(passcode).once('value', function(snapshot){
                 if(snapshot.val()) {
+                    console.log("hi")
                     Cookies.set("teamid", teamid);
                     Cookies.set("passcode", passcode);
                     window.globalClasses[0] = "loggedIn";
@@ -292,7 +286,7 @@
     document.getElementById("logout").onclick = function(e) {
         logout();
         alertFailure("Logged out.");
-        window.location = window.location.split("?")[0];
+        window.location.reload();
         e.preventDefault();
         return false;
     }
@@ -356,9 +350,7 @@
                   scoreboxes += "<div style='display: inline-block'>";
                   for(var j = 0; j < window.numPackets[i]; j++) {
                       var s = scores[window.dClass[i]][j];
-                      if(scores[window.dClass[i]][j] >= 0 && scores[window.dClass[i]][j] < 8)
-                        s = (scores[window.dClass[i]][j] & 1) + (scores[window.dClass[i]][j] & 2)/2 + (scores[window.dClass[i]][j] & 4)/4;
-                      var content = "" + ((j == window.numPackets[i] - 1 && answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "?" : s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
+                      var content = "" + (s >= 0 ? s : (answers[window.dClass[i]][j] && answers[window.dClass[i]][j]["submit"]) ? "&hellip;" : (window.dClass[i] + j == answers["currPacket"]) ? "+" : "");
                       scoreboxes += "<div class='scorebox "+window.dClass[i]+(content?" filled":"")+(content=="+"?" plus":"")+"'>" + content + "</div>";
                       if(j == window.numPackets[i] - 1 && content != "") {
                         document.getElementById("start"+window.dClass[i]).disabled = true;
@@ -384,11 +376,11 @@
               answersFB.child("currPacket").on("value", function(snap) {
                 var c = snap.val();
                 document.getElementById("answersubmit").onclick = null;
-                // console.log("currPacket", c)
+                console.log("currPacket", c)
                 if(c) {
                   var difficulty = c.match(/[^\d]+/)[0];
                   var n = parseInt(c.match(/\d+/)[0]);
-                  document.getElementById("questionname").innerText = "Packet " + (n+1);
+                  document.getElementById("questionname").innerText = difficulty.charAt(0).toUpperCase() + difficulty.slice(1) + " " + (n+1);
                   fb.child('questions').off();
                   fb.child('questions').child(difficulty).child(n).on("value", function(snap) {
                     document.getElementById("pdf").src = snap.val()
@@ -443,7 +435,7 @@
                 var n = val.findIndex(e=>!e || !e["submit"]);
                 if(n == -1)
                   n = val.length;
-                // console.log("Starting", difficulty, n)
+                console.log("Starting", difficulty, n)
                 document.getElementById("answersubmit").onclick = null;
                 if(n >= window.numPacketsDict[difficulty])
                   alertFailure("Unable to start packet - there are no more " + difficulty + " packets")
@@ -481,14 +473,11 @@
                         continue;
                     if(i > 0 && scores[i].score != scores[i-1].score)
                         prevRank = i;
-
-                    if(scores[i].score == 0 && scores[i].progress[2] == 0)
-                      break;
-
+                    
                     s += "<li"+(id == Cookies.get("teamid")?" style='font-weight:bold'":"")+">" + (prevRank + 1) + ". " + window.teamNames[id].name + "<span>" + scores[i].score + "</span><div></div>"
-                    // s += "<span class='progress easy' style='width:"+scores[i].progress[0]*33+"%'></span>"
-                    // s += "<span class='progress medium' style='width:"+scores[i].progress[1]*34+"%'></span>"
-                    s += "<span class='progress hard' style='width:"+scores[i].progress[2]*100+"%'></span>"
+                    s += "<span class='progress easy' style='width:"+scores[i].progress[0]*33+"%'></span>"
+                    s += "<span class='progress medium' style='width:"+scores[i].progress[1]*34+"%'></span>"
+                    s += "<span class='progress hard' style='width:"+scores[i].progress[2]*33+"%'></span>"
                     s += "</li>";
                 }
                 document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
@@ -534,9 +523,8 @@
     }
 
     (function(){
-        const urlParams = new URLSearchParams(window.location.search);
-        var teamid = urlParams.get('id') || Cookies.get("teamid");
-        var passcode = urlParams.get('code') || Cookies.get("passcode");
+        var teamid = Cookies.get("teamid");
+        var passcode = Cookies.get("passcode");
         tryLogin(teamid, passcode);
     })()
   </script>

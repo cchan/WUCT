@@ -3,23 +3,23 @@
   <script src="//d2wy8f7a9ursnm.cloudfront.net/v5/bugsnag.min.js"></script>
   <script>window.bugsnagClient = bugsnag('e68a9c7e8df6ed36d155702829ec5705')</script>
 
-  <title>LMT Guts Round</title>
+  <title>WUCT Breaking Bonds Round</title>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1620622864496"></script>
+  <script src="common.min.js?1648521770552"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1620622864496" />
+  <link rel="stylesheet" href="main.css?1648521770552" />
 </head>
 <body>
   <header>
-    <h1><img src="lmtlogowhite.svg" alt="LMT" />Guts Round</h1>
+    <h1><img src="wuct.png" alt="WUCT" />Breaking Bonds Round</h1>
     <a id="teamname" href="/compete.html">compete</a><a href="/index.html">scoreboard</a></span>
   </header>
   
-  <h1><img src="lmtlogo.svg" alt="LMT" /></h1>
+  <h1><img src="wuct_bw.png" alt="WUCT" /></h1>
   
   <div id="timer"></div>
   
@@ -36,8 +36,6 @@
     body>h1 img{
       height: 1.6em;
       vertical-align: -0.143em;
-      padding: 0.2em;
-      box-sizing: border-box;
     }
     #app{
       padding: 2em;
@@ -81,16 +79,14 @@
     #app ol li span.progress.easy{
       background: #0f0;
       left: 0%;
-      display: none;
     }
     #app ol li span.progress.medium{
       background: #09f;
       left: 33%;
-      display: none;
     }
     #app ol li span.progress.hard{
       background: #f00;
-      left: 0%;
+      left: 67%;
     }
     #app ol li span{
       float: right;
@@ -154,12 +150,10 @@
           if(i > 0 && scores[i].score != scores[i-1].score)
             prevRank = i;
           
-          if(scores[i].score == 0 && scores[i].progress[2] == 0)
-            break;
           s += "<li>" + (prevRank + 1) + ". " + window.teamNames[id].name + "<span>" + scores[i].score + "</span><div></div>"
-          // s += "<span class='progress easy' style='width:"+scores[i].progress[0]*33+"%'></span>"
-          // s += "<span class='progress medium' style='width:"+scores[i].progress[1]*34+"%'></span>"
-          s += "<span class='progress hard' style='width:"+scores[i].progress[2]*100+"%'></span>"
+          s += "<span class='progress easy' style='width:"+scores[i].progress[0]*33+"%'></span>"
+          s += "<span class='progress medium' style='width:"+scores[i].progress[1]*34+"%'></span>"
+          s += "<span class='progress hard' style='width:"+scores[i].progress[2]*33+"%'></span>"
           s += "</li>";
         }
         document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
