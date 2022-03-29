@@ -27,3 +27,4 @@ Probably the lowest code quality codebase I have ever written, oops.
     - <year>/ak/<difficulty> = https://public/google/drive/url
         - or <year>/ak/<difficulty>/<question_num> = https://public/google/drive/url, but every question_num must be present or it'll break
     - <year>/questions/<difficulty>/<question_num> = https://public/google/drive/url
+- make sure the wuct@clive.io user is enabled and has a password (in the Authentication page in Firebase)
