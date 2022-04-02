@@ -83,7 +83,7 @@
     window.scores = [];
     
     function addTeam(){
-        var newid = parseInt(document.getElementById('newid').value);
+        var newid = parseIntFull(document.getElementById('newid').value);
         if(!isNaN(newid)) {
           var newname = document.getElementById('newname').value;
           if(newname) fb.child('teams').child(newid).child("name").set(newname);
@@ -119,7 +119,7 @@
         return false;
     }
     function deleteTeam(newid){
-      newid = parseInt(newid);
+      newid = parseIntFull(newid);
       if(!isNaN(newid)){
         if (confirm("This will permanently delete team "+newid+" and all of its scores and answers. Are you sure?")){
           fb.child('teams').child(newid).remove();

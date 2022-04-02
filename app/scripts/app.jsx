@@ -301,7 +301,7 @@ class TeamCardSet extends React.Component {
               <div><span>1</span><textarea id="q1" disabled></textarea></div>
               <div><span>2</span><textarea id="q2" disabled></textarea></div>
               <div><span>3</span><textarea id="q3" disabled></textarea></div>
-              Score: <input type="text" id="score" style="border:solid 1px black" /><button id="scoresubmit">Submit</button><button id="scorecancel">Back</button>
+              <div id="score-wrapper">Score out of 3:<br/><input type="text" id="score" style="border:solid 1px black" /><button id="scoresubmit">Submit</button><button id="scorecancel">Back</button></div>
             </div>
           </div>
         </div>
@@ -352,7 +352,8 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
           document.getElementById("scoresubmit").onclick = null;
         }
         document.getElementById("scoresubmit").onclick = function(e) {
-          var score = parseInt(document.getElementById("score").value);
+          var score = parseIntFull(document.getElementById("score").value);
+          console.log(document.getElementById("score").value);
           if(!(score == 0 || score == 1 || score == 2 || score == 3))
             alertFailure("Invalid score - must be 0, 1, 2, or 3");
           else {
@@ -367,6 +368,7 @@ window.renderSide = function(e, id, teamname, pc, d, n, successCallback) {
           e.preventDefault();
           return false;
         }
+        document.getElementById("score").focus();
       });
     }
   });

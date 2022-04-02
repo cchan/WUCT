@@ -108,6 +108,17 @@ connectedRef.on("value", function(snap) {
   }
 });
 
+// A better parseInt from https://stackoverflow.com/a/4168683
+function parseIntFull(x) {
+  if ( typeof x === "string" && /^\s*(\+|-)?\d+\s*$/.test(x) ) {
+      x = Number(x);
+  }
+  if ( typeof x === "number" ) {
+      return x === Math.floor(x) ? x : NaN;
+  }
+  return NaN;
+}
+
 
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
