@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1648873539431"></script>
+  <script src="common.min.js?1648874560625"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1648873539431" />
+  <link rel="stylesheet" href="main.css?1648874560625" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -50,6 +50,7 @@
     <div id="liveboxes"></div>
 
     <h2>Question Links</h2>
+    <p>Add all the question links here. Highly recommend either PDF Google Drive links, or File > Publish to the Web > Publish for Google Docs. Definitely don't make the docs editable.</p>
     <table id="questions"></table>
 
     <h2>Copyable Scoreboard Table&nbsp;<sup id="scoreboard-updated"><small>[update&nbsp;flasher]</small></sup></h2>
@@ -175,28 +176,41 @@
             }
             for(var i = 0; i < window.numPacketsDict[difficultyLevel]; i++) {
               (function(difficultyLevel, i){
-              $('#questions').append(
-                $('<tr>').append(
-                  difficultyLevel + " " + (i+1) + ": "
-                ).append(
-                  $("<td>").append(
-                    $("<input type='text' id='questions-"+difficultyLevel+"-"+i+"'/>").val(questions[difficultyLevel][i]).change(function(e){
-                      fb.child('questions').child(difficultyLevel).child(i).set(e.target.value).then(function(){
-                        setTimeout(function(){flashGreen(document.getElementById("questions-"+difficultyLevel+"-"+i));});
-                      });
-                    })
+                $('#questions').append(
+                  $('<tr>').append(
+                    $("<span>").append(
+                      difficultyLevel + " " + (i+1) + ": "
+                    )
+                  ).append(
+                    $("<td>").append(
+                      $("<input type='text' id='questions-"+difficultyLevel+"-"+i+"'/>").val(questions[difficultyLevel][i]).change(function(e){
+                        fb.child('questions').child(difficultyLevel).child(i).set(e.target.value).then(function(){
+                          setTimeout(function(){flashGreen(document.getElementById("questions-"+difficultyLevel+"-"+i));});
+                        });
+                      })
+                    )
+                  ).append(
+                    $("<td>").append(
+                      $("<input type='text' id='answerkeys-"+difficultyLevel+"-"+i+"'/>").val(answerkeys[difficultyLevel][i]).change(function(e){
+                        console.log(e.target.value);
+                        fb.child('ak').child(difficultyLevel).child(i).set(e.target.value).then(function(){
+                          setTimeout(function(){flashGreen(document.getElementById("answerkeys-"+difficultyLevel+"-"+i));});
+                        });
+                      })
+                    )
                   )
-                ).append(
-                  $("<td>").append(
-                    $("<input type='text' id='answerkeys-"+difficultyLevel+"-"+i+"'/>").val(answerkeys[difficultyLevel][i]).change(function(e){
-                      console.log(e.target.value);
-                      fb.child('ak').child(difficultyLevel).child(i).set(e.target.value).then(function(){
-                        setTimeout(function(){flashGreen(document.getElementById("answerkeys-"+difficultyLevel+"-"+i));});
-                      });
-                    })
-                  )
-                )
-              );})(difficultyLevel, i);
+                );
+                fb.child('questions').child(difficultyLevel).child(i).on('value', function(snapshot){
+                  var url = snapshot.val();
+                  $("#questions-"+difficultyLevel+"-"+i).val(url);
+                  flashGreen(document.getElementById("questions-"+difficultyLevel+"-"+i));
+                });
+                fb.child('ak').child(difficultyLevel).child(i).on('value', function(snapshot){
+                  var url = snapshot.val();
+                  $("#answerkeys-"+difficultyLevel+"-"+i).val(url);
+                  flashGreen(document.getElementById("answerkeys-"+difficultyLevel+"-"+i));
+                });
+              })(difficultyLevel, i);
             }
           }
         })
@@ -489,6 +503,12 @@
     }
     .scorebox, .scorebox.plus {
       font-size: 0.5em;
+    }
+    #questions span {
+      font-size: 1.2em;
+    }
+    #questions input {
+      width: 20em;
     }
   </style>
 </body>
