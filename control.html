@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1648850842316"></script>
+  <script src="common.min.js?1648872459504"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1648850842316" />
+  <link rel="stylesheet" href="main.css?1648872459504" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -35,7 +35,7 @@
     <h2>Active Scoring Stations <sup><small><a href="https://github.com/cchan/WUCT/issues">beta</a></small></sup></h2>
     <p>This tracks all currently active scoring stations and all teams that they are tracking. Scoring stations may identify themselves using the Identifier textbox in the scoring page header. Use the 'x' to remove stray scoring stations (which forces them to log out).</p>
     <div id="stations"></div>
-    
+
     <h2>Teams</h2>
     <p>Note that changing a team's passcode locks them out immediately (and confuses their browser a bit).</p>
     <input type="text" placeholder="id" id="newid" />
@@ -48,6 +48,9 @@
 
     <h2>Live Scoreboard Boxes</h2>
     <div id="liveboxes"></div>
+
+    <h2>Question Links</h2>
+    <table id="questions"></table>
 
     <h2>Copyable Scoreboard Table&nbsp;<sup id="scoreboard-updated"><small>[update&nbsp;flasher]</small></sup></h2>
     <p>Right click > Copy.</p>
@@ -151,6 +154,54 @@
             });
           })(id);
     }
+
+    function renderQuestions(){
+      $('#questions').html('');
+      $('#questions').append('<tr><th>Question</th><th>Question Link</th><th>Answer Key Link</th></tR>');
+      fb.child('questions').once('value', function(snapshot) {
+        var questions = snapshot.val();
+        fb.child('ak').once('value', function(snapshot) {
+          var answerkeys = snapshot.val();
+
+          for(var difficultyLevel in window.numPacketsDict) {
+            if(typeof answerkeys[difficultyLevel] == "string") {
+              // It used to be the case that there was only one answer key pdf for the whole thing.
+              var origValue = answerkeys[difficultyLevel];
+              answerkeys[difficultyLevel] = {}
+              for(var i = 0; i < window.numPacketsDict[difficultyLevel]; i++) {
+                answerkeys[difficultyLevel][i] = origValue;
+              }
+              fb.child('ak').child(difficultyLevel).set(answerkeys[difficultyLevel]);
+            }
+            for(var i = 0; i < window.numPacketsDict[difficultyLevel]; i++) {
+              (function(difficultyLevel, i){
+              $('#questions').append(
+                $('<tr>').append(
+                  difficultyLevel + " " + (i+1) + ": "
+                ).append(
+                  $("<td>").append(
+                    $("<input type='text' id='questions-"+difficultyLevel+"-"+i+"'/>").val(questions[difficultyLevel][i]).change(function(e){
+                      fb.child('questions').child(difficultyLevel).child(i).set(e.target.value).then(function(){
+                        setTimeout(function(){flashGreen(document.getElementById("questions-"+difficultyLevel+"-"+i));});
+                      });
+                    })
+                  )
+                ).append(
+                  $("<td>").append(
+                    $("<input type='text' id='answerkeys-"+difficultyLevel+"-"+i+"'/>").val(answerkeys[difficultyLevel][i]).change(function(e){
+                      console.log(e.target.value);
+                      fb.child('ak').child(difficultyLevel).child(i).set(e.target.value).then(function(){
+                        setTimeout(function(){flashGreen(document.getElementById("answerkeys-"+difficultyLevel+"-"+i));});
+                      });
+                    })
+                  )
+                )
+              );})(difficultyLevel, i);
+            }
+          }
+        })
+      })
+    }
     
     function setTimerMins(mins) {
       fb.child('timer').child('target').set(mins * 60 * 1000 + (new Date()).getTime()).then(function(){
@@ -218,6 +269,7 @@
         fb.child("users").once('value', updateStations);
         renderTeams();
         renderTable();
+        renderQuestions();
         flashGreen(document.getElementById("teamlist"));
         flashGreen(document.getElementById("scoreboard-updated"));
       });
