@@ -165,7 +165,7 @@ class TeamCard extends React.Component {
     };
     
     var difficultySections;
-    if(this.state.teamName != null && this.state.passcode != null)
+    if(this.state.teamName != null)
       difficultySections = 
         <div>
           <DifficultySection difficulty="0" teamId={this.props.teamId} teamName={this.state.teamName} passcode={this.state.passcode}/>
