@@ -46,7 +46,9 @@ class DifficultySection extends React.Component {
     this.ref = fb.child('scores')
       .child('team'+this.props.teamId)
       .child(window.dClass[this.props.difficulty]);
-    this.ref2 = fb.child("answers").child(this.props.teamId).child(this.props.passcode).child(dClass[this.props.difficulty]);
+    if(this.props.passcode !== null) {
+      this.ref2 = fb.child("answers").child(this.props.teamId).child(this.props.passcode).child(dClass[this.props.difficulty]);
+    }
   }
   componentDidMount(){
     this.ref.once('value', function(snapshot){
@@ -65,15 +67,17 @@ class DifficultySection extends React.Component {
         this.setState({scores: snapshot.val()});
     }.bind(this));
 
-    this.ref2.on('value', function(snapshot){
-      var submitted = new Array(numPackets[this.props.difficulty]).fill(false);
-      var answers = snapshot.val();
-      if(answers)
-        for(var i = 0; i < answers.length; i++)
-          if(answers[i].submit)
-            submitted[i] = true;
-      this.setState({submitted: submitted});
-    }.bind(this));
+    if(this.props.passcode !== null) {
+      this.ref2.on('value', function(snapshot){
+        var submitted = new Array(numPackets[this.props.difficulty]).fill(false);
+        var answers = snapshot.val();
+        if(answers)
+          for(var i = 0; i < answers.length; i++)
+            if(answers[i].submit)
+              submitted[i] = true;
+        this.setState({submitted: submitted});
+      }.bind(this));
+    }
   }
   componentWillUnmount(){
     this.ref.off('value');
