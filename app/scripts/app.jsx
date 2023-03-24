@@ -96,11 +96,16 @@ class DifficultySection extends React.Component {
     this.setState({currentQuestion: this.state.currentQuestion + 1});
   }
   render() {
+    var scoreBtn;
+    if(this.props.passcode !== null)
+      scoreBtn = <h3><button disabled={!this.state.submitted[this.state.currentQuestion]} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.teamName, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>;
+    else
+      scoreBtn = <h3>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</h3>
     return (
       <span className={"difficulty "+dClass[this.props.difficulty]}>
         <Button className="back" onClick={this.back.bind(this)} disabled={this.state.currentQuestion <= 0}>&lt;</Button>
         <Button className="next" onClick={this.next.bind(this)} disabled={this.state.currentQuestion >= numPackets[this.props.difficulty] - 1 || this.state.scores[this.state.currentQuestion] == -1}>&gt;</Button>
-        <h3><button disabled={!this.state.submitted[this.state.currentQuestion]} onclick={/**/e=>window.renderSide(e, this.props.teamId, this.props.teamName, this.props.passcode, this.props.difficulty, this.state.currentQuestion, this.next.bind(this))}>{dTitle[this.props.difficulty]} {this.state.currentQuestion+1}</button></h3>
+        {scoreBtn}
         <RadioBtnGroup selected={this.state.scores[this.state.currentQuestion]} scoreHandler={this.scoreHandler.bind(this)} xdisabled={this.state.currentQuestion < numPackets[this.props.difficulty] - 1 && this.state.scores[this.state.currentQuestion + 1] != -1} />
       </span>
     );
