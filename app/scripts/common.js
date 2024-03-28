@@ -1,14 +1,14 @@
 // note the the number of difficulty classes is fixed at 3, for now
 window.dClass = ["easy", "medium", "hard"];
 window.dTitle = ["Easy", "Med", "Hard"];
-window.numPackets = [22, 14, 10];
-window.numPacketsDict = {"easy": 22, "medium": 14, "hard": 10};
+window.numPackets = [20, 13, 10];
+window.numPacketsDict = {"easy": 20, "medium": 13, "hard": 10};
 window.scoreValues = [1, 3, 7];
 
 if(window.location.hostname == 'wuct.clive.io')
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2023';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2024';
 else if (window.location.hostname == 'localhost' && window.location.port == 8849)
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2023';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2024';
 else
   throw new Error();
 console.log(window.dbName);
