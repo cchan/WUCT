@@ -1,8 +1,8 @@
 // note the the number of difficulty classes is fixed at 3, for now
 window.dClass = ["easy", "medium", "hard"];
 window.dTitle = ["Easy", "Med", "Hard"];
-window.numPackets = [20, 13, 10];
-window.numPacketsDict = {"easy": 20, "medium": 13, "hard": 10};
+window.numPackets = [21, 14, 9];
+window.numPacketsDict = {"easy": 21, "medium": 14, "hard": 9};
 window.scoreValues = [1, 3, 7];
 
 if(window.location.hostname == 'wuct.clive.io')
