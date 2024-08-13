@@ -6,9 +6,9 @@ window.numPacketsDict = {"easy": 21, "medium": 14, "hard": 9};
 window.scoreValues = [1, 3, 7];
 
 if(window.location.hostname == 'wuct.clive.io')
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2024';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2024china';
 else if (window.location.hostname == 'localhost' && window.location.port == 8849)
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2024';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2024china';
 else
   throw new Error();
 console.log(window.dbName);
