@@ -1,14 +1,20 @@
-// note the the number of difficulty classes is fixed at 3, for now
+// =================== CONFIG ===================
+// Each year, update the year_tag and packet numbers here.
+// When you update year_tag, you also need to update all 6 instances of the tag in
+// the security rule (Realtime Database > Rules) in Firebase.
+// Also, note that the number of difficulty classes is fixed at 3, for now.
+const year_tag = "wuct2026"
 window.dClass = ["easy", "medium", "hard"];
 window.dTitle = ["Easy", "Med", "Hard"];
 window.numPackets = [21, 15, 13];
 window.numPacketsDict = {"easy": 21, "medium": 15, "hard": 13};
 window.scoreValues = [1, 3, 7];
+// ==============================================
 
 if(window.location.hostname == 'wuct.clive.io')
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2024china';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || year_tag;
 else if (window.location.hostname == 'localhost' && window.location.port == 8849)
-  window.dbName = new URLSearchParams(window.location.search).get("db") || 'wuct2024china';
+  window.dbName = new URLSearchParams(window.location.search).get("db") || year_tag;
 else
   throw new Error();
 console.log(window.dbName);
