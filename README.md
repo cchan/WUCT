@@ -20,7 +20,9 @@ Need to get in touch? Reach out at cc@clive.io.
 - https://wuct.clive.io/?db=wuct2022 (was held online!)
 - 2023 was held, but the organizing team cleared the data before archival.
 - https://wuct.clive.io/?db=wuct2024
+- A WUCT 2024 China was apparently held, but I'm not sure where the data went or if there was a Breaking Bonds round.
 - https://wuct.clive.io/?db=wuct2025
+- https://wuct.clive.io/?db=wuct2025china
 
 ## How to use as an organizer
 - Make sure somebody with GitHub access initializes a new competition year, see below.
