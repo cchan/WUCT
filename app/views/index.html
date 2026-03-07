@@ -116,6 +116,24 @@
   <script>
     window.teamNames = {};
     window.scores = {};
+    window.uniqueDivisions = [window.defaultDivision];
+    function getUniqueDivisions() {
+      window.uniqueDivisions = [];
+      for (let teamId in window.teamNames) {
+        if (window.teamNames[teamId].hasOwnProperty("division")) {
+          if (!window.uniqueDivisions.includes(window.teamNames[teamId].division)) {
+            window.uniqueDivisions.push(window.teamNames[teamId].division);
+          }
+        } else {
+          if (!window.uniqueDivisions.includes(window.defaultDivision)) {
+            window.uniqueDivisions.push(window.defaultDivision);
+          }
+        }
+      }
+      if (window.uniqueDivisions.length === 0) {
+        window.uniqueDivisions = [window.defaultDivision];
+      }
+    }
     
     fb.child('timer').once('value', function(snapshot){
       if(Math.floor((snapshot.val().target - (new Date()).getTime())/1000) < snapshot.val().hidetime * 60){
@@ -125,12 +143,12 @@
       
       fb.child('teams').on('value', function(snapshot){
         window.teamNames = snapshot.val();
-        window.uniqueDivisions = ["A", "B"]; // todo
-        console.log(window.teamNames);
+        getUniqueDivisions();
         render();
       });
       
       fb.child('scores').on('value', function(snapshot){
+        getUniqueDivisions();
         window.scores = {};
         for (division of window.uniqueDivisions) {
           window.scores[division] = [];
@@ -144,7 +162,9 @@
             if(window.teamNames[id] === undefined) {
               continue;
             }
-            const division = window.teamNames[id].division ?? window.uniqueDivisions[Math.floor(Math.random()*2)];
+            const division = window.teamNames[id].division ?? (
+              window.uniqueDivisions.length > 0 ? window.uniqueDivisions[0] : window.defaultDivision
+            );
             window.scores[division].push({id: teamId, score: score, progress: progress});
           }
         }
