@@ -1,17 +1,17 @@
 //based on http://egorsmirnov.me/2015/05/22/react-and-es6-part1.html
 
-const gulp =        require('gulp');
+const gulp = require('gulp');
 const browserSync = require('browser-sync').create();
-const sourcemaps =  require('gulp-sourcemaps');
-const rename =      require('gulp-rename');
+const sourcemaps = require('gulp-sourcemaps');
+const rename = require('gulp-rename');
 
 gulp.task('build-jsx', function () {
-  const rollup =   require('gulp-better-rollup');
-  const babel =    require('rollup-plugin-babel');
-  const resolve =  require('rollup-plugin-node-resolve');
+  const rollup = require('gulp-better-rollup');
+  const babel = require('rollup-plugin-babel');
+  const resolve = require('rollup-plugin-node-resolve');
   const commonjs = require('rollup-plugin-commonjs');
-  const replace =  require('rollup-plugin-replace');
-  const terser =   require('gulp-terser');
+  const replace = require('rollup-plugin-replace');
+  const terser = require('gulp-terser');
   const alias = aliases => ({
     resolveId(importee) {
       const alias = aliases[importee];
@@ -62,19 +62,19 @@ gulp.task('build-js', function () {
 gulp.task('build-html', function () {
   const template = require('gulp-template');
   return gulp.src('app/views/*.html')
-    .pipe(template({timestamp: new Date().getTime()}))
+    .pipe(template({ timestamp: new Date().getTime() }))
     .pipe(gulp.dest('dist'))
     .pipe(browserSync.stream());
 });
 
-gulp.task('build-sass', function() {
-  const sass =         require('gulp-sass');
+gulp.task('build-sass', function () {
+  const sass = require('gulp-sass')(require('sass'));
   const autoprefixer = require('gulp-autoprefixer');
   // const purify =       require('gulp-purifycss');
-  const uglify =       require('gulp-uglifycss');
+  const uglify = require('gulp-uglifycss');
   return gulp.src('app/styles/*.sass')
     .pipe(sourcemaps.init())
-    .pipe(sass({outputStyle:'compressed'}))
+    .pipe(sass({ outputStyle: 'compressed' }))
     .pipe(autoprefixer())
     // .pipe(purify(['./build/**.html', './dist/**.js']))
     .pipe(uglify())
@@ -83,12 +83,12 @@ gulp.task('build-sass', function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task('watch-jsx', gulp.series('build-jsx', function(done) {
+gulp.task('watch-jsx', gulp.series('build-jsx', function (done) {
   browserSync.reload();
   done();
 }));
 
-gulp.task('build-static', function(){
+gulp.task('build-static', function () {
   return gulp.src('app/static/*')
     .pipe(gulp.dest('dist'))
     .pipe(browserSync.stream());
@@ -112,7 +112,7 @@ gulp.task('watch', gulp.series('build', function (done) {
     ghostMode: false
   });
   gulp.watch('app/scripts/*.jsx', gulp.series('watch-jsx'));
-  gulp.watch('app/views/*.html', gulp.series('build-html')).on('change', function(){setTimeout(browserSync.reload,500);});
+  gulp.watch('app/views/*.html', gulp.series('build-html')).on('change', function () { setTimeout(browserSync.reload, 500); });
   gulp.watch('app/styles/*.sass', gulp.series('build-sass'));
   gulp.watch('app/static/*', gulp.series('build-static'));
   done();
