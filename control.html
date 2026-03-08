@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1766505336420"></script>
+  <script src="common.min.js?1772992324775"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1766505336420" />
+  <link rel="stylesheet" href="main.css?1772992324775" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -41,6 +41,14 @@
     <input type="text" placeholder="id" id="newid" />
     <input type="text" placeholder="new name" id="newname" />
     <input type="text" placeholder="new passcode" id="newpasscode" />
+
+    <div>
+      <label for="newdivision">Enter Division:</label>
+      <input type="text" placeholder="new division" id="newdivision" />
+      <label for="divisionSelect">Existing Divisions:</label>
+      <select id="divisionSelect"></select>
+    </div>
+    
     <input type="submit" onclick="document.getElementById('newpasscode').value=Math.random().toString().slice(2,7); return false;" value="Random Passcode">
     <input type="submit" value="Add/Update" onclick="addTeam();" />
     
@@ -81,12 +89,47 @@
     
     window.teamNames = {};
     window.scores = [];
+    window.uniqueDivisions = [window.defaultDivision];
+    function getUniqueDivisions() {
+      window.uniqueDivisions = [];
+      for (let teamId in window.teamNames) {
+        if (window.teamNames[teamId].hasOwnProperty("division")) {
+          if (!window.uniqueDivisions.includes(window.teamNames[teamId].division)) {
+            window.uniqueDivisions.push(window.teamNames[teamId].division);
+          }
+        } else {
+          if (!window.uniqueDivisions.includes(window.defaultDivision)) {
+            window.uniqueDivisions.push(window.defaultDivision);
+          }
+        }
+      }
+      if (window.uniqueDivisions.length === 0) {
+        window.uniqueDivisions = [window.defaultDivision];
+      }
+      // update division select
+      document.getElementById('divisionSelect').innerHTML = "";
+      for (const division of window.uniqueDivisions) {
+        const option = document.createElement('option');
+        option.value = division;
+        option.textContent = division;
+        document.getElementById('divisionSelect').appendChild(option);
+      }
+      setDefaultDivision();
+    }
+    function setDefaultDivision() {
+      document.getElementById('newdivision').value = window.uniqueDivisions[0];
+    }
+    document.getElementById('divisionSelect').addEventListener('change', function() {
+      document.getElementById('newdivision').value = this.value;
+    });
     
     function addTeam(){
         var newid = parseIntFull(document.getElementById('newid').value);
         if(!isNaN(newid)) {
           var newname = document.getElementById('newname').value;
           if(newname) fb.child('teams').child(newid).child("name").set(newname);
+          const newdivision = document.getElementById('newdivision').value;
+          if(newdivision) fb.child('teams').child(newid).child("division").set(newdivision);
           var newpasscode = document.getElementById('newpasscode').value;
           fb.child('scores').child("team"+newid).once('value', function(snapshot) {
             if(!snapshot.val()) {
@@ -102,7 +145,7 @@
               var old = {"created": ""+new Date()};
               if(obj && Object.keys(obj).length)
                 old = obj[Object.keys(obj)[0]];
-              console.log(old);
+              // console.log(old);
 
               fb.child('answers').child(newid).set({[newpasscode]: old}).then(function(){
                 renderTeams();
@@ -112,6 +155,7 @@
           }
           document.getElementById('newid').value = '';
           document.getElementById('newname').value = '';
+          setDefaultDivision();
           document.getElementById('newpasscode').value = '';
         } else {
           alertFailure("Invalid team ID");
@@ -134,15 +178,22 @@
     
     function renderTeams(){
       $('#teamlist').html('');
-      for(var id in teamNames)
-        if(teamNames.hasOwnProperty(id) && teamNames[id])
+      getUniqueDivisions();
+      for (let division of window.uniqueDivisions) {
+        $('#teamlist').append(
+          $('<div>').attr('id', 'division-' + division).append($('<h2>').text("Division " + division))
+        );
+      }
+      for(var id in teamNames) {
+        if(teamNames.hasOwnProperty(id) && teamNames[id]) {
           (function(id){
             fb.child('answers').child(id).once('value', function(snapshot) {
               var obj = snapshot.val();
               var passcode = null;
               if(obj && Object.keys(obj).length)
                 passcode = Object.keys(obj)[0];
-              $('#teamlist').append(
+              const division = window.teamNames[id]?.division ?? window.defaultDivision;
+              $('#division-' + division).append(
                 $('<div>').append(
                   $('<button class="removeBtn">&#x2715;</button>')
                   .click(function(e){
@@ -154,6 +205,8 @@
               );
             });
           })(id);
+        }
+      }
     }
 
     function renderQuestions(){
@@ -163,6 +216,10 @@
         var questions = snapshot.val();
         fb.child('ak').once('value', function(snapshot) {
           var answerkeys = snapshot.val();
+          // give up when answerkeys is blank
+          if (!answerkeys) {
+            return;
+          }
 
           for(var difficultyLevel in window.numPacketsDict) {
             if(typeof answerkeys[difficultyLevel] == "string") {
@@ -192,7 +249,7 @@
                   ).append(
                     $("<td>").append(
                       $("<input type='text' id='answerkeys-"+difficultyLevel+"-"+i+"'/>").val(answerkeys[difficultyLevel][i]).change(function(e){
-                        console.log(e.target.value);
+                        // console.log(e.target.value);
                         fb.child('ak').child(difficultyLevel).child(i).set(e.target.value).then(function(){
                           setTimeout(function(){flashGreen(document.getElementById("answerkeys-"+difficultyLevel+"-"+i));});
                         });
@@ -277,29 +334,49 @@
       });
     }());
     
+    window.debounceId = null;
     (function(){
       fb.child('teams').on('value', function(snapshot){
         teamNames = snapshot.val();
         fb.child("users").once('value', updateStations);
-        renderTeams();
-        renderTable();
-        renderQuestions();
-        flashGreen(document.getElementById("teamlist"));
-        flashGreen(document.getElementById("scoreboard-updated"));
+        // debounce: prevent race conditions of multiple updates
+        if (window.debounceId) {
+          clearTimeout(window.debounceId);
+        }
+        window.debounceId = setTimeout(() => {
+          renderTeams();
+          renderTable();
+          renderQuestions();
+          flashGreen(document.getElementById("teamlist"));
+          flashGreen(document.getElementById("scoreboard-updated"));
+        }, 100);
       });
       
       fb.child('scores').on('value', function(snapshot){
-        scores = [];
+        getUniqueDivisions();
+        window.scores = {};
+        for (let division of window.uniqueDivisions) {
+          window.scores[division] = [];
+        }
         var teams = snapshot.val();
         for(var teamId in teams){
           if(teams.hasOwnProperty(teamId)){
             var score = window.getScore(teams[teamId]);
             var progress = window.getProgress(teams[teamId]);
-            scores.push({id: teamId, score: score, progress: progress});
+            var id = parseInt(teamId.slice(4));
+            if(window.teamNames[id] === undefined) {
+              continue;
+            }
+            const division = window.teamNames[id].division ?? (
+              window.uniqueDivisions.length > 0 ? window.uniqueDivisions[0] : window.defaultDivision
+            );
+            window.scores[division].push({id: teamId, score: score, progress: progress});
           }
         }
-        scores.sort(function(a,b){return b.score - a.score;});
-        console.log("!!", scores)
+        for (let division of window.uniqueDivisions) {
+          window.scores[division].sort(function(a,b){return b.score - a.score;});
+        }
+        // console.log("!!", scores)
         renderTable();
         flashGreen(document.getElementById("scoreboard-updated"));
       });
@@ -320,27 +397,37 @@
       // });
       
       function renderTable(){
-        var s = "<tr><th>Rank</th><th>Team ID</th><th>Team Name</th><th>Total Score</th>"
+        var s = "<tr><th>Division</th><th>Rank</th><th>Team ID</th><th>Team Name</th><th>Total Score</th>"
                +"<th>Submitted "+window.dTitle[0]+" packets (of "+window.numPackets[0]+" total)</th>"
                +"<th>Submitted "+window.dTitle[1]+" packets (of "+window.numPackets[1]+" total)</th>"
                +"<th>Submitted "+window.dTitle[2]+" packets (of "+window.numPackets[2]+" total)</th>"
                +"</tr>";
-        var prevRank = 0;
-        console.log("??", scores)
-        for(let i = 0; i < scores.length; i++){
-          console.log(teamNames);
-          if(teamNames[parseInt(scores[i].id.slice(4))] === undefined)
+        for (let division of window.uniqueDivisions) {
+          let prevRank = 0;
+          let scores = window.scores[division];
+          if (!scores) {
             continue;
-          if(i > 0 && scores[i].score != scores[i-1].score)
-            prevRank = i;
-          
-          s += "<tr><td>" + (prevRank + 1) + "</td><td>"+scores[i].id.slice(4)+"</td><td>" + teamNames[parseInt(scores[i].id.slice(4))].name + "</td><td>" + scores[i].score + "</td>";
-          s += "<td>"+(scores[i].progress[0]*window.numPackets[0])+"</td>";
-          s += "<td>"+(scores[i].progress[1]*window.numPackets[1])+"</td>";
-          s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
-          s += "</tr>";
+          }
+          // console.log("??", scores)
+          for(let i = 0; i < scores.length; i++){
+            // console.log(teamNames);
+            if(teamNames[parseInt(scores[i].id.slice(4))] === undefined)
+              continue;
+            const division = teamNames[parseInt(scores[i].id.slice(4))].division ?? (
+              window.uniqueDivisions.length > 0 ? window.uniqueDivisions[0] : window.defaultDivision
+            );
+            if(i > 0 && scores[i].score != scores[i-1].score)
+              prevRank = i;
+            
+            s += "<tr><td>" + division + "</td><td>" + (prevRank + 1) + "</td><td>"+scores[i].id.slice(4)+"</td><td>" + teamNames[parseInt(scores[i].id.slice(4))].name + "</td><td>" + scores[i].score + "</td>";
+            s += "<td>"+(scores[i].progress[0]*window.numPackets[0])+"</td>";
+            s += "<td>"+(scores[i].progress[1]*window.numPackets[1])+"</td>";
+            s += "<td>"+(scores[i].progress[2]*window.numPackets[2])+"</td>";
+            s += "</tr>";
+          }
         }
-        console.log(s)
+        
+        // console.log(s)
         document.getElementById('scoreboard').innerHTML = "<table id='clickselectall' readonly='readonly' contenteditable>" + s + "</table>";
 
         document.querySelector('#clickselectall').onfocus = function(e) {
@@ -411,7 +498,7 @@
               tracking.forEach(x => allTracked.add(parseInt(x)));
             })(u);
       }
-      console.log(window.teamNames)
+      // console.log(window.teamNames)
       $('#stations').append($("<div>").append("<b>Untracked teams:</b> ")
       .append(Object.keys(window.teamNames).map(x=>parseInt(x)).filter(x => !allTracked.has(x)).map(t=>
                         $('<span class="teamid">').text(t)
