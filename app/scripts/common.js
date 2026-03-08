@@ -9,6 +9,7 @@ window.dTitle = ["Easy", "Med", "Hard"];
 window.numPackets = [21, 15, 13];
 window.numPacketsDict = {"easy": 21, "medium": 15, "hard": 13};
 window.scoreValues = [1, 3, 7];
+window.defaultDivision = "A";
 // ==============================================
 
 if(window.location.hostname == 'wuct.clive.io')

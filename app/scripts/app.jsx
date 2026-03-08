@@ -81,7 +81,10 @@ class DifficultySection extends React.Component {
   }
   componentWillUnmount(){
     this.ref.off('value');
-    this.ref2.off('value');
+    // only turn off if it was initialized
+    if (this.ref2) {
+      this.ref2.off('value');
+    }
   }
   scoreHandler(selected){
     var newScores = this.state.scores;

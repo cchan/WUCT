@@ -115,7 +115,25 @@
   
   <script>
     window.teamNames = {};
-    window.scores = [];
+    window.scores = {};
+    window.uniqueDivisions = [window.defaultDivision];
+    function getUniqueDivisions() {
+      window.uniqueDivisions = [];
+      for (let teamId in window.teamNames) {
+        if (window.teamNames[teamId].hasOwnProperty("division")) {
+          if (!window.uniqueDivisions.includes(window.teamNames[teamId].division)) {
+            window.uniqueDivisions.push(window.teamNames[teamId].division);
+          }
+        } else {
+          if (!window.uniqueDivisions.includes(window.defaultDivision)) {
+            window.uniqueDivisions.push(window.defaultDivision);
+          }
+        }
+      }
+      if (window.uniqueDivisions.length === 0) {
+        window.uniqueDivisions = [window.defaultDivision];
+      }
+    }
     
     fb.child('timer').once('value', function(snapshot){
       if(Math.floor((snapshot.val().target - (new Date()).getTime())/1000) < snapshot.val().hidetime * 60){
@@ -125,40 +143,62 @@
       
       fb.child('teams').on('value', function(snapshot){
         window.teamNames = snapshot.val();
+        getUniqueDivisions();
         render();
       });
       
       fb.child('scores').on('value', function(snapshot){
-        window.scores = [];
+        getUniqueDivisions();
+        window.scores = {};
+        for (division of window.uniqueDivisions) {
+          window.scores[division] = [];
+        }
         var teams = snapshot.val();
         for(var teamId in teams){
           if(teams.hasOwnProperty(teamId)){
             var score = window.getScore(teams[teamId]);
             var progress = window.getProgress(teams[teamId]);
-            window.scores.push({id: teamId, score: score, progress: progress});
+            var id = teamId.slice(4);
+            if(window.teamNames[id] === undefined) {
+              continue;
+            }
+            const division = window.teamNames[id].division ?? (
+              window.uniqueDivisions.length > 0 ? window.uniqueDivisions[0] : window.defaultDivision
+            );
+            window.scores[division].push({id: teamId, score: score, progress: progress});
           }
         }
-        window.scores.sort(function(a,b){return b.score - a.score;});
+        for (division of window.uniqueDivisions) {
+          window.scores[division].sort(function(a,b){return b.score - a.score;});
+        }
         render();
       });
       
       function render(){
-        var s = "";
-        var prevRank = 0;
-        for(let i = 0; i < window.scores.length; i++){
-          var id = scores[i].id.slice(4);
-          if(window.teamNames[id] === undefined)
-            continue;
-          if(i > 0 && scores[i].score != scores[i-1].score)
-            prevRank = i;
-          
-          s += "<li>" + (prevRank + 1) + ". " + window.teamNames[id].name + "<span>" + scores[i].score + "</span><div></div>"
-          s += "<span class='progress easy' style='width:"+scores[i].progress[0]*33+"%'></span>"
-          s += "<span class='progress medium' style='width:"+scores[i].progress[1]*34+"%'></span>"
-          s += "<span class='progress hard' style='width:"+scores[i].progress[2]*33+"%'></span>"
-          s += "</li>";
+        let s_all_divisions = "";
+        for (division of window.uniqueDivisions) {
+          if (window.scores[division] == undefined) {
+            return;
+          }
+          var s = "";
+          var prevRank = 0;
+          for(let i = 0; i < window.scores[division].length; i++){
+            var id = scores[division][i].id.slice(4);
+            if(window.teamNames[id] === undefined)
+              continue;
+            if(i > 0 && scores[division][i].score != scores[division][i-1].score)
+              prevRank = i;
+            
+            s += "<li>" + (prevRank + 1) + ". " + window.teamNames[id].name + "<span>" + scores[division][i].score + "</span><div></div>"
+            s += "<span class='progress easy' style='width:"+scores[division][i].progress[0]*33+"%'></span>"
+            s += "<span class='progress medium' style='width:"+scores[division][i].progress[1]*34+"%'></span>"
+            s += "<span class='progress hard' style='width:"+scores[division][i].progress[2]*33+"%'></span>"
+            s += "</li>";
+          }
+          s_all_divisions += "<h2> Division " + division + "</h2><ol>" + s + "</ol>";
         }
-        document.getElementById('app').innerHTML = "<ol>" + s + "</ol>";
+        
+        document.getElementById('app').innerHTML = s_all_divisions;
       }
     });
     var hidetime;
