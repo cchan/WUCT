@@ -162,9 +162,7 @@
             if(window.teamNames[id] === undefined) {
               continue;
             }
-            const division = window.teamNames[id].division ?? (
-              window.uniqueDivisions.length > 0 ? window.uniqueDivisions[0] : window.defaultDivision
-            );
+            const division = window.teamNames[id].division ?? window.defaultDivision;
             window.scores[division].push({id: teamId, score: score, progress: progress});
           }
         }
