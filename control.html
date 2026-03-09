@@ -8,9 +8,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1772992324775"></script>
+  <script src="common.min.js?1773029336409"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1772992324775" />
+  <link rel="stylesheet" href="main.css?1773029336409" />
 </head>
 <body>
   <style>input[type=text]{border: solid 1px #ccc;}</style>
@@ -367,9 +367,7 @@
             if(window.teamNames[id] === undefined) {
               continue;
             }
-            const division = window.teamNames[id].division ?? (
-              window.uniqueDivisions.length > 0 ? window.uniqueDivisions[0] : window.defaultDivision
-            );
+            const division = window.teamNames[id].division ?? window.defaultDivision;
             window.scores[division].push({id: teamId, score: score, progress: progress});
           }
         }
@@ -413,9 +411,7 @@
             // console.log(teamNames);
             if(teamNames[parseInt(scores[i].id.slice(4))] === undefined)
               continue;
-            const division = teamNames[parseInt(scores[i].id.slice(4))].division ?? (
-              window.uniqueDivisions.length > 0 ? window.uniqueDivisions[0] : window.defaultDivision
-            );
+            const division = teamNames[parseInt(scores[i].id.slice(4))].division ?? window.defaultDivision;
             if(i > 0 && scores[i].score != scores[i-1].score)
               prevRank = i;
             
