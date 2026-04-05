@@ -3,7 +3,7 @@ WUCT
 
 [![License](https://img.shields.io/github/license/cchan/WUCT.svg)](https://github.com/cchan/WUCT/blob/master/LICENSE)
 
-The live scoring system for the in-person [Washington University Chemistry Tournament](https://wuct.wustl.edu/) Breaking Bonds Round.
+The live scoring system for the in-person [Washington University Chemistry Tournament](https://wuctwustl.org/) Breaking Bonds Round.
 
 There exists an online competition system as well in a branch in this repository, which was used for both WUCT and LMT ([Lexington Math Tournament](https://www.lhsmath.org/LMT/Home)) during COVID.
 
