@@ -9,9 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-database.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="common.min.js?1773029336409"></script>
+  <script src="common.min.js?1775425025820"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css?1773029336409" />
+  <link rel="stylesheet" href="main.css?1775425025820" />
 </head>
 <body>
   <header>
@@ -25,9 +25,25 @@
   
   <div id="timer"></div>
   
+  
   <!--span id="login-status"></span-->
   <div style="position:relative;">
-    <div id="app" style="position: absolute;"></div>
+    <div id="app" style="position: absolute;">
+      <div id="division-header" style="z-index: 9999; cursor: pointer;">
+        <u id="division-title"></u>
+        <span>
+          <button id="switch-division" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color: #255d38;">
+              <path d="M7 6c2-1.5 4.5-2 7-1.5 2.5.5 4.5 2 6 4" />
+              <path d="M20 5v5h-5" />
+              <path d="M17 18c-2 1.5-4.5 2-7 1.5-2.5-.5-4.5-2-6-4" />
+              <path d="M4 19v-5h5" />
+            </svg>
+          </button>
+        </span>
+      </div>
+      <div id="division-list"></div>
+    </div>
     <div id="hidden" style="position: absolute; margin-top: 1em;">Scores hidden for awards ceremony suspense :)</div>
   </div>
   <style>
@@ -105,11 +121,28 @@
       width: 1000px;
       left: 50%;
       margin-left: -500px;
-      font-size: 2em
+      font-size: 2em;
+      pointer-events: none;
     }
     #timer{
       font-size: 4em;
       height: 1em;
+    }
+    svg:hover {
+      transform: rotate(45deg);
+      transition: transform 0.2s ease-in-out;
+    }
+    #division-title {
+      color: #255d38;
+    }
+    #switch-division {
+      aspect-ratio: 1;
+      margin: 0.3em;
+      padding: 0;
+      border-radius: 20%;
+    }
+    #switch-division:hover {
+      background-color: #9e9c9cff;
     }
   </style>
   
@@ -117,6 +150,39 @@
     window.teamNames = {};
     window.scores = {};
     window.uniqueDivisions = [window.defaultDivision];
+    window.currentDivision = getCurrentDivision();
+    document.getElementById("switch-division").onclick = switchDivision;
+    const trigger = document.getElementById("division-header");
+    const switchBtn = document.getElementById("switch-division");
+    trigger.addEventListener('mouseenter', () => {
+      switchBtn.style.display = 'inline-block';
+    });
+    trigger.addEventListener('mouseleave', () => {
+      switchBtn.style.display = 'none';
+    });
+
+    function getCurrentDivision() {
+      const currentDivision = localStorage.getItem("currentDivision");
+      if (currentDivision) {
+        return currentDivision;
+      }
+      return window.uniqueDivisions[0];
+    }
+
+    function setCurrentDivision(currentDivision) {
+      localStorage.setItem("currentDivision", currentDivision);
+      window.currentDivision = currentDivision;
+    }
+
+    function switchDivision() {
+      const currentDivision = getCurrentDivision();
+      const uniqueDivisions = window.uniqueDivisions;
+      const currentIndex = uniqueDivisions.indexOf(currentDivision);
+      const nextIndex = (currentIndex + 1) % uniqueDivisions.length;
+      setCurrentDivision(uniqueDivisions[nextIndex]);
+      render();
+    }
+
     function getUniqueDivisions() {
       window.uniqueDivisions = [];
       for (let teamId in window.teamNames) {
@@ -132,6 +198,9 @@
       }
       if (window.uniqueDivisions.length === 0) {
         window.uniqueDivisions = [window.defaultDivision];
+      }
+      if (!window.uniqueDivisions.includes(window.currentDivision)) {
+        setCurrentDivision(window.uniqueDivisions[0]);
       }
     }
     
@@ -171,34 +240,30 @@
         }
         render();
       });
-      
-      function render(){
-        let s_all_divisions = "";
-        for (division of window.uniqueDivisions) {
-          if (window.scores[division] == undefined) {
-            return;
-          }
-          var s = "";
-          var prevRank = 0;
-          for(let i = 0; i < window.scores[division].length; i++){
-            var id = scores[division][i].id.slice(4);
-            if(window.teamNames[id] === undefined)
-              continue;
-            if(i > 0 && scores[division][i].score != scores[division][i-1].score)
-              prevRank = i;
-            
-            s += "<li>" + (prevRank + 1) + ". " + window.teamNames[id].name + "<span>" + scores[division][i].score + "</span><div></div>"
-            s += "<span class='progress easy' style='width:"+scores[division][i].progress[0]*33+"%'></span>"
-            s += "<span class='progress medium' style='width:"+scores[division][i].progress[1]*34+"%'></span>"
-            s += "<span class='progress hard' style='width:"+scores[division][i].progress[2]*33+"%'></span>"
-            s += "</li>";
-          }
-          s_all_divisions += "<h2> Division " + division + "</h2><ol>" + s + "</ol>";
-        }
-        
-        document.getElementById('app').innerHTML = s_all_divisions;
-      }
     });
+    function render(){
+      const division = window.currentDivision;
+      if (window.scores[division] == undefined) {
+        return;
+      }
+      var s = "";
+      var prevRank = 0;
+      for(let i = 0; i < window.scores[division].length; i++){
+        var id = scores[division][i].id.slice(4);
+        if(window.teamNames[id] === undefined)
+          continue;
+        if(i > 0 && scores[division][i].score != scores[division][i-1].score)
+          prevRank = i;
+        
+        s += "<li>" + (prevRank + 1) + ". " + window.teamNames[id].name + "<span>" + scores[division][i].score + "</span><div></div>"
+        s += "<span class='progress easy' style='width:"+scores[division][i].progress[0]*33+"%'></span>"
+        s += "<span class='progress medium' style='width:"+scores[division][i].progress[1]*34+"%'></span>"
+        s += "<span class='progress hard' style='width:"+scores[division][i].progress[2]*33+"%'></span>"
+        s += "</li>";
+      }
+      document.getElementById('division-title').innerHTML = "<h1>Division " + division + "</h1>";
+      document.getElementById('division-list').innerHTML = "<ol>" + s + "</ol>";
+    }
     var hidetime;
     fb.child('timer').child('hidetime').on('value', function(snapshot){hidetime = snapshot.val();});
     setTimer(document.getElementById("timer"), function(seconds){
